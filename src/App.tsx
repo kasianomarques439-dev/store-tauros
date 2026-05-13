@@ -1,213 +1,333 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import "./style.css";
 
 const DISCORD_LINK = "https://discord.gg/WPH5Xc58cm";
+const ADMIN_KEY = "admtauros";
 
 type Product = {
+  id: number;
   name: string;
+  subtitle: string;
   price: string;
-  type: string;
+  tag: string;
+  theme: string;
+  icon: string;
 };
+
+type Sale = {
+  id: string;
+  product: string;
+  price: string;
+  date: string;
+  status: string;
+};
+
+const products: Product[] = [
+  {
+    id: 1,
+    name: "100 Membros Mistos",
+    subtitle: "Membros mistos para Discord",
+    price: "R$ 2,00",
+    tag: "MAIS VENDIDO",
+    theme: "green",
+    icon: "👥",
+  },
+  {
+    id: 2,
+    name: "100 Membros Reais",
+    subtitle: "Membros reais e ativos",
+    price: "R$ 2,50",
+    tag: "POPULARES",
+    theme: "purple",
+    icon: "👑",
+  },
+  {
+    id: 3,
+    name: "500 Membros Discord",
+    subtitle: "Pacote para crescer rápido",
+    price: "R$ 6,50",
+    tag: "EM ALTA",
+    theme: "blue",
+    icon: "⚡",
+  },
+  {
+    id: 4,
+    name: "Designer de Servidor",
+    subtitle: "Design profissional",
+    price: "R$ 15,00",
+    tag: "DESIGNER",
+    theme: "cyan",
+    icon: "🎨",
+  },
+  {
+    id: 5,
+    name: "U100 Digital",
+    subtitle: "Códigos 100% originais",
+    price: "R$ 3,00",
+    tag: "NOVO",
+    theme: "gold",
+    icon: "U100",
+  },
+  {
+    id: 6,
+    name: "Pacote Completo",
+    subtitle: "Mais por menos",
+    price: "R$ 20,00",
+    tag: "PACOTES",
+    theme: "teal",
+    icon: "📦",
+  },
+];
+
+const defaultSales: Sale[] = [
+  { id: "T-1001", product: "100 Membros Mistos", price: "R$ 2,00", date: "Hoje", status: "Pendente" },
+  { id: "T-1002", product: "100 Membros Reais", price: "R$ 2,50", date: "Hoje", status: "Aguardando ticket" },
+];
 
 export default function App() {
   const [selected, setSelected] = useState<Product | null>(null);
+  const [adminLoginOpen, setAdminLoginOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
-  const [pix, setPix] = useState(localStorage.getItem("pix") || "COLOQUE-SUA-CHAVE-PIX-AQUI");
+  const [adminKey, setAdminKey] = useState("");
+  const [pixKey, setPixKey] = useState(localStorage.getItem("taurosPixKey") || "cadastre-sua-chave-pix");
+  const [pixQr, setPixQr] = useState(localStorage.getItem("taurosPixQr") || "");
+  const [sales, setSales] = useState<Sale[]>(() => {
+    const saved = localStorage.getItem("taurosSales");
+    return saved ? JSON.parse(saved) : defaultSales;
+  });
 
-  const products: Product[] = [
-    { name: "100 Membros Mistos", price: "R$ 2,00", type: "Membros mistos" },
-    { name: "100 Membros Reais", price: "R$ 2,50", type: "Membros reais" },
-    { name: "500 Membros Discord", price: "R$ 6,50", type: "Membros Discord" },
-  ];
+  useEffect(() => {
+    localStorage.setItem("taurosSales", JSON.stringify(sales));
+  }, [sales]);
 
-  function savePix() {
-    localStorage.setItem("pix", pix);
-    alert("Chave Pix salva com sucesso!");
-  }
+  const totalSales = useMemo(() => sales.length, [sales]);
 
   function openDiscord(product?: Product) {
-    const text = product
-      ? `Olá, quero comprar: ${product.name} - ${product.price}`
+    const msg = product
+      ? `Olá, quero comprar: ${product.name} - ${product.price}. Já fiz o pagamento e vou enviar o comprovante.`
       : "Olá, quero abrir um ticket na Store Tauros.";
-    window.open(`${DISCORD_LINK}?pedido=${encodeURIComponent(text)}`, "_blank");
+    window.open(DISCORD_LINK, "_blank");
+
+    if (product) {
+      const newSale: Sale = {
+        id: "T-" + Math.floor(1000 + Math.random() * 9000),
+        product: product.name,
+        price: product.price,
+        date: new Date().toLocaleString("pt-BR"),
+        status: "Aguardando comprovante",
+      };
+      setSales((prev) => [newSale, ...prev]);
+      setSelected(null);
+    }
+  }
+
+  function savePix() {
+    localStorage.setItem("taurosPixKey", pixKey);
+    localStorage.setItem("taurosPixQr", pixQr);
+    alert("Pix e QR Code salvos com sucesso!");
+  }
+
+  function loginAdmin() {
+    if (adminKey === ADMIN_KEY) {
+      setAdminLoginOpen(false);
+      setAdminOpen(true);
+      setAdminKey("");
+    } else {
+      alert("Chave admin incorreta!");
+    }
+  }
+
+  function uploadQr(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPixQr(String(reader.result));
+    };
+    reader.readAsDataURL(file);
   }
 
   return (
-    <div style={styles.page}>
-      <header style={styles.header}>
-        <div>
-          <h1 style={styles.logo}>STORE TAUROS</h1>
-          <p style={styles.small}>Loja gamer de membros, impulsos e produtos digitais</p>
-        </div>
+    <div className="page">
+      <div className="bg-grid" />
 
-        <div style={styles.nav}>
-          <button style={styles.navButton} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Início</button>
-          <button style={styles.navButton} onClick={() => document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" })}>Produtos</button>
-          <button style={styles.navButton} onClick={() => openDiscord()}>Suporte</button>
-          <button style={styles.adminButton} onClick={() => setAdminOpen(true)}>Admin</button>
-        </div>
-      </header>
-
-      <section style={styles.hero}>
-        <div>
-          <p style={styles.badge}>A LOJA Nº1 EM PRODUTOS PARA DISCORD</p>
-          <h2 style={styles.title}>STORE <span style={styles.neon}>TAUROS</span></h2>
-          <p style={styles.subtitle}>Qualidade, confiança e poder para elevar seu servidor ao topo.</p>
-
-          <div style={styles.heroButtons}>
-            <button style={styles.buyMain} onClick={() => document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" })}>Ver produtos</button>
-            <button style={styles.outline} onClick={() => openDiscord()}>Abrir ticket</button>
+      <header className="topbar">
+        <div className="brand">
+          <div className="brand-icon">🐂</div>
+          <div>
+            <h1>STORE TAUROS</h1>
+            <p>Produtos para Discord</p>
           </div>
         </div>
 
-        <div style={styles.bullBox}>
-          <div style={styles.bull}>🐂</div>
-          <h3 style={styles.bullTitle}>DOMINE SEU DISCORD</h3>
-          <p style={styles.small}>Membros, boosts, designs e suporte via ticket.</p>
+        <nav>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>INÍCIO</button>
+          <button onClick={() => document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" })}>MEMBROS</button>
+          <button onClick={() => document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" })}>NITRO</button>
+          <button onClick={() => document.getElementById("como-funciona")?.scrollIntoView({ behavior: "smooth" })}>COMO FUNCIONA</button>
+          <button onClick={() => openDiscord()}>SUPORTE</button>
+        </nav>
+
+        <div className="top-actions">
+          <button className="cart">🛒 CARRINHO <span>0</span></button>
+          <button className="login" onClick={() => setAdminLoginOpen(true)}>ENTRAR 🎮</button>
+        </div>
+      </header>
+
+      <section className="hero">
+        <div className="hero-left">
+          <p className="eyebrow">A LOJA Nº1 EM PRODUTOS PARA DISCORD</p>
+          <h2><span>STORE</span> TAUROS</h2>
+          <h3>QUALIDADE, CONFIANÇA E PODER<br />PARA LEVAR SEU SERVIDOR AO TOPO!</h3>
+
+          <div className="benefits">
+            <div>🛡️<small>COMPRA<br />SEGURA</small></div>
+            <div>⚡<small>ENTREGA<br />MANUAL</small></div>
+            <div>💎<small>QUALIDADE<br />PREMIUM</small></div>
+            <div>🎧<small>SUPORTE<br />24/7</small></div>
+          </div>
+
+          <div className="pix-card">
+            <strong>💠 PAGAMENTO VIA <b>PIX</b></strong>
+            <span>APROVAÇÃO MANUAL VIA TICKET</span>
+          </div>
+        </div>
+
+        <div className="bull-hero">
+          <div className="bull-glow">🐂</div>
+          <div className="hero-panel">
+            <div className="crown">♛</div>
+            <h3>DOMINE SEU <span>DISCORD</span></h3>
+            <p>Membros, Nitros, Designs e muito mais!</p>
+            <button onClick={() => document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" })}>VER PRODUTOS ›</button>
+          </div>
         </div>
       </section>
 
-      <section style={styles.features}>
-        <div style={styles.feature}>🛡️ Compra segura</div>
-        <div style={styles.feature}>⚡ Entrega manual</div>
-        <div style={styles.feature}>💎 Qualidade premium</div>
-        <div style={styles.feature}>🎧 Suporte Discord</div>
-      </section>
-
-      <section id="produtos" style={styles.productsSection}>
-        <h2 style={styles.sectionTitle}>PRODUTOS EM DESTAQUE</h2>
-
-        <div style={styles.grid}>
-          {products.map((product) => (
-            <div key={product.name} style={styles.card}>
-              <div style={styles.icon}>👥</div>
-              <h3 style={styles.productName}>{product.name}</h3>
-              <p style={styles.desc}>{product.type} para aumentar seu servidor Discord.</p>
-              <p style={styles.from}>A partir de</p>
-              <p style={styles.price}>{product.price}</p>
-              <button style={styles.buyButton} onClick={() => setSelected(product)}>COMPRAR</button>
-            </div>
+      <section id="produtos" className="products">
+        <h2>PRODUTOS EM DESTAQUE</h2>
+        <div className="product-grid">
+          {products.map((p) => (
+            <article className={`product ${p.theme}`} key={p.id}>
+              <span className="tag">{p.tag}</span>
+              <div className="product-icon">{p.icon}</div>
+              <h3>{p.name}</h3>
+              <p>{p.subtitle}</p>
+              <small>A partir de</small>
+              <strong>{p.price}</strong>
+              <button onClick={() => setSelected(p)}>🛒 COMPRAR</button>
+            </article>
           ))}
         </div>
       </section>
 
-      <section style={styles.ticketBox}>
-        <h2>Como funciona?</h2>
-        <p>O cliente escolhe o produto, copia a chave Pix, realiza o pagamento e abre um ticket no Discord enviando o comprovante.</p>
-        <button style={styles.buyMain} onClick={() => openDiscord()}>Abrir ticket no Discord</button>
+      <section className="stats">
+        <div>👥 <b>+10.000</b><span>CLIENTES SATISFEITOS</span></div>
+        <div>🛍️ <b>+50.000</b><span>PEDIDOS ENTREGUES</span></div>
+        <div>🛡️ <b>+3 ANOS</b><span>NO MERCADO</span></div>
+        <div>⭐ <b>99.9%</b><span>AVALIAÇÕES POSITIVAS</span></div>
+      </section>
+
+      <section id="como-funciona" className="how">
+        <h2>COMO FUNCIONA</h2>
+        <div className="steps">
+          <div><b>1</b><h3>Escolha o produto</h3><p>Clique em comprar no produto desejado.</p></div>
+          <div><b>2</b><h3>Pague no Pix</h3><p>Use a chave Pix ou o QR Code cadastrado.</p></div>
+          <div><b>3</b><h3>Abra ticket</h3><p>Envie o comprovante no Discord.</p></div>
+          <div><b>4</b><h3>Receba manualmente</h3><p>A equipe entrega após confirmação.</p></div>
+        </div>
       </section>
 
       {selected && (
-        <div style={styles.modalBg}>
-          <div style={styles.modal}>
-            <button style={styles.close} onClick={() => setSelected(null)}>X</button>
-            <h2 style={styles.modalTitle}>Confirmar compra</h2>
-            <p>Produto: <b>{selected.name}</b></p>
-            <p style={styles.price}>{selected.price}</p>
+        <div className="modal-bg">
+          <div className="modal buy-modal">
+            <button className="close" onClick={() => setSelected(null)}>×</button>
+            <h2>CONFIRMAR COMPRA</h2>
+            <p className="selected-product">{selected.name}</p>
+            <strong className="selected-price">{selected.price}</strong>
 
-            <div style={styles.pixBox}>
-              <p style={styles.badge}>CHAVE PIX</p>
-              <p style={styles.pixText}>{pix}</p>
+            <div className="payment-area">
+              <div>
+                <h3>Chave Pix</h3>
+                <p className="pix-key">{pixKey}</p>
+              </div>
+
+              <div className="qr-area">
+                {pixQr ? <img src={pixQr} alt="QR Code Pix" /> : <span>QR Code ainda não cadastrado</span>}
+              </div>
             </div>
 
-            <button style={styles.buyButton} onClick={() => openDiscord(selected)}>Já paguei, abrir ticket</button>
+            <button className="primary" onClick={() => openDiscord(selected)}>JÁ PAGUEI, ABRIR TICKET</button>
+          </div>
+        </div>
+      )}
+
+      {adminLoginOpen && (
+        <div className="modal-bg">
+          <div className="modal">
+            <button className="close" onClick={() => setAdminLoginOpen(false)}>×</button>
+            <h2>ACESSO ADMIN</h2>
+            <p>Digite a chave para entrar no painel.</p>
+            <input
+              type="password"
+              placeholder="Chave admin"
+              value={adminKey}
+              onChange={(e) => setAdminKey(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && loginAdmin()}
+            />
+            <button className="primary" onClick={loginAdmin}>ENTRAR NO PAINEL</button>
           </div>
         </div>
       )}
 
       {adminOpen && (
-        <div style={styles.modalBg}>
-          <div style={styles.modal}>
-            <button style={styles.close} onClick={() => setAdminOpen(false)}>X</button>
-            <h2 style={styles.modalTitle}>Painel Admin</h2>
-            <p>Cadastre ou altere sua chave Pix abaixo:</p>
+        <div className="modal-bg">
+          <div className="modal admin-modal">
+            <button className="close" onClick={() => setAdminOpen(false)}>×</button>
+            <h2>PAINEL ADMIN STORE TAUROS</h2>
 
-            <input
-              style={styles.input}
-              value={pix}
-              onChange={(e) => setPix(e.target.value)}
-              placeholder="Digite sua chave Pix"
-            />
+            <div className="admin-grid">
+              <div className="admin-card">
+                <h3>💰 Cadastrar Pix</h3>
+                <label>Chave Pix</label>
+                <input value={pixKey} onChange={(e) => setPixKey(e.target.value)} placeholder="Digite sua chave Pix" />
 
-            <button style={styles.buyButton} onClick={savePix}>Salvar Pix</button>
-            <p style={styles.warn}>Observação: este painel salva o Pix no navegador. Para painel admin com senha e banco de dados, precisa backend.</p>
+                <label>QR Code Pix</label>
+                <input type="file" accept="image/*" onChange={uploadQr} />
+
+                <div className="qr-preview">
+                  {pixQr ? <img src={pixQr} alt="QR Pix" /> : <span>Prévia do QR Code</span>}
+                </div>
+
+                <button className="primary" onClick={savePix}>SALVAR PIX</button>
+              </div>
+
+              <div className="admin-card">
+                <h3>📊 Vendas</h3>
+                <div className="sale-total">{totalSales}<span>pedidos registrados</span></div>
+                <div className="sales-list">
+                  {sales.map((sale) => (
+                    <div className="sale" key={sale.id}>
+                      <div>
+                        <b>{sale.product}</b>
+                        <small>{sale.id} • {sale.date}</small>
+                      </div>
+                      <strong>{sale.price}</strong>
+                      <em>{sale.status}</em>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <p className="admin-note">
+              Painel demonstrativo: a chave Pix, QR Code e vendas ficam salvos no navegador. Para salvar para todos os dispositivos, precisa banco de dados.
+            </p>
           </div>
         </div>
       )}
-
-      <footer style={styles.footer}>
-        © 2026 Store Tauros — Entrega manual via ticket Discord
-      </footer>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "radial-gradient(circle at top, #0f3cff55, transparent 35%), #020617",
-    color: "white",
-    fontFamily: "Arial, sans-serif",
-    padding: "20px",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    border: "1px solid #0ea5e955",
-    borderRadius: 18,
-    padding: "15px 25px",
-    background: "#020617cc",
-    position: "sticky",
-    top: 10,
-    zIndex: 5,
-  },
-  logo: { color: "#38bdf8", margin: 0, fontSize: 28, fontWeight: 900 },
-  small: { color: "#cbd5e1", margin: 0 },
-  nav: { display: "flex", gap: 10, flexWrap: "wrap" },
-  navButton: { background: "transparent", color: "white", border: "1px solid #1d4ed8", borderRadius: 10, padding: "10px 14px", cursor: "pointer" },
-  adminButton: { background: "#0ea5e9", color: "black", border: "none", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 900 },
-  hero: {
-    marginTop: 30,
-    padding: 40,
-    borderRadius: 28,
-    border: "1px solid #0ea5e955",
-    background: "linear-gradient(135deg,#020617,#0b1f45)",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
-    gap: 30,
-    alignItems: "center",
-  },
-  badge: { color: "#38bdf8", fontWeight: 900 },
-  title: { fontSize: 70, margin: "10px 0", fontWeight: 900 },
-  neon: { color: "#0ea5e9", textShadow: "0 0 25px #0ea5e9" },
-  subtitle: { fontSize: 22, color: "#e2e8f0" },
-  heroButtons: { display: "flex", gap: 15, flexWrap: "wrap" },
-  buyMain: { background: "#2563eb", color: "white", border: "none", borderRadius: 12, padding: "14px 25px", cursor: "pointer", fontWeight: 900 },
-  outline: { background: "transparent", color: "#38bdf8", border: "1px solid #38bdf8", borderRadius: 12, padding: "14px 25px", cursor: "pointer", fontWeight: 900 },
-  bullBox: { textAlign: "center", border: "1px solid #38bdf855", borderRadius: 25, padding: 30, background: "#020617aa" },
-  bull: { fontSize: 130 },
-  bullTitle: { fontSize: 30, color: "#38bdf8" },
-  features: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 15, marginTop: 25 },
-  feature: { background: "#0f172a", border: "1px solid #0ea5e955", borderRadius: 18, padding: 18, textAlign: "center", fontWeight: 900 },
-  productsSection: { marginTop: 50 },
-  sectionTitle: { textAlign: "center", fontSize: 34 },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 20 },
-  card: { background: "linear-gradient(180deg,#082f49,#020617)", border: "1px solid #0ea5e9", borderRadius: 22, padding: 25, textAlign: "center", boxShadow: "0 0 25px #0ea5e933" },
-  icon: { fontSize: 70 },
-  productName: { fontSize: 24 },
-  desc: { color: "#cbd5e1" },
-  from: { color: "#94a3b8" },
-  price: { color: "#22d3ee", fontSize: 34, fontWeight: 900 },
-  buyButton: { width: "100%", background: "#2563eb", color: "white", border: "none", borderRadius: 12, padding: 14, cursor: "pointer", fontWeight: 900 },
-  ticketBox: { marginTop: 50, background: "#0f172a", border: "1px solid #0ea5e955", borderRadius: 22, padding: 30, textAlign: "center" },
-  modalBg: { position: "fixed", inset: 0, background: "#000000cc", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 20, padding: 20 },
-  modal: { width: "100%", maxWidth: 480, background: "#020617", border: "1px solid #38bdf8", borderRadius: 22, padding: 25, position: "relative" },
-  close: { position: "absolute", top: 12, right: 12, background: "#ef4444", color: "white", border: "none", borderRadius: 8, padding: "6px 10px", cursor: "pointer" },
-  modalTitle: { color: "#38bdf8" },
-  pixBox: { background: "#0f172a", border: "1px dashed #38bdf8", borderRadius: 15, padding: 18, marginBottom: 18 },
-  pixText: { fontSize: 18, wordBreak: "break-word" },
-  input: { width: "100%", padding: 14, borderRadius: 12, border: "1px solid #38bdf8", background: "#0f172a", color: "white", marginBottom: 15 },
-  warn: { color: "#94a3b8", fontSize: 13 },
-  footer: { marginTop: 50, textAlign: "center", color: "#94a3b8" },
-};
