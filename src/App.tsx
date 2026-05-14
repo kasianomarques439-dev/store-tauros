@@ -3,17 +3,17 @@ import React, { useMemo, useState } from "react";
 import "./style.css";
 
 const DISCORD_LINK = "https://discord.gg/WPH5Xc58cm";
-const ADMIN_KEY = "admtauros";
+const ADMIN_PASSWORD = "admtauros";
 
 type MemberType = "Mistos" | "Reais" | "Premium";
 
-type CartItem = {
-  nome: string;
-  preco: string;
-  detalhe: string;
+type Product = {
+  name: string;
+  price: string;
+  details: string;
 };
 
-const memberPrices: Record<MemberType, number> = {
+const prices: Record<MemberType, number> = {
   Mistos: 2,
   Reais: 2.5,
   Premium: 6.5,
@@ -22,242 +22,229 @@ const memberPrices: Record<MemberType, number> = {
 const quantities = [100, 200, 300, 400, 5000];
 
 export default function App() {
-  const [memberTab, setMemberTab] = useState<MemberType>("Mistos");
-  const [selected, setSelected] = useState<CartItem | null>(null);
+  const [openMenu, setOpenMenu] = useState(false);
+  const [openList, setOpenList] = useState<MemberType | null>("Mistos");
+  const [selected, setSelected] = useState<Product | null>(null);
   const [adminLogin, setAdminLogin] = useState(false);
-  const [adminOpen, setAdminOpen] = useState(false);
+  const [adminPanel, setAdminPanel] = useState(false);
   const [adminKey, setAdminKey] = useState("");
-  const [pixKey, setPixKey] = useState(localStorage.getItem("taurosPixKey") || "Cadastre sua chave Pix no painel admin");
-  const [qrPix, setQrPix] = useState(localStorage.getItem("taurosQrPix") || "");
-  const [orders, setOrders] = useState<string[]>(() => JSON.parse(localStorage.getItem("taurosOrders") || "[]"));
+  const [pixKey, setPixKey] = useState(localStorage.getItem("storetauros_pix") || "adm@storetauros.com");
+  const [sales, setSales] = useState<string[]>(() => JSON.parse(localStorage.getItem("storetauros_sales") || "[]"));
 
-  const memberOptions = useMemo(() => {
-    return quantities.map((qtd) => {
-      const price = (qtd / 100) * memberPrices[memberTab];
-      return {
-        nome: `${qtd.toLocaleString("pt-BR")} Membros ${memberTab}`,
-        preco: money(price),
-        detalhe: `Pacote de ${qtd.toLocaleString("pt-BR")} membros ${memberTab.toLowerCase()} para Discord`,
-      };
-    });
-  }, [memberTab]);
+  const memberCards = useMemo(() => {
+    return (["Mistos", "Reais", "Premium"] as MemberType[]).map((type) => ({
+      type,
+      title: `Membros ${type}`,
+      desc:
+        type === "Mistos"
+          ? "Membros mistos para movimentar seu servidor."
+          : type === "Reais"
+          ? "Membros reais e ativos para seu Discord."
+          : "Membros premium com mais qualidade.",
+      base: prices[type],
+    }));
+  }, []);
 
-  function money(value: number) {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  function formatMoney(v: number) {
+    return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   }
 
-  function openBuy(item: CartItem) {
-    setSelected(item);
+  function makeProduct(type: MemberType, quantity: number): Product {
+    const value = (quantity / 100) * prices[type];
+    return {
+      name: `${quantity.toLocaleString("pt-BR")} Membros ${type}`,
+      price: formatMoney(value),
+      details: `Pacote de ${quantity.toLocaleString("pt-BR")} membros ${type.toLowerCase()} para Discord.`,
+    };
   }
 
-  function confirmTicket() {
-    if (!selected) return;
-    const registro = `${selected.nome} - ${selected.preco} - ${new Date().toLocaleString("pt-BR")}`;
-    const newOrders = [registro, ...orders];
-    setOrders(newOrders);
-    localStorage.setItem("taurosOrders", JSON.stringify(newOrders));
-    window.open(DISCORD_LINK, "_blank");
-    setSelected(null);
+  function buy(product: Product) {
+    setSelected(product);
+    const order = `${product.name} | ${product.price} | ${new Date().toLocaleString("pt-BR")}`;
+    const updated = [order, ...sales];
+    setSales(updated);
+    localStorage.setItem("storetauros_sales", JSON.stringify(updated));
   }
 
   function loginAdmin() {
-    if (adminKey === ADMIN_KEY) {
+    if (adminKey.trim() === ADMIN_PASSWORD) {
       setAdminLogin(false);
-      setAdminOpen(true);
+      setAdminPanel(true);
       setAdminKey("");
     } else {
       alert("Chave admin incorreta.");
     }
   }
 
-  function uploadQr(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setQrPix(String(reader.result));
-    reader.readAsDataURL(file);
+  function savePix() {
+    localStorage.setItem("storetauros_pix", pixKey);
+    alert("Chave Pix salva com sucesso!");
   }
 
-  function savePix() {
-    localStorage.setItem("taurosPixKey", pixKey);
-    localStorage.setItem("taurosQrPix", qrPix);
-    alert("Pix salvo com sucesso!");
+  function copyPix() {
+    navigator.clipboard.writeText(pixKey);
+    alert("Chave Pix copiada!");
   }
 
   return (
-    <main className="site">
-      <header className="nav">
-        <div className="logo">
-          <div className="bull-logo">🐂</div>
-          <div>
-            <b>STORE</b>
-            <strong>TAUROS</strong>
-          </div>
+    <main className="page">
+      <header className="top">
+        <button className="menu-btn" onClick={() => setOpenMenu(true)}>•••</button>
+
+        <div className="brand">
+          <span>STORE</span><b>TAUROS</b>
+          <small>A melhor store para seu Discord</small>
         </div>
 
-        <nav>
-          <a href="#inicio">Início</a>
-          <a href="#membros">Membros</a>
-          <a href="#extras">Extras</a>
-          <a href="#funciona">Como funciona</a>
-          <button onClick={() => window.open(DISCORD_LINK, "_blank")}>Suporte</button>
-        </nav>
-
-        <button className="admin-btn" onClick={() => setAdminLogin(true)}>Entrar Admin</button>
+        <button className="admin-top" onClick={() => setAdminLogin(true)}>🔒 Área do Admin</button>
       </header>
 
-      <section id="inicio" className="hero">
-        <div className="hero-text">
-          <span className="pill">A MELHOR STORE PARA DISCORD</span>
-          <h1>
-            QUALIDADE, CONFIANÇA
-            <br />
-            E PODER PARA SEU
-            <em> DISCORD!</em>
-          </h1>
-          <p>
-            Venda focada em membros para servidor, designer profissional e contas nitradas.
-            Atendimento e resgate sempre via ticket.
-          </p>
-
-          <div className="hero-actions">
-            <a href="#membros">Ver membros</a>
-            <button onClick={() => window.open(DISCORD_LINK, "_blank")}>Abrir ticket</button>
-          </div>
-
-          <div className="features">
-            <span>🛡️ Compra segura</span>
-            <span>⚡ Resgate via ticket</span>
-            <span>💠 Pix manual</span>
-            <span>🎧 Suporte ativo</span>
+      {openMenu && (
+        <div className="menu-modal">
+          <div className="menu-card">
+            <button className="close" onClick={() => setOpenMenu(false)}>×</button>
+            <h2>Opções</h2>
+            <a onClick={() => setOpenMenu(false)} href="#membros">Membros</a>
+            <a onClick={() => setOpenMenu(false)} href="#extras">Designer / Conta nitrada</a>
+            <a onClick={() => setOpenMenu(false)} href="#pix">Pix</a>
+            <a onClick={() => setOpenMenu(false)} href="#como">Como funciona</a>
+            <button onClick={() => window.open(DISCORD_LINK, "_blank")}>Abrir ticket Discord</button>
           </div>
         </div>
+      )}
 
-        <div className="hero-bull">
-          <div className="blue-bull">
-            <div className="horn left"></div>
-            <div className="horn right"></div>
-            <div className="face">
-              <div className="eye left-eye"></div>
-              <div className="eye right-eye"></div>
-              <div className="nose"></div>
-              <div className="mouth"></div>
+      <section className="hero">
+        <div className="banner-image">
+          <div className="banner-text">
+            <h1>TAUROS</h1>
+            <span>STORE</span>
+          </div>
+          <div className="bull-art">
+            <div className="horn h-left"></div>
+            <div className="horn h-right"></div>
+            <div className="head">
+              <i className="eye e-left"></i>
+              <i className="eye e-right"></i>
+              <i className="nose"></i>
             </div>
           </div>
-          <div className="discount">
-            <b>STORE</b>
-            <strong>TAUROS</strong>
-            <span>vendas via ticket</span>
+        </div>
+
+        <div className="features">
+          <div>⚡ <b>Entrega</b><span>Via ticket</span></div>
+          <div>💠 <b>Pagamento</b><span>Via Pix</span></div>
+          <div>🎧 <b>Suporte</b><span>Discord</span></div>
+          <div>🛡️ <b>Seguro</b><span>100%</span></div>
+          <div>⭐ <b>Qualidade</b><span>Premium</span></div>
+        </div>
+      </section>
+
+      <section id="membros" className="layout">
+        <div className="main-products">
+          <h2>MEMBROS PARA DISCORD</h2>
+
+          <div className="member-blocks">
+            {memberCards.map((card) => (
+              <article className={`member-block ${card.type.toLowerCase()}`} key={card.type}>
+                <button className="member-head" onClick={() => setOpenList(openList === card.type ? null : card.type)}>
+                  <span>{card.type === "Premium" ? "👑" : "👥"}</span>
+                  <div>
+                    <h3>{card.title}</h3>
+                    <p>{card.desc}</p>
+                  </div>
+                  <b>{openList === card.type ? "▲" : "▼"}</b>
+                </button>
+
+                {openList === card.type && (
+                  <div className="dropdown-list">
+                    {quantities.map((q) => {
+                      const p = makeProduct(card.type, q);
+                      return (
+                        <button key={q} onClick={() => buy(p)}>
+                          <span>{q.toLocaleString("pt-BR")} membros</span>
+                          <strong>{p.price}</strong>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+
+          <div id="pix" className="pix-strip">
+            <div>
+              <h2>Pagamento via Pix</h2>
+              <p>Use uma única chave Pix cadastrada pelo admin para todos os produtos.</p>
+            </div>
+            <div className="pix-key">
+              <small>Chave Pix</small>
+              <b>{pixKey}</b>
+            </div>
+            <button onClick={copyPix}>Copiar</button>
           </div>
         </div>
-      </section>
 
-      <section id="membros" className="section">
-        <div className="title">
-          <span>MEMBROS DISCORD</span>
-          <h2>Escolha o tipo de membro</h2>
-          <p>Cada 100 membros multiplica o valor conforme o tipo escolhido.</p>
-        </div>
+        <aside id="extras" className="side">
+          <h2>Outros produtos</h2>
 
-        <div className="tabs">
-          {(["Mistos", "Reais", "Premium"] as MemberType[]).map((tab) => (
-            <button
-              key={tab}
-              className={memberTab === tab ? "active" : ""}
-              onClick={() => setMemberTab(tab)}
-            >
-              Membros {tab}
-              <small>
-                {tab === "Mistos" && "R$ 2,00 / 100"}
-                {tab === "Reais" && "R$ 2,50 / 100"}
-                {tab === "Premium" && "R$ 6,50 / 100"}
-              </small>
-            </button>
-          ))}
-        </div>
-
-        <div className="cards members-grid">
-          {memberOptions.map((item) => (
-            <article className="card member-card" key={item.nome}>
-              <div className="icon">👥</div>
-              <h3>{item.nome}</h3>
-              <p>{item.detalhe}</p>
-              <small>A partir de</small>
-              <strong>{item.preco}</strong>
-              <button onClick={() => openBuy(item)}>Comprar</button>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="extras" className="section">
-        <div className="title">
-          <span>PRODUTOS EXTRAS</span>
-          <h2>Designer e conta nitrada</h2>
-          <p>Produtos com entrega manual e resgate somente pelo ticket Discord.</p>
-        </div>
-
-        <div className="cards extras-grid">
-          <article className="card design-card">
-            <div className="icon">🎨</div>
-            <h3>Designer de Servidor</h3>
-            <p>Organização, cargos, canais, decoração e visual profissional para seu servidor.</p>
-            <small>Valor</small>
-            <strong>R$ 35,00</strong>
-            <button onClick={() => openBuy({ nome: "Designer de Servidor", preco: "R$ 35,00", detalhe: "Design completo para servidor Discord" })}>Comprar</button>
+          <article className="side-product">
+            <div className="side-icon">🎨</div>
+            <div>
+              <h3>Designer de Server</h3>
+              <p>Design profissional para seu servidor Discord.</p>
+              <strong>R$ 35,00</strong>
+              <button onClick={() => buy({ name: "Designer de Server", price: "R$ 35,00", details: "Design profissional para servidor Discord." })}>
+                Comprar agora
+              </button>
+            </div>
           </article>
 
-          <article className="card nitro-card">
-            <div className="icon">💎</div>
-            <h3>Conta Nitrada</h3>
-            <p>Conta nitrada com resgate e entrega somente via ticket com a equipe.</p>
-            <small>Valor</small>
-            <strong>R$ 5,00</strong>
-            <button onClick={() => openBuy({ nome: "Conta Nitrada", preco: "R$ 5,00", detalhe: "Conta nitrada via ticket" })}>Comprar</button>
+          <article className="side-product purple">
+            <div className="side-icon">💎</div>
+            <div>
+              <h3>Conta Nitrada</h3>
+              <p>Conta nitrada com resgate somente no ticket.</p>
+              <strong>R$ 5,00</strong>
+              <button onClick={() => buy({ name: "Conta Nitrada", price: "R$ 5,00", details: "Conta nitrada com resgate via ticket." })}>
+                Comprar agora
+              </button>
+            </div>
           </article>
-        </div>
-      </section>
 
-      <section id="funciona" className="how">
-        <h2>COMO FUNCIONA</h2>
-        <div>
-          <article><b>1</b><span>Escolha o produto</span></article>
-          <article><b>2</b><span>Copie o Pix ou QR Code</span></article>
-          <article><b>3</b><span>Abra ticket no Discord</span></article>
-          <article><b>4</b><span>Envie o comprovante</span></article>
-        </div>
+          <div id="como" className="how">
+            <h3>Como funciona</h3>
+            <p><b>1.</b> Escolha o produto e quantidade.</p>
+            <p><b>2.</b> Pague via Pix.</p>
+            <p><b>3.</b> Após comprar, aparece o link do Discord.</p>
+            <p><b>4.</b> Abra ticket e envie o comprovante.</p>
+          </div>
+        </aside>
       </section>
 
       <footer>
-        <div className="logo">
-          <div className="bull-logo">🐂</div>
-          <div>
-            <b>STORE</b>
-            <strong>TAUROS</strong>
-          </div>
-        </div>
-        <p>© 2026 Store Tauros — vendas e resgates somente via ticket.</p>
+        <b>© 2026 Storetauros</b>
+        <span>Resgate somente via ticket Discord.</span>
       </footer>
 
       {selected && (
         <div className="modal-bg">
           <div className="modal">
             <button className="close" onClick={() => setSelected(null)}>×</button>
-            <h2>Finalizar compra</h2>
-            <p className="selected">{selected.nome}</p>
-            <strong className="modal-price">{selected.preco}</strong>
+            <h2>Compra selecionada</h2>
+            <h3>{selected.name}</h3>
+            <p>{selected.details}</p>
+            <strong className="price">{selected.price}</strong>
 
-            <div className="payment">
-              <div>
-                <h3>Chave Pix</h3>
-                <p>{pixKey}</p>
-              </div>
-              <div className="qr">
-                {qrPix ? <img src={qrPix} alt="QR Code Pix" /> : <span>QR Code Pix não cadastrado</span>}
-              </div>
+            <div className="pix-confirm">
+              <small>Chave Pix única:</small>
+              <b>{pixKey}</b>
+              <button onClick={copyPix}>Copiar Pix</button>
             </div>
 
-            <button className="primary" onClick={confirmTicket}>Já paguei, abrir ticket</button>
+            <a className="discord-link" href={DISCORD_LINK} target="_blank" rel="noreferrer">
+              Resgatar no Discord
+            </a>
           </div>
         </div>
       )}
@@ -266,11 +253,11 @@ export default function App() {
         <div className="modal-bg">
           <div className="modal small">
             <button className="close" onClick={() => setAdminLogin(false)}>×</button>
-            <h2>Painel Admin</h2>
-            <p>Digite a chave para acessar.</p>
+            <h2>Área do Admin</h2>
+            <p>Entre usando a chave admin.</p>
             <input
               type="password"
-              placeholder="Chave admin"
+              placeholder="Digite a chave"
               value={adminKey}
               onChange={(e) => setAdminKey(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && loginAdmin()}
@@ -280,42 +267,31 @@ export default function App() {
         </div>
       )}
 
-      {adminOpen && (
+      {adminPanel && (
         <div className="modal-bg">
           <div className="modal admin">
-            <button className="close" onClick={() => setAdminOpen(false)}>×</button>
-            <h2>Admin Store Tauros</h2>
+            <button className="close" onClick={() => setAdminPanel(false)}>×</button>
+            <h2>Painel Admin Storetauros</h2>
 
             <div className="admin-grid">
-              <div className="admin-box">
-                <h3>Cadastrar Pix</h3>
-                <label>Chave Pix</label>
+              <section>
+                <h3>Chave Pix única</h3>
+                <p>Essa chave será usada para todos os produtos.</p>
                 <input value={pixKey} onChange={(e) => setPixKey(e.target.value)} />
+                <button className="primary" onClick={savePix}>Salvar chave Pix</button>
+              </section>
 
-                <label>QR Code Pix</label>
-                <input type="file" accept="image/*" onChange={uploadQr} />
-
-                <div className="qr preview">
-                  {qrPix ? <img src={qrPix} alt="QR Pix" /> : <span>Prévia do QR Code</span>}
+              <section>
+                <h3>Painel de vendas</h3>
+                <p>{sales.length} vendas registradas neste navegador.</p>
+                <div className="sales">
+                  {sales.length === 0 && <span>Nenhuma venda registrada ainda.</span>}
+                  {sales.map((sale, index) => <div key={index}>{sale}</div>)}
                 </div>
-
-                <button className="primary" onClick={savePix}>Salvar Pix</button>
-              </div>
-
-              <div className="admin-box">
-                <h3>Vendas registradas</h3>
-                {orders.length === 0 && <p>Nenhuma venda registrada ainda.</p>}
-                <div className="orders">
-                  {orders.map((order, index) => (
-                    <div key={index}>{order}</div>
-                  ))}
-                </div>
-              </div>
+              </section>
             </div>
 
-            <p className="note">
-              Painel local: Pix, QR Code e vendas ficam salvos neste navegador. Para salvar em todos os celulares/computadores, precisa banco de dados.
-            </p>
+            <p className="note">Observação: este painel salva no navegador. Para salvar em vários dispositivos, precisa banco de dados.</p>
           </div>
         </div>
       )}
