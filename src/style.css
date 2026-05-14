@@ -6,22 +6,24 @@ box-sizing:border-box;
 }
 
 body{
-background:#000;
-overflow:hidden;
-font-family:Arial, sans-serif;
+font-family:Arial,sans-serif;
+background:black;
 }
 
-.site{
-width:100vw;
+.bg{
 height:100vh;
-background-image:url('/background-exato.png');
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#050510,#12002e,#001d52);
+color:white;
 }
 
 .overlay{
-position:absolute;
-inset:0;
+text-align:center;
+}
+
+h1{
+font-size:70px;
+margin-bottom:20px;
 }

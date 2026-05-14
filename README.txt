@@ -1,8 +1,15 @@
 
-PASTA COM O PLANO DE FUNDO EXATO.
+PASTA CORRIGIDA
 
-A imagem enviada foi colocada diretamente como tela inicial do site.
+Erro resolvido:
+Cannot find module '@vitejs/plugin-react'
 
-Para iniciar:
+Ja possui:
+- vite
+- react
+- react-dom
+- @vitejs/plugin-react
+
+Comandos:
 npm install
 npm run dev
