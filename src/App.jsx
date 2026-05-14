@@ -1,306 +1,40 @@
 
-import React, { useMemo, useState } from "react";
-
-const DISCORD = "https://discord.gg/WPH5Xc58cm";
-const ADMIN_PASS = "admtauros";
-
-const products = [
-  {
-    id: "nitro",
-    category: "Discord",
-    title: "Nitro Discord",
-    subtitle: "Resgate via ticket",
-    price: "R$ 5,00+",
-    image: "/assets/ref-2.png",
-    badge: "NITRO",
-    type: "fixed"
-  },
-  {
-    id: "membros",
-    category: "Discord",
-    title: "Membros Discord",
-    subtitle: "Membros para seu servidor",
-    price: "R$ 2,00+",
-    image: "/assets/ref-7.png",
-    badge: "MEMBROS",
-    type: "members"
-  },
-  {
-    id: "conta-nitrada",
-    category: "Discord",
-    title: "Conta Nitrada",
-    subtitle: "Conta pronta para resgate",
-    price: "R$ 5,00+",
-    image: "/assets/ref-2.png",
-    badge: "NITRADA",
-    type: "fixed"
-  },
-  {
-    id: "designer",
-    category: "Discord",
-    title: "Designer de Server",
-    subtitle: "Design completo para servidor",
-    price: "R$ 35,00",
-    image: "/assets/ref-7.png",
-    badge: "DESIGN",
-    type: "fixed"
-  }
-];
-
-const categories = [
-  { name: "Discord", total: "36 produtos", image: "/assets/ref-1.png" },
-  { name: "Membros", total: "5 pacotes", image: "/assets/ref-7.png" },
-  { name: "Nitro", total: "3 planos", image: "/assets/ref-2.png" },
-  { name: "Designer", total: "1 pacote", image: "/assets/ref-8.png" }
-];
-
-const quantities = [100, 200, 300, 400, 5000];
-
-function priceForMembers(type, qty) {
-  const per100 = type === "mistos" ? 2 : type === "reais" ? 2.5 : 6.5;
-  return ((qty / 100) * per100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-export default function App() {
-  const [selected, setSelected] = useState(null);
-  const [memberType, setMemberType] = useState("mistos");
-  const [memberQty, setMemberQty] = useState(100);
-  const [paid, setPaid] = useState(false);
-
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [adminLogin, setAdminLogin] = useState(false);
-  const [adminOpen, setAdminOpen] = useState(false);
-  const [adminPassword, setAdminPassword] = useState("");
-
-  const [pix, setPix] = useState(localStorage.getItem("st_pix") || "");
-  const [qr, setQr] = useState(localStorage.getItem("st_qr") || "");
-  const [banner, setBanner] = useState(localStorage.getItem("st_banner") || "A Maior Loja Digital da Store Tauros!");
-  const [orders, setOrders] = useState(() => JSON.parse(localStorage.getItem("st_orders") || "[]"));
-
-  const finalMemberPrice = useMemo(() => priceForMembers(memberType, memberQty), [memberType, memberQty]);
-
-  function openProduct(product) {
-    setSelected(product);
-    setPaid(false);
-  }
-
-  function confirmPayment() {
-    const sale = {
-      id: "ST-" + Math.floor(1000 + Math.random() * 9000),
-      product: selected?.type === "members" ? `${memberQty} membros ${memberType}` : selected?.title,
-      price: selected?.type === "members" ? finalMemberPrice : selected?.price,
-      date: new Date().toLocaleString("pt-BR")
-    };
-    const next = [sale, ...orders];
-    setOrders(next);
-    localStorage.setItem("st_orders", JSON.stringify(next));
-    setPaid(true);
-  }
-
-  function loginAdmin() {
-    if (adminPassword === ADMIN_PASS) {
-      setAdminLogin(false);
-      setAdminOpen(true);
-      setAdminPassword("");
-    } else {
-      alert("Senha incorreta");
-    }
-  }
-
-  function saveAdmin() {
-    localStorage.setItem("st_pix", pix);
-    localStorage.setItem("st_qr", qr);
-    localStorage.setItem("st_banner", banner);
-    alert("Configurações salvas!");
-  }
-
-  function uploadQr(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setQr(String(reader.result));
-    reader.readAsDataURL(file);
-  }
-
-  function copyPix() {
-    if (!pix) return alert("Pix ainda não cadastrado pelo admin.");
-    navigator.clipboard.writeText(pix);
-    alert("Pix copiado!");
-  }
-
-  return (
-    <div className="store">
-      <aside className="sidebar">
-        <div className="profile">
-          <div className="avatar">🐂</div>
-          <b>Store Tauros <span>✓</span></b>
-          <small>Loja oficial</small>
-        </div>
-
-        <p className="sideTitle">MENU</p>
-        <a href="#home">⌂ <span>Início</span></a>
-        <a href="#categorias">⌕ <span>Buscar</span></a>
-        <a href="#produtos">▣ <span>Produtos</span></a>
-        <button onClick={() => setSelected(products[0])}>🛒 <span>Carrinho</span></button>
-
-        <p className="sideTitle">CATEGORIAS</p>
-        <button onClick={() => window.open(DISCORD, "_blank")}>🎧 <span>Suporte</span></button>
-        <button onClick={() => alert("Termos: pagamento via Pix e resgate via ticket.")}>📄 <span>Termos</span></button>
-        <button onClick={() => setAdminLogin(true)}>⚙ <span>Painel ADM</span></button>
-
-        <div className="ticketBox">
-          <b>Resgate via Ticket</b>
-          <p>Após pagar, abra o Discord para receber seu pedido.</p>
-          <button onClick={() => window.open(DISCORD, "_blank")}>Discord</button>
-        </div>
-      </aside>
-
-      <main>
-        <header className="top">
-          <div className="logo">STORE<span>TAUROS</span></div>
-          <nav>
-            <a href="#home">Início</a>
-            <a href="#categorias">Categorias</a>
-            <a href="#produtos">Produtos</a>
-            <button onClick={() => window.open(DISCORD, "_blank")}>Discord</button>
-          </nav>
-          <div className="topActions">
-            <button onClick={() => setCreateOpen(true)}>Criar conta</button>
-            <button onClick={() => setLoginOpen(true)}>Entrar</button>
-          </div>
-        </header>
-
-        <section id="home" className="hero">
-          <div>
-            <div className="chips"><span>⚡ Entrega automática</span><span>🛡 Compra 100% segura</span></div>
-            <h1>{banner.replace("Store Tauros", "")}<br/><span>Store Tauros</span></h1>
-            <p>Nossa loja oferece produtos digitais para Discord com preços competitivos, suporte ativo e resgate simples pelo ticket.</p>
-            <div className="heroBtns">
-              <a href="#produtos">Explorar produtos →</a>
-              <button onClick={() => window.open(DISCORD, "_blank")}>Comunidade</button>
-            </div>
-            <div className="stats"><b>24h</b><span>Suporte ativo</span><b>100%</b><span>Digital</span><b>Pix</b><span>Pagamento instantâneo</span></div>
-          </div>
-
-          <div className="featureGrid">
-            <article className="bigFeature">⚡<h3>Entrega automática</h3><p>Seu produto é liberado após a confirmação.</p></article>
-            <article>🛡<h3>100% Seguro</h3><p>Dados protegidos</p></article>
-            <article>🎧<h3>Suporte 24h</h3><p>Sempre disponível</p></article>
-            <article className="wide">💠<h3>Pix, cartão e mais</h3><p>Pagamento por Pix cadastrado no admin</p></article>
-          </div>
-        </section>
-
-        <section id="categorias" className="categories">
-          <div className="sectionHead"><h2>Categorias</h2><span>{categories.length} disponíveis</span></div>
-          <div className="categoryGrid">
-            {categories.map((cat) => (
-              <button className="categoryCard" key={cat.name} onClick={() => document.getElementById("produtos")?.scrollIntoView()}>
-                <img src={cat.image} alt={cat.name}/>
-                <div><h3>{cat.name}</h3><p>{cat.total}</p></div>
-                <span className="arrow">→</span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section id="produtos" className="products">
-          <div className="sectionHead"><h2>Produtos</h2><span>À vista no Pix</span></div>
-          <div className="productGrid">
-            {products.map((product) => (
-              <article className="productCard" key={product.id}>
-                <div className="dots">•••</div>
-                <img src={product.image} alt={product.title}/>
-                <div className="productBody">
-                  <strong>{product.price}</strong>
-                  <h3>{product.title}</h3>
-                  <p>{product.subtitle}</p>
-                  <button onClick={() => openProduct(product)}>🛒 Comprar agora</button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <footer>
-          <b>StoreTauros</b>
-          <span>© 2026 — Loja digital com resgate via Discord.</span>
-        </footer>
-      </main>
-
-      {selected && (
-        <div className="modalBg">
-          <div className="modal productModal">
-            <button className="close" onClick={() => setSelected(null)}>×</button>
-            <img src={selected.image} alt={selected.title}/>
-            <div className="productInfo">
-              <span className="stock">13 em estoque</span>
-              <h2>{selected.title}</h2>
-              <strong>{selected.type === "members" ? finalMemberPrice : selected.price}</strong>
-              {selected.type === "members" && (
-                <div className="memberOptions">
-                  <select value={memberType} onChange={(e) => setMemberType(e.target.value)}>
-                    <option value="mistos">Membros Mistos - R$ 2/100</option>
-                    <option value="reais">Membros Reais - R$ 2,50/100</option>
-                    <option value="premium">Membros Premium - R$ 6,50/100</option>
-                  </select>
-                  <select value={memberQty} onChange={(e) => setMemberQty(Number(e.target.value))}>
-                    {[100,200,300,400,5000].map(q => <option key={q} value={q}>{q} membros</option>)}
-                  </select>
-                </div>
-              )}
-              <div className="payBox">
-                <h3>Pagamento Pix</h3>
-                <p>{pix || "Pix ainda não cadastrado pelo admin."}</p>
-                <button onClick={copyPix}>Copiar Pix</button>
-                {qr && <img src={qr} alt="QR Pix"/>}
-              </div>
-              {!paid ? <button className="buyNow" onClick={confirmPayment}>Confirmar pagamento</button> : (
-                <div className="confirmed"><h3>✅ Pagamento confirmado!</h3><p>Abra o Discord para resgatar.</p><a href={DISCORD} target="_blank">Abrir Discord</a></div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {(loginOpen || createOpen) && (
-        <div className="modalBg">
-          <div className="authModal">
-            <button className="close" onClick={() => {setLoginOpen(false);setCreateOpen(false)}}>×</button>
-            <h2>{createOpen ? "Criar conta" : "Entrar"}</h2>
-            <input placeholder="Email"/>
-            <input placeholder="Senha" type="password"/>
-            {createOpen && <input placeholder="Confirmar senha" type="password"/>}
-            <button onClick={() => alert("Login visual criado. Para funcionar real precisa banco de dados.")}>{createOpen ? "Criar conta" : "Entrar"}</button>
-          </div>
-        </div>
-      )}
-
-      {adminLogin && (
-        <div className="modalBg">
-          <div className="authModal">
-            <button className="close" onClick={() => setAdminLogin(false)}>×</button>
-            <h2>Painel ADM</h2>
-            <input type="password" placeholder="Senha: admtauros" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} onKeyDown={(e)=>e.key==="Enter"&&loginAdmin()}/>
-            <button onClick={loginAdmin}>Entrar no painel</button>
-          </div>
-        </div>
-      )}
-
-      {adminOpen && (
-        <div className="modalBg">
-          <div className="modal adminModal">
-            <button className="close" onClick={() => setAdminOpen(false)}>×</button>
-            <h2>Painel de Administração</h2>
-            <div className="adminGrid">
-              <section><h3>Pix e QR</h3><input value={pix} onChange={(e)=>setPix(e.target.value)} placeholder="Chave Pix"/><input type="file" accept="image/*" onChange={(e)=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>setQr(String(r.result));r.readAsDataURL(f)}}/>{qr&&<img className="qrPreview" src={qr}/>}<button onClick={()=>{localStorage.setItem("st_pix",pix);localStorage.setItem("st_qr",qr);alert("Salvo")}}>Salvar</button></section>
-              <section><h3>Banner</h3><input value={banner} onChange={(e)=>setBanner(e.target.value)}/><button onClick={()=>{localStorage.setItem("st_banner",banner);alert("Banner salvo")}}>Salvar banner</button></section>
-              <section><h3>Vendas</h3><div className="orders">{orders.length===0?<p>Nenhuma venda.</p>:orders.map(o=><div key={o.id}><b>{o.product}</b><small>{o.price} - {o.date}</small></div>)}</div><button onClick={()=>{setOrders([]);localStorage.removeItem("st_orders")}}>Limpar vendas</button></section>
-              <section><h3>Discord</h3><p>{DISCORD}</p><button onClick={()=>window.open(DISCORD,"_blank")}>Abrir Discord</button></section>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+import React,{useState}from"react";
+const DISCORD="https://discord.gg/WPH5Xc58cm";
+const ADMIN_PASS="admtauros";
+const prices={mistos:4,reais:5,premium:9};
+const produtos=[
+{id:"discord",titulo:"Discord",subtitulo:"Veja nossos produtos",preco:"",img:"discord",tipo:"categoria"},
+{id:"membros",titulo:"Membros Discord",subtitulo:"Servidores com membros",preco:"A partir de R$ 4,00",img:"membros",tipo:"membros"},
+{id:"nitro",titulo:"Nitro Discord",subtitulo:"Nitro para sua conta",preco:"R$ 6,50",img:"nitro",tipo:"fixo"},
+{id:"designer",titulo:"Designer",subtitulo:"Designer para seu servidor",preco:"R$ 65,00",img:"designer",tipo:"fixo"}];
+function moeda(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+export default function App(){
+const[produto,setProduto]=useState(null),[discordAberto,setDiscordAberto]=useState(false),[tipoMembro,setTipoMembro]=useState("mistos"),[quantidade,setQuantidade]=useState(100),[pago,setPago]=useState(false);
+const[login,setLogin]=useState(false),[criarConta,setCriarConta]=useState(false),[email,setEmail]=useState(localStorage.getItem("st_email")||""),[logado,setLogado]=useState(!!localStorage.getItem("st_email"));
+const[adminLogin,setAdminLogin]=useState(false),[adminAberto,setAdminAberto]=useState(false),[senhaAdmin,setSenhaAdmin]=useState(""),[pix,setPix]=useState(localStorage.getItem("st_pix")||""),[qr,setQr]=useState(localStorage.getItem("st_qr")||""),[vendas,setVendas]=useState(()=>JSON.parse(localStorage.getItem("st_vendas")||"[]"));
+const precoMembro=moeda((quantidade/100)*prices[tipoMembro]);
+function abrirProduto(p){if(p.id==="discord"){setDiscordAberto(!discordAberto);return}setProduto(p);setPago(false)}
+function entrarConta(novo=false){if(!email.includes("@"))return alert("Digite um email válido.");localStorage.setItem("st_email",email);setLogado(true);setLogin(false);setCriarConta(false);alert(novo?"Conta criada com sucesso!":"Login realizado!")}
+function entrarAdmin(){if(senhaAdmin===ADMIN_PASS){setAdminLogin(false);setAdminAberto(true);setSenhaAdmin("")}else alert("Senha admin incorreta.")}
+function salvarAdmin(){localStorage.setItem("st_pix",pix);localStorage.setItem("st_qr",qr);alert("Configurações salvas!")}
+function uploadQr(e){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>setQr(String(r.result));r.readAsDataURL(f)}
+function copiarPix(){if(!pix)return alert("Pix ainda não cadastrado no painel admin.");navigator.clipboard.writeText(pix);alert("Pix copiado!")}
+function confirmarPagamento(){const nome=produto?.tipo==="membros"?`${quantidade} Membros ${tipoMembro}`:produto?.titulo;const valor=produto?.tipo==="membros"?precoMembro:produto?.preco;const venda={id:"ST-"+Math.floor(1000+Math.random()*9000),nome,valor,data:new Date().toLocaleString("pt-BR")};const novas=[venda,...vendas];setVendas(novas);localStorage.setItem("st_vendas",JSON.stringify(novas));setPago(true)}
+return <div className="page">
+<aside className="sidebar">
+ <div className="perfil"><div className="taurosLogo"></div><div><b>STORE TAUROS <span>✓</span></b><small>Loja oficial</small></div></div>
+ <p>MENU</p><a href="#inicio" className="active">⌂ <span>Início</span></a><a href="#produtos">▣ <span>Produtos</span></a><button onClick={()=>setDiscordAberto(!discordAberto)}>💬 <span>Discord</span><em>⌄</em></button><a href="#pix">◇ <span>Pix</span></a><button onClick={()=>window.open(DISCORD,"_blank")}>🎧 <span>Suporte</span></button>
+ <p>ADMINISTRAÇÃO</p><button className="adminSide" onClick={()=>setAdminLogin(true)}>🛡 <span>Painel Admin</span></button><button onClick={()=>setAdminLogin(true)}>↪ <span>Login Admin</span></button>
+ <p>CONTA</p><button onClick={()=>setLogin(true)}>↪ <span>{logado?"Minha conta":"Entrar"}</span></button><button onClick={()=>setCriarConta(true)}>☊ <span>Criar conta</span></button>
+ <div className="discordBox"><b>Acessar Discord</b><small>Comunidade oficial</small><button onClick={()=>window.open(DISCORD,"_blank")}>Abrir</button></div>
+</aside>
+<main>
+ <section id="inicio" className="hero"><div className="heroText"><h1>Bem-Vindo(a) à<br/><span>Store Tauros!</span></h1><p>Aqui você encontra tudo para elevar sua experiência, com produtos digitais premium, entrega automática e suporte dedicado!</p><div className="beneficios"><div>⚡ <b>Entrega automática</b><small>Instantânea</small></div><div>🛡 <b>100% Seguro</b><small>Dados protegidos</small></div><div>🎧 <b>Suporte 24/7</b><small>Sempre disponível</small></div></div></div><div className="heroLogo"><div className="bullImage"></div><h2>TAUROS</h2><span>STORE</span></div></section>
+ <section id="produtos" className="produtos"><h2>Nossos Produtos</h2><p>Produtos digitais premium para você!</p><div className="cards">{produtos.map(p=><button className="card" key={p.id} onClick={()=>abrirProduto(p)}><div className={`cardImg ${p.img}`}><span>{p.img==="discord"?"💬":p.img==="membros"?"👥":p.img==="nitro"?"💎":"◉"}</span></div><div className="cardInfo"><h3>{p.titulo}</h3><p>{p.subtitulo}</p><i>→</i></div></button>)}</div>{discordAberto&&<div className="discordDropdown"><h3>Produtos Discord</h3><div>{produtos.filter(p=>p.id!=="discord").map(p=><button key={p.id} onClick={()=>abrirProduto(p)}><b>{p.titulo}</b><small>{p.preco}</small></button>)}</div></div>}</section>
+ <section id="pix" className="pagamento"><h2>Pagamento</h2><p>Formas de pagamento</p><button className="pixCard" onClick={()=>alert("A chave Pix aparece apenas após clicar em comprar.")}><div className="pixIcon">◆</div><div><b>Apenas Pix</b><small>Pagamento via PIX</small></div><span>→</span></button></section><div className="help"><b>Precisa de ajuda?</b><span>Entre no nosso Discord!</span><button onClick={()=>window.open(DISCORD,"_blank")}>💬</button></div></main>
+ {produto&&<div className="modalBg"><div className="modal compra"><button className="close" onClick={()=>setProduto(null)}>×</button><div className={`modalImage ${produto.img}`}></div><div><span className="stock">Disponível</span><h2>{produto.titulo}</h2><p>{produto.subtitulo}</p>{produto.tipo==="membros"?<><strong>{precoMembro}</strong><div className="selects"><select value={tipoMembro} onChange={e=>setTipoMembro(e.target.value)}><option value="mistos">Membros Mistos - R$ 4,00 por 100</option><option value="reais">Membros Reais - R$ 5,00 por 100</option><option value="premium">Membros Premium - R$ 9,00 por 100</option></select><select value={quantidade} onChange={e=>setQuantidade(Number(e.target.value))}>{[100,200,300,400,5000].map(q=><option key={q} value={q}>{q} membros</option>)}</select></div></>:<strong>{produto.preco}</strong>}<div className="pay"><h3>Pagamento Pix</h3><p>{pix||"Pix ainda não cadastrado no painel admin."}</p><button onClick={copiarPix}>Copiar Pix</button>{qr&&<img src={qr} alt="QR Pix"/>}</div>{!pago?<button className="buy" onClick={confirmarPagamento}>Confirmar pagamento</button>:<div className="ok"><h3>✅ Pagamento confirmado!</h3><p>Agora abra o Discord para resgatar seu pedido.</p><a href={DISCORD} target="_blank">Abrir Discord</a></div>}</div></div></div>}
+ {(login||criarConta)&&<div className="modalBg"><div className="modal auth"><button className="close" onClick={()=>{setLogin(false);setCriarConta(false)}}>×</button><h2>{criarConta?"Criar conta":"Entrar"}</h2><input placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)}/><input type="password" placeholder="Senha"/>{criarConta&&<input type="password" placeholder="Confirmar senha"/>}<button onClick={()=>entrarConta(criarConta)}>{criarConta?"Criar conta":"Entrar"}</button><p>Login visual salvo neste navegador.</p></div></div>}
+ {adminLogin&&<div className="modalBg"><div className="modal auth"><button className="close" onClick={()=>setAdminLogin(false)}>×</button><h2>Login Admin</h2><input type="password" placeholder="Senha: admtauros" value={senhaAdmin} onChange={e=>setSenhaAdmin(e.target.value)} onKeyDown={e=>e.key==="Enter"&&entrarAdmin()}/><button onClick={entrarAdmin}>Entrar</button></div></div>}
+ {adminAberto&&<div className="modalBg"><div className="modal admin"><button className="close" onClick={()=>setAdminAberto(false)}>×</button><h2>Painel de Administração</h2><div className="adminGrid"><section><h3>Pix e QR</h3><input placeholder="Chave Pix" value={pix} onChange={e=>setPix(e.target.value)}/><input type="file" accept="image/*" onChange={uploadQr}/>{qr&&<img className="qr" src={qr}/>}<button onClick={salvarAdmin}>Salvar Pix/QR</button></section><section><h3>Vendas</h3><div className="vendas">{vendas.length===0?<p>Nenhuma venda.</p>:vendas.map(v=><div key={v.id}><b>{v.nome}</b><small>{v.valor} • {v.data}</small></div>)}</div><button onClick={()=>{setVendas([]);localStorage.removeItem("st_vendas")}}>Limpar vendas</button></section><section><h3>Discord</h3><p>{DISCORD}</p><button onClick={()=>window.open(DISCORD,"_blank")}>Abrir Discord</button></section></div></div></div>}
+</div>}
