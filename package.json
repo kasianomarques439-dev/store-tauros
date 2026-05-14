@@ -1,7 +1,7 @@
 {
-  "name": "storetauros-100-digital",
+  "name": "storetauros-premium-plus",
   "private": true,
-  "version": "5.0.0",
+  "version": "7.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,8 @@
     "@vitejs/plugin-react": "^4.2.1",
     "vite": "^5.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@supabase/supabase-js": "^2.45.4"
   },
   "devDependencies": {}
 }
