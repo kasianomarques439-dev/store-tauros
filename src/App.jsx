@@ -3,97 +3,231 @@ import React, { useState } from "react";
 
 const discord = "https://discord.gg/WPH5Xc58cm";
 
-const planos = [
-  { nome:"100 Membros Mistos", preco:"R$ 2,00"},
-  { nome:"100 Membros Reais", preco:"R$ 2,50"},
-  { nome:"100 Membros Premium", preco:"R$ 6,50"},
-  { nome:"Designer de Server", preco:"R$ 35,00"},
-  { nome:"Conta Nitrada", preco:"R$ 5,00"}
+const categorias = [
+  {
+    titulo:"Membros Mistos",
+    preco:"R$ 2,00 / 100",
+    cor:"mistos",
+    opcoes:["100","200","300","400","5000"]
+  },
+  {
+    titulo:"Membros Reais",
+    preco:"R$ 2,50 / 100",
+    cor:"reais",
+    opcoes:["100","200","300","400","5000"]
+  },
+  {
+    titulo:"Membros Premium",
+    preco:"R$ 6,50 / 100",
+    cor:"premium",
+    opcoes:["100","200","300","400","5000"]
+  },
+  {
+    titulo:"Designer de Servidor",
+    preco:"R$ 35,00",
+    cor:"designer",
+    opcoes:["Pacote Único"]
+  },
+  {
+    titulo:"Conta Nitrada",
+    preco:"R$ 5,00",
+    cor:"nitro",
+    opcoes:["1 Conta","5 Contas","10 Contas"]
+  }
 ];
 
 export default function App(){
-  const [pix,setPix]=useState(localStorage.getItem("pix") || "SEU PIX");
-  const [admin,setAdmin]=useState(false);
-  const [senha,setSenha]=useState("");
-  const [confirmado,setConfirmado]=useState(false);
+  const [pix,setPix] = useState(localStorage.getItem("pix") || "000.000.000-00");
+  const [admin,setAdmin] = useState(false);
+  const [senha,setSenha] = useState("");
+  const [confirmado,setConfirmado] = useState(false);
 
-  function entrar(){
-    if(senha==="admtauros"){
+  function loginAdmin(){
+    if(senha === "admtauros"){
       setAdmin(true);
-    }else{
+    } else {
       alert("Senha incorreta");
     }
   }
 
-  function salvar(){
-    localStorage.setItem("pix",pix);
-    alert("Pix salvo");
+  function salvarPix(){
+    localStorage.setItem("pix", pix);
+    alert("Chave PIX salva!");
   }
 
   return(
-    <div className="app">
+    <div className="layout">
+
       <aside className="sidebar">
-        <h1>STORETAUROS</h1>
-        <button>☰</button>
+        <div className="logo">
+          <div className="bull">🐂</div>
+          <span>STORETAUROS</span>
+        </div>
+
         <button>🏠</button>
         <button>🛒</button>
+        <button>💬</button>
         <button onClick={()=>setAdmin(true)}>⚙️</button>
       </aside>
 
       <main className="content">
+
         <section className="hero">
-          <div>
-            <span className="tag">STORE DISCORD</span>
-            <h2>PAINEL PROFISSIONAL STORETAUROS</h2>
-            <p>Membros, designer e contas nitradas.</p>
+          <div className="overlay"></div>
+
+          <div className="heroText">
+            <span className="badge">LOJA PREMIUM DISCORD</span>
+
+            <h1>STORETAUROS</h1>
+
+            <h2>
+              MEMBROS, DESIGNER E CONTAS NITRADAS
+            </h2>
+
+            <p>
+              Loja profissional com entrega rápida, suporte ativo e pagamento via PIX.
+            </p>
+
+            <div className="heroButtons">
+              <button>VER PRODUTOS</button>
+              <button className="secondary">SUPORTE</button>
+            </div>
+
+            <div className="infos">
+              <div>⚡ Entrega imediata</div>
+              <div>💎 Qualidade premium</div>
+              <div>🛡️ Compra segura</div>
+            </div>
           </div>
         </section>
 
-        <h2 className="title">Categorias</h2>
+        <section className="pixBox">
+          <div>
+            <h3>PAGAMENTO VIA PIX</h3>
+            <p>Chave única cadastrada pelo administrador</p>
+          </div>
 
-        <div className="grid">
-          {planos.map((p,i)=>(
-            <div className="card" key={i}>
-              <div className="image"></div>
-              <h3>{p.nome}</h3>
-              <strong>{p.preco}</strong>
+          <div className="pixKey">{pix}</div>
+        </section>
 
-              <div className="buttons">
-                <button onClick={()=>navigator.clipboard.writeText(pix)}>Copiar Pix</button>
-                <button onClick={()=>setConfirmado(true)}>Confirmar</button>
+        <h2 className="sectionTitle">PRODUTOS</h2>
+
+        <section className="cards">
+
+          {categorias.map((item,index)=>(
+            <div className={`card ${item.cor}`} key={index}>
+
+              <div className="cardImage"></div>
+
+              <div className="cardContent">
+
+                <span className="smallTag">STORETAUROS</span>
+
+                <h3>{item.titulo}</h3>
+
+                <strong>{item.preco}</strong>
+
+                <select>
+                  {item.opcoes.map((op,i)=>(
+                    <option key={i}>{op}</option>
+                  ))}
+                </select>
+
+                <div className="buttons">
+                  <button
+                    onClick={()=>{
+                      navigator.clipboard.writeText(pix);
+                      alert("PIX copiado!");
+                    }}
+                  >
+                    COPIAR PIX
+                  </button>
+
+                  <button
+                    className="buy"
+                    onClick={()=>setConfirmado(true)}
+                  >
+                    COMPRAR
+                  </button>
+                </div>
+
+                {confirmado && (
+                  <div className="confirm">
+                    <span>✅ Pagamento confirmado!</span>
+
+                    <a href={discord} target="_blank">
+                      ABRIR DISCORD
+                    </a>
+                  </div>
+                )}
+
               </div>
-
-              {confirmado && (
-                <a className="discord" href={discord} target="_blank">
-                  Abrir Discord
-                </a>
-              )}
             </div>
           ))}
-        </div>
+
+        </section>
 
         {!admin && (
-          <div className="adminlogin">
-            <h2>Área Admin</h2>
-            <input placeholder="Senha admin" onChange={(e)=>setSenha(e.target.value)} />
-            <button onClick={entrar}>Entrar</button>
-          </div>
+          <section className="adminLogin">
+
+            <h2>PAINEL ADMIN</h2>
+
+            <input
+              type="password"
+              placeholder="Senha admin"
+              onChange={(e)=>setSenha(e.target.value)}
+            />
+
+            <button onClick={loginAdmin}>
+              ENTRAR
+            </button>
+
+          </section>
         )}
 
         {admin && (
-          <div className="admin">
-            <h2>Painel Admin</h2>
-            <p>Cadastre apenas uma chave pix:</p>
-            <input value={pix} onChange={(e)=>setPix(e.target.value)} />
-            <button onClick={salvar}>Salvar Pix</button>
+          <section className="adminPanel">
 
-            <div className="sales">
-              <h3>Painel de vendas</h3>
-              <div className="sale">Venda #001</div>
-              <div className="sale">Venda #002</div>
+            <h2>CONFIGURAÇÕES ADMIN</h2>
+
+            <div className="adminGrid">
+
+              <div className="adminCard">
+                <h3>Chave PIX</h3>
+
+                <input
+                  value={pix}
+                  onChange={(e)=>setPix(e.target.value)}
+                />
+
+                <button onClick={salvarPix}>
+                  SALVAR
+                </button>
+              </div>
+
+              <div className="adminCard">
+                <h3>Vendas</h3>
+
+                <div className="sale">#001 Membros Premium</div>
+                <div className="sale">#002 Conta Nitrada</div>
+                <div className="sale">#003 Designer Server</div>
+              </div>
+
+              <div className="adminCard">
+                <h3>Suporte</h3>
+
+                <p>Discord integrado</p>
+
+                <a className="supportBtn" href={discord} target="_blank">
+                  Abrir suporte
+                </a>
+              </div>
+
             </div>
-          </div>
+
+          </section>
         )}
+
       </main>
     </div>
   )
