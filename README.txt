@@ -1,23 +1,18 @@
+STORETAUROS - DESIGN NOVO
 
-STORETAUROS FULL READY
+Inclui:
+- Sidebar lateral
+- Menu rápido
+- Hero com vídeo em public/storetauros-video.mp4
+- Categorias com cards
+- Avaliações
+- Área de suporte
+- Produtos: membros, Nitro Discord e Designer de Server
+- Admin privado com senha: admtauros
+- Pix único, QR Pix, cupom, painel de vendas
+- Discord de resgate: https://discord.gg/WPH5Xc58cm
 
-Conteúdo:
-- Site completo React + Vite
-- Área admin
-- Salvar chave PIX
-- Salvar QR PIX
-- Discord de resgate
-- Confirmação de pagamento
-- Produtos completos
-- Designer gamer premium
-
-Senha admin:
-admtauros
-
-Discord:
-https://discord.gg/WPH5Xc58cm
-
-Como usar:
-1. Extraia o ZIP
-2. Envie para o GitHub
-3. Faça deploy na Vercel
+Como publicar:
+1. Extraia o ZIP.
+2. Envie os arquivos para o GitHub.
+3. Faça Deploy ou Redeploy na Vercel.
