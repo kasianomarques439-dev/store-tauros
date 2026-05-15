@@ -1,5 +1,4 @@
-// CHAVE PIX FIXA PARA TODOS OS CLIENTES
-export const PIX_KEY_FIXA = "taurosorg@gmail.com";
-
-// QR CODE FIXO E PERMANENTE
-export const QR_PIX_FIXO = "/assets/qr-pix.jpeg";
+export const PIX_KEY_FIXA="taurosorg@gmail.com";
+export const QR_PIX_FIXO="/assets/qr-pix.jpeg";
+export const DISCORD_LINK="https://discord.gg/SXZCqeqMRM";
+export const ADMIN_PASSWORD="admtauros";
