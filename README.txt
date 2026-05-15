@@ -1,26 +1,35 @@
-STORE TAUROS - SITE ATUALIZADO
+STORE TAUROS FINAL
 
-O QUE FOI ALTERADO:
-- Fundo trocado para a última imagem enviada.
-- Produtos com as imagens enviadas.
-- Discord configurado: https://discord.gg/SXZCqeqMRM
-- Após confirmar compra, o cliente é direcionado para o Discord.
-- Painel Admin separado em modal.
-- Senha admin: admtauros
-- Admin pode salvar chave Pix única.
-- Admin pode fazer upload do QR Code Pix.
-- Admin pode ver clientes e vendas.
-- Admin pode limpar vendas.
-- Login/criar conta salva no localStorage.
-- Histórico de pedidos.
-- Responsivo para celular.
-- Projeto pronto para Vercel.
+ALTERAÇÕES APLICADAS:
+- Nova pasta do projeto.
+- Site com estilo neon azul/roxo.
+- Banner com touro no topo e nos lugares principais do site.
+- Sistema de pastas/categorias:
+  1. Membros Discord
+  2. Conta Nitrada
+- Ao clicar na pasta, abre os produtos.
+- Produtos finais:
+  Membros Online = R$10,00
+  Membros Reais = R$5,00
+  Membros Premium = R$6,50
+  Membros Mistos = R$4,00
+  Conta Nitrada = R$6,00
+- Foto de membros aplicada nos produtos de membros.
+- Foto de conta nitrada aplicada na conta nitrada.
+- QR Code removido da página principal.
+- QR Code fica somente no Painel Admin privado.
+- Chave Pix configurável pelo admin.
+- Após compra, direciona para o Discord:
+  https://discord.gg/SXZCqeqMRM
+
+ADMIN:
+Senha: admtauros
 
 COMO RODAR:
 npm install
 npm run dev
 
-COMO PUBLICAR NA VERCEL:
+VERCEL:
 Framework: Vite
 Build command: npm run build
 Output directory: dist

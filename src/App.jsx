@@ -2,109 +2,107 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Home,
   ShoppingBag,
-  MessageCircle,
-  ShieldCheck,
+  ClipboardList,
+  Headphones,
   UserPlus,
   LogIn,
+  MessageCircle,
+  ShieldCheck,
+  Zap,
   Copy,
   X,
-  QrCode,
-  Trash2,
   Save,
   Upload,
-  Crown,
-  Users,
-  Brush,
+  Trash2,
   Menu,
-  CheckCircle2,
-  Wallet,
-  ExternalLink,
-  BadgeDollarSign
+  ArrowRight,
+  ShoppingCart,
+  Lock,
+  Users,
+  Crown,
 } from "lucide-react";
 
 const DISCORD_LINK = "https://discord.gg/SXZCqeqMRM";
 const ADMIN_PASSWORD = "admtauros";
 
-const productList = [
+const categories = [
   {
-    id: "membros-mistos",
-    title: "100 membros mistos",
-    desc: "Membros reais e mistos para crescer seu servidor.",
-    price: 4,
-    type: "unit",
-    img: "/assets/produto-membros-discord.png",
-    icon: Users,
+    id: "membros",
+    title: "Membros Discord",
+    subtitle: "Online, reais, premium e mistos",
+    image: "/assets/membros-discord.png",
   },
   {
-    id: "membros-reais",
-    title: "100 membros reais",
-    desc: "Entrega digital após pagamento.",
-    price: 5,
-    type: "unit",
-    img: "/assets/produto-membros-discord.png",
-    icon: Users,
-  },
-  {
-    id: "membros-premium",
-    title: "100 membros premium",
-    desc: "Membros premium para destacar seu servidor.",
-    price: 9,
-    type: "unit",
-    img: "/assets/produto-membros-discord.png",
-    icon: Users,
-  },
-  {
-    id: "membros-online",
-    title: "100 membros online",
-    desc: "Pacote de membros online.",
-    price: 10,
-    type: "unit",
-    img: "/assets/produto-membros-discord.png",
-    icon: Users,
-  },
-  {
-    id: "nitro-discord",
-    title: "Nitro Discord",
-    desc: "Nitro para sua conta Discord.",
-    price: 6.5,
-    type: "fixed",
-    img: "/assets/produto-nitro-gaming.png",
-    icon: Crown,
-  },
-  {
-    id: "conta-nitrada",
+    id: "conta",
     title: "Conta Nitrada",
-    desc: "Conta nitrada digital.",
-    price: 15,
-    type: "fixed",
-    img: "/assets/produto-conta-nitrada.png",
-    icon: Crown,
-  },
-  {
-    id: "designer-servidor",
-    title: "Designer servidor",
-    desc: "Designer completo para seu servidor.",
-    price: 65,
-    type: "fixed",
-    img: "/assets/referencia-site.png",
-    icon: Brush,
+    subtitle: "Conta Discord com Nitro",
+    image: "/assets/conta-nitrada.png",
   },
 ];
 
-function currency(value) {
+const products = [
+  {
+    id: "online",
+    category: "membros",
+    name: "Membros Online",
+    desc: "100 membros online para servidores Discord",
+    price: 10,
+    image: "/assets/membros-discord.png",
+    icon: Users,
+  },
+  {
+    id: "reais",
+    category: "membros",
+    name: "Membros Reais",
+    desc: "100 membros reais para servidores Discord",
+    price: 5,
+    image: "/assets/membros-discord.png",
+    icon: Users,
+  },
+  {
+    id: "premium",
+    category: "membros",
+    name: "Membros Premium",
+    desc: "100 membros premium para servidores Discord",
+    price: 6.5,
+    image: "/assets/membros-discord.png",
+    icon: Users,
+  },
+  {
+    id: "mistos",
+    category: "membros",
+    name: "Membros Mistos",
+    desc: "100 membros mistos para servidores Discord",
+    price: 4,
+    image: "/assets/membros-discord.png",
+    icon: Users,
+  },
+  {
+    id: "nitrada",
+    category: "conta",
+    name: "Conta Nitrada",
+    desc: "Conta Discord nitrada com entrega digital",
+    price: 6,
+    image: "/assets/conta-nitrada.png",
+    icon: Crown,
+  },
+];
+
+function money(value) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 export default function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menu, setMenu] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [selected, setSelected] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [pixKey, setPixKey] = useState(localStorage.getItem("tauros_pix_key") || "SUA-CHAVE-PIX-AQUI");
-  const [qrImage, setQrImage] = useState(localStorage.getItem("tauros_qr") || "");
   const [orders, setOrders] = useState([]);
   const [clients, setClients] = useState([]);
-  const [adminOpen, setAdminOpen] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("tauros_user") || "null"));
+  const [admin, setAdmin] = useState(false);
+  const [pixKey, setPixKey] = useState(localStorage.getItem("tauros_pix_key") || "SUA-CHAVE-PIX-AQUI");
+  const [qrImage, setQrImage] = useState(localStorage.getItem("tauros_qr") || "");
   const [toast, setToast] = useState("");
 
   useEffect(() => {
@@ -112,14 +110,18 @@ export default function App() {
     setClients(JSON.parse(localStorage.getItem("tauros_clients") || "[]"));
   }, []);
 
+  const visibleProducts = activeCategory
+    ? products.filter((p) => p.category === activeCategory)
+    : [];
+
   const total = useMemo(() => {
     if (!selected) return 0;
-    return Number((selected.price * quantity).toFixed(2));
+    return selected.price * quantity;
   }, [selected, quantity]);
 
-  function notify(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(""), 2800);
+  function notify(text) {
+    setToast(text);
+    setTimeout(() => setToast(""), 2500);
   }
 
   function saveOrders(next) {
@@ -135,225 +137,227 @@ export default function App() {
   function createAccount() {
     const name = prompt("Digite seu nome:");
     if (!name) return;
-    const email = prompt("Digite seu email ou Discord:");
-    if (!email) return;
+    const contact = prompt("Digite seu Discord ou email:");
+    if (!contact) return;
 
-    const newUser = { name, email, createdAt: new Date().toLocaleString("pt-BR") };
+    const newUser = { name, contact, createdAt: new Date().toLocaleString("pt-BR") };
     setUser(newUser);
     localStorage.setItem("tauros_user", JSON.stringify(newUser));
-
-    const next = [...clients, newUser];
-    saveClients(next);
+    saveClients([newUser, ...clients]);
     notify("Conta criada com sucesso!");
   }
 
   function login() {
-    const email = prompt("Digite seu email ou Discord:");
-    if (!email) return;
-    const found = clients.find((c) => c.email === email) || { name: "Cliente Tauros", email, createdAt: new Date().toLocaleString("pt-BR") };
+    const contact = prompt("Digite seu Discord ou email:");
+    if (!contact) return;
+
+    const found = clients.find((c) => c.contact === contact) || {
+      name: "Cliente Tauros",
+      contact,
+      createdAt: new Date().toLocaleString("pt-BR"),
+    };
+
     setUser(found);
     localStorage.setItem("tauros_user", JSON.stringify(found));
     notify("Login realizado!");
   }
 
   function adminLogin() {
-    const pass = prompt("Senha do painel admin:");
+    const pass = prompt("Digite a senha admin:");
     if (pass === ADMIN_PASSWORD) {
-      setAdminOpen(true);
-      notify("Painel admin aberto!");
+      setAdmin(true);
+      notify("Painel admin aberto.");
     } else {
       notify("Senha incorreta.");
     }
   }
 
   function finishOrder() {
-    const buyer = user || { name: "Cliente sem login", email: "Não informado" };
+    const buyer = user || { name: "Cliente sem login", contact: "Não informado" };
+
     const order = {
       id: Date.now(),
-      produto: selected.title,
-      quantidade: quantity,
-      total: currency(total),
-      cliente: buyer.name,
-      contato: buyer.email,
-      status: "Aguardando resgate no Discord",
-      data: new Date().toLocaleString("pt-BR"),
+      product: selected.name,
+      quantity,
+      total: money(total),
+      client: buyer.name,
+      contact: buyer.contact,
+      date: new Date().toLocaleString("pt-BR"),
+      status: "Resgatar pedido no Discord",
     };
 
-    const nextOrders = [order, ...orders];
-    saveOrders(nextOrders);
-
-    if (!user) {
-      const anon = { name: buyer.name, email: buyer.email, createdAt: order.data };
-      saveClients([anon, ...clients]);
-    }
-
-    notify("Compra registrada! Indo para o Discord...");
+    saveOrders([order, ...orders]);
+    notify("Pedido feito! Abrindo Discord...");
     setSelected(null);
-    setTimeout(() => window.open(DISCORD_LINK, "_blank"), 500);
+    setTimeout(() => window.open(DISCORD_LINK, "_blank"), 600);
   }
 
-  function handleQrUpload(event) {
-    const file = event.target.files?.[0];
+  function uploadQr(e) {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = () => {
       setQrImage(reader.result);
       localStorage.setItem("tauros_qr", reader.result);
-      notify("QR Code salvo!");
+      notify("QR Code salvo no painel admin.");
     };
     reader.readAsDataURL(file);
   }
 
-  function clearSales() {
-    if (confirm("Deseja limpar todas as vendas?")) {
-      saveOrders([]);
-      notify("Vendas limpas.");
-    }
-  }
-
   return (
     <div className="page">
-      <div className="bg"></div>
-      <div className="overlay"></div>
+      <div className="site-bg"></div>
+      <button className="mobile-menu" onClick={() => setMenu(!menu)}><Menu /></button>
 
-      <button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
-        <Menu size={25} />
-      </button>
-
-      <aside className={`sidebar ${menuOpen ? "open" : ""}`}>
-        <div className="brand">
-          <div className="bull-logo">
-            <span>♉</span>
-          </div>
+      <aside className={`sidebar ${menu ? "open" : ""}`}>
+        <div className="logo">
+          <img src="/assets/banner-tauros.png" alt="Tauros" />
           <div>
-            <strong>STORE TAUROS</strong>
-            <small>Loja oficial digital</small>
+            <h1>TAUROS</h1>
+            <span>STORE</span>
           </div>
         </div>
 
-        <p className="menu-title">MENU</p>
-        <a href="#inicio"><Home /> Início</a>
-        <a href="#produtos"><ShoppingBag /> Produtos</a>
-        <button onClick={() => window.open(DISCORD_LINK, "_blank")}><MessageCircle /> Discord</button>
-        <a href="#pagamento"><Wallet /> Pix</a>
-        <button onClick={() => window.open(DISCORD_LINK, "_blank")}><ShieldCheck /> Suporte</button>
+        <nav>
+          <a href="#inicio"><Home /> Início</a>
+          <a href="#produtos"><ShoppingBag /> Produtos</a>
+          <a href="#pedidos"><ClipboardList /> Meus Pedidos</a>
+          <button onClick={() => window.open(DISCORD_LINK, "_blank")}><Headphones /> Suporte</button>
 
-        <p className="menu-title">ADMINISTRAÇÃO</p>
-        <button onClick={adminLogin}><ShieldCheck /> Painel Admin</button>
-        <button onClick={adminLogin}><LogIn /> Login Admin</button>
+          <p>CONTA</p>
+          <button onClick={login}><LogIn /> Entrar</button>
+          <button onClick={createAccount}><UserPlus /> Criar Conta</button>
 
-        <p className="menu-title">CONTA</p>
-        <button onClick={login}><LogIn /> Entrar</button>
-        <button onClick={createAccount}><UserPlus /> Criar conta</button>
+          <p>ADMIN</p>
+          <button onClick={adminLogin}><Lock /> Painel Admin</button>
+        </nav>
 
-        <button className="discord-card" onClick={() => window.open(DISCORD_LINK, "_blank")}>
+        <button className="discord-box" onClick={() => window.open(DISCORD_LINK, "_blank")}>
           <MessageCircle />
-          <span>Acessar Discord</span>
+          <b>Entrar no Discord</b>
           <small>Resgate seu pedido</small>
+          <ArrowRight />
         </button>
       </aside>
 
       <main className="content">
         <section className="hero" id="inicio">
-          <div className="hero-text">
-            <span className="safe"><CheckCircle2 /> Compra 100% digital</span>
-            <h1>Bem-vindo(a) à <b>Store Tauros</b></h1>
-            <p>
-              Produtos digitais para Discord com visual neon, pagamento via Pix,
-              suporte no servidor e resgate direto após a compra.
-            </p>
+          <div className="hero-left">
+            <h2>Bem-vindo à</h2>
+            <h1>Store Tauros!</h1>
+            <p>Sua loja premium de produtos digitais para Discord. Compre, pague via Pix e resgate seu pedido diretamente no nosso servidor.</p>
 
-            <div className="features">
-              <div><BadgeDollarSign /> Pix rápido</div>
-              <div><ShieldCheck /> Compra segura</div>
-              <div><MessageCircle /> Resgate no Discord</div>
+            <div className="badges">
+              <div><Zap /> Entrega rápida</div>
+              <div><ShieldCheck /> 100% seguro</div>
+              <div><Headphones /> Suporte 24/7</div>
             </div>
           </div>
 
-          <div className="hero-logo">
-            <div className="neon-bull">♉</div>
-            <h2>TAUROS</h2>
-            <p>STORE</p>
+          <div className="hero-banner">
+            <img src="/assets/banner-tauros.png" alt="Banner Tauros" />
           </div>
         </section>
 
-        <section className="welcome">
-          <h2>Bem-vindo à Store Tauros</h2>
-          <p>Escolha seu produto, pague via Pix e entre no Discord para resgatar seu pedido com a equipe.</p>
-        </section>
-
-        <section className="products" id="produtos">
+        <section className="categories" id="produtos">
           <div className="section-title">
             <h2>Nossos Produtos</h2>
-            <p>Clique em um card para abrir a compra.</p>
+            <p>Clique em uma pasta para abrir as opções de compra.</p>
           </div>
 
-          <div className="grid">
-            {productList.map((product) => {
-              const Icon = product.icon;
-              return (
-                <article className="product-card" key={product.id} onClick={() => { setSelected(product); setQuantity(1); }}>
-                  <img src={product.img} alt={product.title} />
-                  <div className="product-body">
-                    <Icon className="product-icon" />
-                    <h3>{product.title}</h3>
-                    <p>{product.desc}</p>
-                    <strong>{currency(product.price)}</strong>
-                    <button>Comprar <ExternalLink size={16} /></button>
+          {!activeCategory && (
+            <div className="folder-grid">
+              {categories.map((cat) => (
+                <button className="folder-card" key={cat.id} onClick={() => setActiveCategory(cat.id)}>
+                  <img src={cat.image} alt={cat.title} />
+                  <div>
+                    <h3>{cat.title}</h3>
+                    <p>{cat.subtitle}</p>
+                    <span>Acessar produtos <ArrowRight size={18} /></span>
                   </div>
-                </article>
-              );
-            })}
-          </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {activeCategory && (
+            <>
+              <button className="back-btn" onClick={() => setActiveCategory(null)}>← Voltar para pastas</button>
+
+              <div className="product-grid">
+                {visibleProducts.map((product) => {
+                  const Icon = product.icon;
+                  return (
+                    <article className="product-card" key={product.id}>
+                      <img src={product.image} alt={product.name} />
+                      <div className="product-info">
+                        <Icon />
+                        <h3>{product.name}</h3>
+                        <p>{product.desc}</p>
+                        <strong>{money(product.price)}</strong>
+                        <button onClick={() => { setSelected(product); setQuantity(1); }}>
+                          <ShoppingCart size={18} /> Comprar agora
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </section>
 
-        <section className="payment" id="pagamento">
+        <section className="payment">
           <h2>Pagamento</h2>
           <div className="payment-box">
-            <QrCode size={48} />
+            <Copy />
             <div>
               <h3>Apenas Pix</h3>
-              <p>QR Code único e chave Pix configurados no painel admin.</p>
+              <p>QR Code removido da página principal. Ele fica apenas no painel admin privado.</p>
             </div>
             <button onClick={() => navigator.clipboard.writeText(pixKey).then(() => notify("Chave Pix copiada!"))}>
-              <Copy /> Copiar Pix
+              Copiar Pix
             </button>
           </div>
         </section>
 
-        <section className="orders">
+        <section className="orders" id="pedidos">
           <h2>Meus pedidos</h2>
-          {orders.length === 0 ? <p>Nenhum pedido ainda.</p> : orders.slice(0, 5).map((o) => (
-            <div className="order" key={o.id}>
-              <strong>{o.produto}</strong>
-              <span>{o.quantidade}x • {o.total}</span>
-              <small>{o.status}</small>
-            </div>
-          ))}
+          {orders.length === 0 ? (
+            <p>Nenhum pedido ainda.</p>
+          ) : (
+            orders.slice(0, 8).map((order) => (
+              <div className="order" key={order.id}>
+                <b>{order.product}</b>
+                <span>{order.quantity}x • {order.total}</span>
+                <small>{order.status}</small>
+              </div>
+            ))
+          )}
         </section>
       </main>
 
       {selected && (
         <div className="modal">
           <div className="modal-card">
-            <button className="modal-close" onClick={() => setSelected(null)}><X /></button>
-            <img src={selected.img} alt={selected.title} />
-            <h2>{selected.title}</h2>
+            <button className="close" onClick={() => setSelected(null)}><X /></button>
+            <img src={selected.image} alt={selected.name} />
+            <h2>{selected.name}</h2>
             <p>{selected.desc}</p>
 
             <label>Quantidade</label>
             <input type="number" min="1" value={quantity} onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} />
 
             <div className="total">
-              <span>Total</span>
-              <strong>{currency(total)}</strong>
+              <span>Total:</span>
+              <b>{money(total)}</b>
             </div>
 
-            <div className="qr-area">
-              {qrImage ? <img src={qrImage} alt="QR Code Pix" /> : <div className="fake-qr"><QrCode size={95} /><span>QR Pix</span></div>}
+            <div className="pix-modal">
+              <h3>Pagamento via Pix</h3>
               <p>{pixKey}</p>
-              <button onClick={() => navigator.clipboard.writeText(pixKey).then(() => notify("Chave Pix copiada!"))}>
+              <button onClick={() => navigator.clipboard.writeText(pixKey).then(() => notify("Pix copiado!"))}>
                 <Copy /> Copiar chave Pix
               </button>
             </div>
@@ -365,36 +369,40 @@ export default function App() {
         </div>
       )}
 
-      {adminOpen && (
+      {admin && (
         <div className="modal">
-          <div className="admin-modal">
-            <button className="modal-close" onClick={() => setAdminOpen(false)}><X /></button>
-            <h2>Painel Admin</h2>
-            <p>Senha: admtauros</p>
+          <div className="admin-card">
+            <button className="close" onClick={() => setAdmin(false)}><X /></button>
+            <h2>Painel Admin Privado</h2>
+            <p>Canal privado para Pix, QR Code, clientes e vendas.</p>
 
             <label>Chave Pix única</label>
             <input value={pixKey} onChange={(e) => setPixKey(e.target.value)} />
-
             <button onClick={() => { localStorage.setItem("tauros_pix_key", pixKey); notify("Chave Pix salva!"); }}>
-              <Save /> Salvar chave Pix
+              <Save /> Salvar Pix
             </button>
 
-            <label>Upload QR Code Pix</label>
-            <input type="file" accept="image/*" onChange={handleQrUpload} />
+            <label>QR Code Pix privado</label>
+            <input type="file" accept="image/*" onChange={uploadQr} />
+            {qrImage && <img className="admin-qr" src={qrImage} alt="QR Pix privado" />}
 
             <div className="admin-actions">
               <button onClick={() => window.open(DISCORD_LINK, "_blank")}><MessageCircle /> Abrir Discord</button>
-              <button onClick={clearSales}><Trash2 /> Limpar vendas</button>
+              <button onClick={() => { saveOrders([]); notify("Vendas limpas."); }}><Trash2 /> Limpar vendas</button>
             </div>
 
             <h3>Clientes</h3>
             <div className="admin-list">
-              {clients.length === 0 ? <small>Nenhum cliente.</small> : clients.map((c, i) => <small key={i}>{c.name} • {c.email}</small>)}
+              {clients.length === 0 ? <small>Nenhum cliente.</small> : clients.map((client, i) => (
+                <small key={i}>{client.name} • {client.contact}</small>
+              ))}
             </div>
 
             <h3>Vendas</h3>
             <div className="admin-list">
-              {orders.length === 0 ? <small>Nenhuma venda.</small> : orders.map((o) => <small key={o.id}>{o.produto} • {o.total} • {o.data}</small>)}
+              {orders.length === 0 ? <small>Nenhuma venda.</small> : orders.map((order) => (
+                <small key={order.id}>{order.product} • {order.total} • {order.date}</small>
+              ))}
             </div>
           </div>
         </div>
