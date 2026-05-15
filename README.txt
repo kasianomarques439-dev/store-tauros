@@ -1,24 +1,29 @@
-STORE TAUROS - LOGIN OBRIGATÓRIO + ADMIN
+STORE TAUROS - SUPABASE ONLINE
 
-Membros Online: R$10,00
-Login obrigatório ao entrar no site.
-Criar conta com Discord, email e senha.
-Admin pode ver clientes e vendas, puxar compras e baixar vendas.
-Imagem nova no topo. Responsivo para celular e computador.
-Pix: taurosorg@gmail.com
-Admin senha: admtauros
+Conectado ao Supabase:
+URL: https://rrfomlwuuceqpskyfxuw.supabase.co
+
+Agora:
+- compras de qualquer dispositivo vão para o banco online
+- painel admin puxa compras do banco
+- clientes ficam sincronizados no banco
+- admins veem vendas em qualquer aparelho
+
+PASSO OBRIGATÓRIO:
+Abra o Supabase → SQL Editor → New query
+Cole tudo do arquivo SUPABASE_SQL.txt
+Clique em RUN.
+
+Depois publique na Vercel.
 
 Comandos:
 npm install
 npm run dev
 
 Vercel:
-Framework Vite
-Build npm run build
-Output dist
+Framework: Vite
+Build command: npm run build
+Output directory: dist
 
-
-CORREÇÃO APLICADA:
-- Pedido confirmado agora é salvo em tauros_orders e tauros_orders_admin.
-- Botão Puxar compras busca e une as duas listas para aparecer no painel admin.
-- Restante do site mantido igual.
+Admin:
+Senha: admtauros
