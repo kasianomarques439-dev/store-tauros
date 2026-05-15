@@ -1,15 +1,24 @@
-STORE TAUROS - PIX CORRIGIDO
+STORE TAUROS - FIX PIX + ONLINE
 
-ALTERAÇÕES:
-- Removida a seção Pagamento da página principal.
-- QR Code e chave Pix aparecem somente ao clicar em Comprar.
-- Imagem central/banner trocada pela imagem enviada.
-- Chave Pix com valor padrão fixo para todos os clientes em src/config.js.
-- Painel Admin ainda salva no navegador local.
+ALTERADO:
+- Pix agora tem chave fixa no código para todos os clientes.
+- Tela principal mostra quantos online no site.
+- Painel Admin ganhou:
+  - Puxar compras
+  - Baixar vendas em CSV
+  - Limpar vendas
+  - Abrir Discord
 
-IMPORTANTE:
-Para a chave Pix aparecer para TODOS, edite src/config.js e troque COLOQUE-SUA-CHAVE-PIX-AQUI pela sua chave real.
-Sem backend/banco de dados, o painel admin salva apenas no navegador onde foi configurado.
+IMPORTANTE SOBRE PIX:
+O erro acontecia porque localStorage salva apenas no navegador do admin, não no navegador dos clientes.
+Para resolver de verdade, coloque sua chave Pix no arquivo:
+src/config.js
+
+Troque:
+COLOQUE-SUA-CHAVE-PIX-AQUI
+pela sua chave real.
+
+Depois faça push/deploy novamente na Vercel.
 
 COMANDOS:
 npm install
@@ -19,6 +28,3 @@ VERCEL:
 Framework: Vite
 Build command: npm run build
 Output directory: dist
-
-ADMIN: admtauros
-DISCORD: https://discord.gg/SXZCqeqMRM

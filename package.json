@@ -1,6 +1,6 @@
 {
-  "name": "store-tauros-pix-corrigido",
-  "version": "4.0.0",
+  "name": "store-tauros-fix-pix-online",
+  "version": "5.0.0",
   "private": true,
   "type": "module",
   "scripts": {
