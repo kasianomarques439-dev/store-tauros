@@ -1,24 +1,21 @@
-STORE TAUROS - SUPABASE ONLINE
+STORE TAUROS - VERSÃO CORRIGIDA SEM ERROS
 
-Conectado ao Supabase:
-URL: https://rrfomlwuuceqpskyfxuw.supabase.co
+Esta versão foi refeita para evitar erro de build na Vercel.
 
-Agora:
-- compras de qualquer dispositivo vão para o banco online
-- painel admin puxa compras do banco
-- clientes ficam sincronizados no banco
-- admins veem vendas em qualquer aparelho
+Já inclui:
+- package.json corrigido
+- vite.config.js corrigido
+- src/App.jsx corrigido
+- Supabase conectado
+- QR Pix permanente
+- Pix taurosorg@gmail.com
+- login obrigatório
+- painel admin
+- puxar compras pelo banco online
+- clientes e vendas sincronizados
 
-PASSO OBRIGATÓRIO:
-Abra o Supabase → SQL Editor → New query
-Cole tudo do arquivo SUPABASE_SQL.txt
-Clique em RUN.
-
-Depois publique na Vercel.
-
-Comandos:
-npm install
-npm run dev
+IMPORTANTE:
+No Supabase, execute o arquivo SUPABASE_SQL.txt no SQL Editor.
 
 Vercel:
 Framework: Vite
