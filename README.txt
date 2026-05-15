@@ -16,3 +16,9 @@ Vercel:
 Framework Vite
 Build npm run build
 Output dist
+
+
+CORREÇÃO APLICADA:
+- Pedido confirmado agora é salvo em tauros_orders e tauros_orders_admin.
+- Botão Puxar compras busca e une as duas listas para aparecer no painel admin.
+- Restante do site mantido igual.
