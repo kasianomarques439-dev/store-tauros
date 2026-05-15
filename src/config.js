@@ -1,7 +1,6 @@
 // CHAVE PIX FIXA PARA TODOS OS CLIENTES
-// Troque abaixo pela sua chave Pix real antes de publicar na Vercel.
-export const PIX_KEY_FIXA = "COLOQUE-SUA-CHAVE-PIX-AQUI";
+// Essa chave aparece para todos na tela de pagamento.
+export const PIX_KEY_FIXA = "taurosorg@gmail.com";
 
-// Se quiser usar um QR Code fixo em imagem, coloque public/assets/qr-pix.png
-// e altere para: export const QR_PIX_FIXO = "/assets/qr-pix.png";
+// QR opcional. Deixe vazio para gerar QR automático com a chave Pix.
 export const QR_PIX_FIXO = "";

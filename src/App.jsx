@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Home, ShoppingBag, ClipboardList, Headphones, UserPlus, LogIn, MessageCircle, ShieldCheck, Zap, Copy, X, Save, Upload, Trash2, Menu, ArrowRight, ShoppingCart, Lock, Users, Crown, QrCode, Download, RefreshCcw, Eye } from "lucide-react";
+import {
+  Home, ShoppingBag, ClipboardList, Headphones, UserPlus, LogIn, MessageCircle,
+  ShieldCheck, Zap, Copy, X, Save, Upload, Trash2, Menu, ArrowRight,
+  ShoppingCart, Lock, Users, Crown, QrCode, Download, RefreshCcw, Eye
+} from "lucide-react";
 import { PIX_KEY_FIXA, QR_PIX_FIXO } from "./config.js";
 
 const DISCORD_LINK = "https://discord.gg/SXZCqeqMRM";
@@ -39,12 +43,8 @@ export default function App() {
   useEffect(() => {
     setOrders(JSON.parse(localStorage.getItem("tauros_orders") || "[]"));
     setClients(JSON.parse(localStorage.getItem("tauros_clients") || "[]"));
-
-    const baseOnline = Math.floor(18 + Math.random() * 37);
-    setOnlineCount(baseOnline);
-    const timer = setInterval(() => {
-      setOnlineCount(Math.floor(18 + Math.random() * 37));
-    }, 9000);
+    setOnlineCount(Math.floor(18 + Math.random() * 37));
+    const timer = setInterval(() => setOnlineCount(Math.floor(18 + Math.random() * 37)), 9000);
     return () => clearInterval(timer);
   }, []);
 
@@ -128,8 +128,8 @@ export default function App() {
   }
 
   function downloadSales() {
-    const data = orders.map(o => `${o.id};${o.date};${o.client};${o.contact};${o.product};${o.quantity};${o.total};${o.status}`).join("\n");
-    const csv = "ID;Data;Cliente;Contato;Produto;Quantidade;Total;Status\n" + data;
+    const data = orders.map(o => `${o.id};${o.date};${o.client};${o.contact};${o.product};${o.quantity};${o.total};${o.status}`).join("\\n");
+    const csv = "ID;Data;Cliente;Contato;Produto;Quantidade;Total;Status\\n" + data;
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -261,10 +261,10 @@ export default function App() {
           <div className="admin-card">
             <button className="close" onClick={() => setAdmin(false)}><X /></button>
             <h2>Painel Admin Privado</h2>
-            <p>Para o Pix aparecer para todos os clientes, edite a chave fixa em <b>src/config.js</b>.</p>
-            <label>Chave Pix fixa atual</label>
+            <p>Pix fixo publicado para todos: <b>taurosorg@gmail.com</b></p>
+            <label>Chave Pix atual</label>
             <input value={pixKey} onChange={e => setPixKey(e.target.value)} />
-            <button onClick={() => notify("Para publicar para todos, coloque essa chave em src/config.js")}><Save /> Orientação de salvar Pix</button>
+            <button onClick={() => notify("Pix fixo já está no arquivo src/config.js")}><Save /> Pix já configurado</button>
             <label>QR Code Pix opcional para teste local</label>
             <input type="file" accept="image/*" onChange={uploadQr} />
             {qrImage && <img className="admin-qr" src={qrImage} alt="QR Pix privado" />}
