@@ -1,26 +1,28 @@
-STORE TAUROS - VERSÃO CORRIGIDA SEM ERROS
+STORE TAUROS - PRONTO FINAL GITHUB
 
-Esta versão foi refeita para evitar erro de build na Vercel.
+Use esta pasta completa para substituir a pasta antiga do GitHub.
 
-Já inclui:
-- package.json corrigido
-- vite.config.js corrigido
-- src/App.jsx corrigido
-- Supabase conectado
-- QR Pix permanente
-- Pix taurosorg@gmail.com
-- login obrigatório
-- painel admin
-- puxar compras pelo banco online
-- clientes e vendas sincronizados
+Inclui:
+- Site completo
+- Login obrigatório
+- Banco Supabase online
+- Painel admin puxando compras
+- Clientes online
+- QR Pix fixo
+- Chave Pix: taurosorg@gmail.com
 
 IMPORTANTE:
-No Supabase, execute o arquivo SUPABASE_SQL.txt no SQL Editor.
+Se ainda não rodou, execute o SUPABASE_SQL.txt no Supabase SQL Editor.
+
+Publicar:
+1. Extraia o ZIP
+2. Copie TODO o conteúdo desta pasta
+3. Cole na pasta do repositório aberto pelo GitHub Desktop em Repository > Show in Explorer
+4. Substitua tudo
+5. GitHub Desktop: Commit to main
+6. Push origin
 
 Vercel:
 Framework: Vite
 Build command: npm run build
 Output directory: dist
-
-Admin:
-Senha: admtauros

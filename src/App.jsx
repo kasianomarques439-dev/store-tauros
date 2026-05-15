@@ -75,7 +75,7 @@ export default function App() {
       .maybeSingle();
 
     if (findError) {
-      notify("Erro ao verificar cadastro. Veja o Supabase.");
+      notify("Erro ao verificar cadastro. Execute o SUPABASE_SQL.");
       return;
     }
 
