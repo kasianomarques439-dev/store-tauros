@@ -1,31 +1,17 @@
-STORE TAUROS FINAL
+STORE TAUROS - PIX CORRIGIDO
 
-ALTERAÇÕES APLICADAS:
-- Nova pasta do projeto.
-- Site com estilo neon azul/roxo.
-- Banner com touro no topo e nos lugares principais do site.
-- Sistema de pastas/categorias:
-  1. Membros Discord
-  2. Conta Nitrada
-- Ao clicar na pasta, abre os produtos.
-- Produtos finais:
-  Membros Online = R$10,00
-  Membros Reais = R$5,00
-  Membros Premium = R$6,50
-  Membros Mistos = R$4,00
-  Conta Nitrada = R$6,00
-- Foto de membros aplicada nos produtos de membros.
-- Foto de conta nitrada aplicada na conta nitrada.
-- QR Code removido da página principal.
-- QR Code fica somente no Painel Admin privado.
-- Chave Pix configurável pelo admin.
-- Após compra, direciona para o Discord:
-  https://discord.gg/SXZCqeqMRM
+ALTERAÇÕES:
+- Removida a seção Pagamento da página principal.
+- QR Code e chave Pix aparecem somente ao clicar em Comprar.
+- Imagem central/banner trocada pela imagem enviada.
+- Chave Pix com valor padrão fixo para todos os clientes em src/config.js.
+- Painel Admin ainda salva no navegador local.
 
-ADMIN:
-Senha: admtauros
+IMPORTANTE:
+Para a chave Pix aparecer para TODOS, edite src/config.js e troque COLOQUE-SUA-CHAVE-PIX-AQUI pela sua chave real.
+Sem backend/banco de dados, o painel admin salva apenas no navegador onde foi configurado.
 
-COMO RODAR:
+COMANDOS:
 npm install
 npm run dev
 
@@ -33,3 +19,6 @@ VERCEL:
 Framework: Vite
 Build command: npm run build
 Output directory: dist
+
+ADMIN: admtauros
+DISCORD: https://discord.gg/SXZCqeqMRM
