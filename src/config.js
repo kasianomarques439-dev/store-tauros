@@ -1,6 +1,5 @@
 // CHAVE PIX FIXA PARA TODOS OS CLIENTES
-// Essa chave aparece para todos na tela de pagamento.
 export const PIX_KEY_FIXA = "taurosorg@gmail.com";
 
-// QR opcional. Deixe vazio para gerar QR automático com a chave Pix.
-export const QR_PIX_FIXO = "";
+// QR Code permanente para todos os clientes.
+export const QR_PIX_FIXO = "https://quickchart.io/qr?text=taurosorg%40gmail.com&size=260";

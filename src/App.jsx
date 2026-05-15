@@ -10,17 +10,16 @@ const DISCORD_LINK = "https://discord.gg/SXZCqeqMRM";
 const ADMIN_PASSWORD = "admtauros";
 
 const categories = [
-  { id: "membros", title: "Membros Discord", subtitle: "Online, reais, premium e mistos", image: "/assets/membros-discord.png" },
+  { id: "membros", title: "Membros Discord", subtitle: "Online, reais e premium", image: "/assets/membros-discord.png" },
   { id: "conta", title: "Conta Nitrada", subtitle: "Conta Discord com Nitro", image: "/assets/conta-nitrada.png" },
 ];
 
 const products = [
-  { id: "online", category: "membros", name: "Membros Online", desc: "100 membros online para servidores Discord", price: 10, image: "/assets/membros-discord.png", icon: Users },
-  { id: "reais", category: "membros", name: "Membros Reais", desc: "100 membros reais para servidores Discord", price: 5, image: "/assets/membros-discord.png", icon: Users },
+  { id: "online", category: "membros", name: "Membros Online", desc: "100 membros online para servidores Discord", price: 8, image: "/assets/membros-discord.png", icon: Users },
+  { id: "reais", category: "membros", name: "Membros Reais", desc: "100 membros reais para servidores Discord", price: 3.8, image: "/assets/membros-discord.png", icon: Users },
   { id: "premium", category: "membros", name: "Membros Premium", desc: "100 membros premium para servidores Discord", price: 6.5, image: "/assets/membros-discord.png", icon: Users },
-  { id: "mistos", category: "membros", name: "Membros Mistos", desc: "100 membros mistos para servidores Discord", price: 4, image: "/assets/membros-discord.png", icon: Users },
   { id: "nitrada", category: "conta", name: "Conta Nitrada", desc: "Conta Discord nitrada com entrega digital", price: 6, image: "/assets/conta-nitrada.png", icon: Crown },
-];
+]
 
 function money(v) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -50,7 +49,7 @@ export default function App() {
 
   const visibleProducts = activeCategory ? products.filter(p => p.category === activeCategory) : [];
   const total = useMemo(() => selected ? selected.price * quantity : 0, [selected, quantity]);
-  const qrSrc = qrImage || `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(`PIX: ${pixKey} | Store Tauros | ${selected?.name || ""} | Total ${money(total)}`)}`;
+  const qrSrc = QR_PIX_FIXO;
 
   function notify(text) {
     setToast(text);
@@ -261,13 +260,11 @@ export default function App() {
           <div className="admin-card">
             <button className="close" onClick={() => setAdmin(false)}><X /></button>
             <h2>Painel Admin Privado</h2>
-            <p>Pix fixo publicado para todos: <b>taurosorg@gmail.com</b></p>
+            <p>Pix fixo publicado para todos: <b>taurosorg@gmail.com</b></p><p>Admins com acesso ao painel podem puxar, ver, baixar e limpar compras.</p>
             <label>Chave Pix atual</label>
             <input value={pixKey} onChange={e => setPixKey(e.target.value)} />
             <button onClick={() => notify("Pix fixo já está no arquivo src/config.js")}><Save /> Pix já configurado</button>
-            <label>QR Code Pix opcional para teste local</label>
-            <input type="file" accept="image/*" onChange={uploadQr} />
-            {qrImage && <img className="admin-qr" src={qrImage} alt="QR Pix privado" />}
+            <div className="admin-fixed-qr"><b>QR Code permanente ativo para clientes</b><img className="admin-qr" src={QR_PIX_FIXO} alt="QR Pix permanente" /></div>
             <div className="admin-actions">
               <button onClick={pullSales}><RefreshCcw /> Puxar compras</button>
               <button onClick={downloadSales}><Download /> Baixar vendas</button>

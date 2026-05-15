@@ -1,28 +1,24 @@
-STORE TAUROS COMPLETO - PIX ATUALIZADO
+STORE TAUROS - AJUSTES FINAIS
 
-Chave Pix definitiva:
-taurosorg@gmail.com
+ALTERADO:
+- Membros Online: R$ 8,00
+- Membros Reais: R$ 3,80
+- Membros Premium: R$ 6,50
+- Conta Nitrada: R$ 6,00
+- Membros Mistos removido
+- Pix fixo: taurosorg@gmail.com
+- QR Code permanente visível para clientes ao clicar em comprar
+- Removida opção de upload de QR no painel admin
+- Admins com acesso ao painel podem puxar, ver, baixar e limpar compras
 
-Arquivos incluídos:
-- package.json
-- vite.config.js
-- index.html
-- src/main.jsx
-- src/App.jsx
-- src/style.css
-- src/config.js
-- public/assets/banner-principal.jpeg
-- public/assets/membros-discord.png
-- public/assets/conta-nitrada.png
+ADMIN:
+Senha: admtauros
 
-Comandos:
+COMANDOS:
 npm install
 npm run dev
 
-Vercel:
+VERCEL:
 Framework: Vite
 Build command: npm run build
 Output directory: dist
-
-Admin:
-Senha: admtauros
