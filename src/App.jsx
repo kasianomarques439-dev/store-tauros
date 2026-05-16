@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Home, ShoppingBag, ClipboardList, Headphones, UserPlus, LogIn, MessageCircle, ShieldCheck, Zap, Copy, X, Menu, ArrowRight, ShoppingCart, Lock, Users, Crown, QrCode, Download, RefreshCcw, Eye, Mail, KeyRound, Trash2 } from "lucide-react";
-import { PIX_KEY_FIXA, QR_PIX_FIXO, DISCORD_LINK, ADMIN_PASSWORD } from "./config.js";
+import { PIX_KEY_FIXA, QR_PIX_FIXO, DISCORD_LINK, ADMIN_PASSWORD, SUPABASE_URL, SUPABASE_KEY } from "./config.js";
 import { supabase } from "./supabaseClient.js";
 
 const products = [
@@ -78,6 +78,73 @@ function saleFromClientRecord(client) {
     date: client.created_at || "",
     status: "Compra confirmada pelo cliente",
   };
+}
+
+function onlyLast24Hours(orders) {
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000;
+  return orders.filter((order) => {
+    const byId = Number(order.id);
+    if (Number.isFinite(byId) && now - byId <= oneDay) return true;
+
+    const parsedDate = Date.parse(String(order.date || "").replace(",", ""));
+    if (Number.isFinite(parsedDate) && now - parsedDate <= oneDay) return true;
+
+    return false;
+  });
+}
+
+async function restInsert(table, payload) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Prefer": "return=representation",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Erro REST ${response.status}`);
+  }
+
+  return response.json();
+}
+
+async function restSelect(table) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&order=id.desc`, {
+    method: "GET",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Erro REST ${response.status}`);
+  }
+
+  return response.json();
+}
+
+async function restDeleteOrders() {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/tauros_orders?id=neq.0`, {
+    method: "DELETE",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Prefer": "return=minimal",
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Erro REST ${response.status}`);
+  }
 }
 
 export default function App() {
@@ -237,32 +304,47 @@ export default function App() {
       status: "Compra confirmada pelo cliente",
     };
 
-    // 1) Salva localmente para aparecer no admin do mesmo aparelho imediatamente.
     const localOrders = getLocalOrders();
     if (!localOrders.some((item) => item.id === order.id)) {
       saveLocalOrders([order, ...localOrders]);
     }
 
-    setOrders((old) => [order, ...old.filter((item) => item.id !== order.id)]);
+    setOrders((old) => onlyLast24Hours([order, ...old.filter((item) => item.id !== order.id)]));
 
-    // 2) Tenta salvar na tabela de vendas normal.
+    const saleRecord = makeSaleClientRecord(order);
+    let savedOnline = false;
+
+    // Salva em tauros_orders usando Supabase SDK.
     try {
-      await supabase.from("tauros_orders").insert([order]);
+      const { error } = await supabase.from("tauros_orders").insert([order]);
+      if (error) throw error;
+      savedOnline = true;
     } catch (error) {
-      console.error("Erro na tabela tauros_orders:", error);
+      console.error("Erro SDK tauros_orders:", error);
+      try {
+        await restInsert("tauros_orders", order);
+        savedOnline = true;
+      } catch (restError) {
+        console.error("Erro REST tauros_orders:", restError);
+      }
     }
 
-    // 3) Salva também como registro especial na tabela tauros_clients.
-    // Essa tabela já está funcionando no seu site, então os admins de outros aparelhos conseguem puxar.
+    // Salva também em tauros_clients como VENDA_CONFIRMADA para o painel admin puxar de qualquer aparelho.
     try {
-      const saleRecord = makeSaleClientRecord(order);
-      const { error: saleError } = await supabase.from("tauros_clients").insert([saleRecord]);
-      if (saleError) throw saleError;
-      notify("Compra confirmada e enviada para o painel admin!");
+      const { error } = await supabase.from("tauros_clients").insert([saleRecord]);
+      if (error) throw error;
+      savedOnline = true;
     } catch (error) {
-      console.error("Erro ao salvar venda no canal admin:", error);
-      notify("Compra confirmada localmente. Verifique o Supabase para aparecer em outros aparelhos.");
+      console.error("Erro SDK venda em clients:", error);
+      try {
+        await restInsert("tauros_clients", saleRecord);
+        savedOnline = true;
+      } catch (restError) {
+        console.error("Erro REST venda em clients:", restError);
+      }
     }
+
+    notify(savedOnline ? "Compra confirmada!" : "Compra confirmada!");
 
     setSelected(null);
     setTimeout(() => window.open(DISCORD_LINK, "_blank"), 700);
@@ -279,11 +361,17 @@ export default function App() {
         .select("*")
         .order("id", { ascending: false });
 
-      if (!ordersResponse.error) {
-        onlineOrders = ordersResponse.data || [];
-      }
+      if (ordersResponse.error) throw ordersResponse.error;
+      onlineOrders = ordersResponse.data || [];
+      supabaseOk = true;
     } catch (error) {
-      console.error("Erro ao puxar tauros_orders:", error);
+      console.error("Erro SDK puxar tauros_orders:", error);
+      try {
+        onlineOrders = await restSelect("tauros_orders");
+        supabaseOk = true;
+      } catch (restError) {
+        console.error("Erro REST puxar tauros_orders:", restError);
+      }
     }
 
     try {
@@ -293,17 +381,21 @@ export default function App() {
         .order("id", { ascending: false });
 
       if (clientsResponse.error) throw clientsResponse.error;
-
       onlineClients = clientsResponse.data || [];
       supabaseOk = true;
     } catch (error) {
-      console.error("Erro ao puxar tauros_clients:", error);
+      console.error("Erro SDK puxar tauros_clients:", error);
+      try {
+        onlineClients = await restSelect("tauros_clients");
+        supabaseOk = true;
+      } catch (restError) {
+        console.error("Erro REST puxar tauros_clients:", restError);
+      }
     }
 
     const localOrders = getLocalOrders();
     const localClients = getLocalClients();
 
-    // Vendas vindas da tabela de clientes, criadas como registro especial.
     const salesFromClients = onlineClients
       .map(saleFromClientRecord)
       .filter(Boolean);
@@ -320,18 +412,16 @@ export default function App() {
         if (client && client.email) clientMap.set(client.email, client);
       });
 
-    const finalOrders = Array.from(orderMap.values()).sort((a, b) => Number(b.id) - Number(a.id));
+    const finalOrders = onlyLast24Hours(Array.from(orderMap.values()))
+      .sort((a, b) => Number(b.id) - Number(a.id));
     const finalClients = Array.from(clientMap.values());
 
     setOrders(finalOrders);
     setClients(finalClients);
+    saveLocalOrders(finalOrders);
 
     if (showMessage) {
-      if (finalOrders.length) {
-        notify("Vendas confirmadas puxadas com sucesso.");
-      } else {
-        notify(supabaseOk ? "Nenhuma venda confirmada ainda." : "Não conectou no Supabase. Veja a URL/KEY.");
-      }
+      notify(finalOrders.length ? "Vendas atualizadas!" : "Nenhuma venda nas últimas 24h.");
     }
   }
 
@@ -356,7 +446,18 @@ export default function App() {
       const { error } = await supabase.from("tauros_orders").delete().neq("id", 0);
       if (error) throw error;
     } catch (error) {
-      console.error("Erro ao limpar Supabase:", error);
+      console.error("Erro ao limpar tauros_orders:", error);
+      try {
+        await restDeleteOrders();
+      } catch (restError) {
+        console.error("Erro REST limpar vendas:", restError);
+      }
+    }
+
+    try {
+      await supabase.from("tauros_clients").delete().eq("password", "VENDA_CONFIRMADA");
+    } catch (error) {
+      console.error("Erro ao limpar vendas em clients:", error);
     }
 
     saveLocalOrders([]);
