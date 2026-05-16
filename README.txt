@@ -1,27 +1,17 @@
-STORE TAUROS - FINAL SEM ERRO
+STORE TAUROS - FINAL COM PRODUTOS NOVOS
 
-Esta pasta foi refeita limpa para remover os erros:
-- makeSaleClientRecord already been declared
-- saleFromClientRecord already been declared
-- onlyLast24Hours already been declared
+Mantém o mesmo design do site e acrescenta:
+- Conta Nitrada 1 Mês: R$6,00
+- Conta Trimestral: R$16,99
+- Nitro Link 1 Mês: R$1,99
+- Nitro Link 3 Meses: R$8,99
+- Ativação Link: R$2,00
 
-Use SOMENTE os arquivos desta pasta no GitHub:
-- public
-- src
-- index.html
-- package.json
-- vite.config.js
-- README.txt
-- SUPABASE_SQL_DEFINITIVO.txt
-
-Não misture com arquivos antigos.
-
-Depois:
-1. Execute SUPABASE_SQL_DEFINITIVO.txt no Supabase.
-2. Copie esta pasta limpa para o repositório.
-3. Commit.
-4. Push origin.
-5. Redeploy na Vercel.
+Imagem nova adicionada:
+- public/assets/nitro-link-produto.png
 
 Admin:
 Senha: admtauros
+
+Banco:
+Execute SUPABASE_SQL_DEFINITIVO.txt no Supabase se ainda não executou.

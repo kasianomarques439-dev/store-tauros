@@ -11,12 +11,18 @@ const products = [
   { id: "online", category: "membros", name: "Membros Online", desc: "100 membros online para servidores Discord", price: 10, image: "/assets/membros-discord.png", icon: Users },
   { id: "reais", category: "membros", name: "Membros Reais", desc: "100 membros reais para servidores Discord", price: 3.8, image: "/assets/membros-discord.png", icon: Users },
   { id: "premium", category: "membros", name: "Membros Premium", desc: "100 membros premium para servidores Discord", price: 6.5, image: "/assets/membros-discord.png", icon: Users },
-  { id: "nitrada", category: "conta", name: "Conta Nitrada", desc: "Conta Discord nitrada com entrega digital", price: 6, image: "/assets/conta-nitrada.png", icon: Crown },
+  { id: "conta-nitrada-1m", category: "conta", name: "Conta Nitrada 1 Mês", desc: "Conta Discord nitrada com entrega digital", price: 6, image: "/assets/conta-nitrada.png", icon: Crown },
+  { id: "conta-nitrada-3m", category: "conta", name: "Conta Trimestral", desc: "Conta Discord nitrada por 3 meses", price: 16.99, image: "/assets/conta-nitrada.png", icon: Crown },
+  { id: "nitro-link-1m", category: "nitro-link", name: "Nitro Link 1 Mês", desc: "Nitro Link para ativar na sua conta", price: 1.99, image: "/assets/nitro-link-produto.png", icon: Crown },
+  { id: "nitro-link-3m", category: "nitro-link", name: "Nitro Link 3 Meses", desc: "Nitro Link trimestral para sua conta", price: 8.99, image: "/assets/nitro-link-produto.png", icon: Crown },
+  { id: "ativacao-link", category: "ativacao-link", name: "Ativação Link", desc: "Ativação segura de Nitro Link na sua conta", price: 2, image: "/assets/nitro-link-produto.png", icon: Crown },
 ];
 
 const categories = [
   { id: "membros", title: "Membros Discord", subtitle: "Online, reais e premium", image: "/assets/membros-discord.png" },
-  { id: "conta", title: "Conta Nitrada", subtitle: "Conta Discord com Nitro", image: "/assets/conta-nitrada.png" },
+  { id: "conta", title: "Contas Nitradas", subtitle: "Conta 1 mês e conta trimestral", image: "/assets/conta-nitrada.png" },
+  { id: "nitro-link", title: "Nitro Link", subtitle: "Link de 1 mês e 3 meses", image: "/assets/nitro-link-produto.png" },
+  { id: "ativacao-link", title: "Ativação Link", subtitle: "Ativação do link na sua conta", image: "/assets/nitro-link-produto.png" },
 ];
 
 function money(value) {
