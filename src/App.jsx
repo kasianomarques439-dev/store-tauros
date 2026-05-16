@@ -53,6 +53,66 @@ function normalizeClient(row) {
   };
 }
 
+function onlyLast24Hours(orders) {
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000;
+  return orders.filter((order) => {
+    const idTime = Number(order.id);
+    return Number.isFinite(idTime) ? now - idTime <= oneDay : true;
+  });
+}
+
+function makeSaleClientRecord(order) {
+  return {
+    id: Number(order.id),
+    discord: `VENDA_CONFIRMADA | ${order.client || "Cliente"} | ${order.product || "Produto"} | ${order.quantity || 1}x | ${order.total || ""}`,
+    email: `venda-${order.id}@storetauros.local`,
+    password: "VENDA_CONFIRMADA",
+    created_at: order.date || new Date().toLocaleString("pt-BR"),
+  };
+}
+
+function saleFromClientRecord(client) {
+  if (!client || client.password !== "VENDA_CONFIRMADA") return null;
+  const parts = String(client.discord || "").split("|").map((item) => item.trim());
+  return {
+    id: client.id,
+    product: parts[2] || "Produto",
+    quantity: parts[3]?.replace("x", "") || "1",
+    total: parts[4] || "",
+    client: parts[1] || "Cliente",
+    contact: client.email || "",
+    date: client.created_at || "",
+    status: "Compra confirmada pelo cliente",
+  };
+}
+
+async function restInsertStrict(table, payload) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Prefer": "return=representation",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
+}
+
+async function restSelectStrict(table) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&order=id.desc`, {
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+    },
+  });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
+}
+
 function makeSaleClientRecord(order) {
   return {
     id: Number(order.id),
@@ -163,6 +223,7 @@ export default function App() {
   const [admin, setAdmin] = useState(false);
   const [toast, setToast] = useState("");
   const [onlineCount, setOnlineCount] = useState(0);
+  const [loadingSales, setLoadingSales] = useState(false);
 
   useEffect(() => {
     pullSales(false);
@@ -304,124 +365,106 @@ export default function App() {
       status: "Compra confirmada pelo cliente",
     };
 
-    const localOrders = getLocalOrders();
-    if (!localOrders.some((item) => item.id === order.id)) {
-      saveLocalOrders([order, ...localOrders]);
-    }
-
-    setOrders((old) => onlyLast24Hours([order, ...old.filter((item) => item.id !== order.id)]));
-
     const saleRecord = makeSaleClientRecord(order);
     let savedOnline = false;
 
-    // Salva em tauros_orders usando Supabase SDK.
     try {
       const { error } = await supabase.from("tauros_orders").insert([order]);
       if (error) throw error;
       savedOnline = true;
     } catch (error) {
-      console.error("Erro SDK tauros_orders:", error);
+      console.error("SDK tauros_orders falhou:", error);
       try {
-        await restInsert("tauros_orders", order);
+        await restInsertStrict("tauros_orders", order);
         savedOnline = true;
       } catch (restError) {
-        console.error("Erro REST tauros_orders:", restError);
+        console.error("REST tauros_orders falhou:", restError);
       }
     }
 
-    // Salva também em tauros_clients como VENDA_CONFIRMADA para o painel admin puxar de qualquer aparelho.
     try {
       const { error } = await supabase.from("tauros_clients").insert([saleRecord]);
       if (error) throw error;
       savedOnline = true;
     } catch (error) {
-      console.error("Erro SDK venda em clients:", error);
+      console.error("SDK venda em tauros_clients falhou:", error);
       try {
-        await restInsert("tauros_clients", saleRecord);
+        await restInsertStrict("tauros_clients", saleRecord);
         savedOnline = true;
       } catch (restError) {
-        console.error("Erro REST venda em clients:", restError);
+        console.error("REST venda em tauros_clients falhou:", restError);
       }
     }
 
-    notify(savedOnline ? "Compra confirmada!" : "Compra confirmada!");
+    if (!savedOnline) {
+      notify("Erro ao enviar compra para o servidor. Tente novamente.");
+      return;
+    }
 
+    setOrders((old) => onlyLast24Hours([order, ...old.filter((item) => item.id !== order.id)]));
+    notify("Compra confirmada!");
     setSelected(null);
     setTimeout(() => window.open(DISCORD_LINK, "_blank"), 700);
   }
 
   async function pullSales(showMessage = true) {
-    let onlineOrders = [];
-    let onlineClients = [];
-    let supabaseOk = false;
+    setLoadingSales(true);
 
     try {
-      const ordersResponse = await supabase
-        .from("tauros_orders")
-        .select("*")
-        .order("id", { ascending: false });
+      let onlineOrders = [];
+      let onlineClients = [];
 
-      if (ordersResponse.error) throw ordersResponse.error;
-      onlineOrders = ordersResponse.data || [];
-      supabaseOk = true;
-    } catch (error) {
-      console.error("Erro SDK puxar tauros_orders:", error);
       try {
-        onlineOrders = await restSelect("tauros_orders");
-        supabaseOk = true;
-      } catch (restError) {
-        console.error("Erro REST puxar tauros_orders:", restError);
+        const ordersResponse = await supabase
+          .from("tauros_orders")
+          .select("*")
+          .order("id", { ascending: false });
+        if (ordersResponse.error) throw ordersResponse.error;
+        onlineOrders = ordersResponse.data || [];
+      } catch (error) {
+        console.error("SDK puxar orders falhou:", error);
+        onlineOrders = await restSelectStrict("tauros_orders");
       }
-    }
 
-    try {
-      const clientsResponse = await supabase
-        .from("tauros_clients")
-        .select("*")
-        .order("id", { ascending: false });
-
-      if (clientsResponse.error) throw clientsResponse.error;
-      onlineClients = clientsResponse.data || [];
-      supabaseOk = true;
-    } catch (error) {
-      console.error("Erro SDK puxar tauros_clients:", error);
       try {
-        onlineClients = await restSelect("tauros_clients");
-        supabaseOk = true;
-      } catch (restError) {
-        console.error("Erro REST puxar tauros_clients:", restError);
+        const clientsResponse = await supabase
+          .from("tauros_clients")
+          .select("*")
+          .order("id", { ascending: false });
+        if (clientsResponse.error) throw clientsResponse.error;
+        onlineClients = clientsResponse.data || [];
+      } catch (error) {
+        console.error("SDK puxar clients falhou:", error);
+        onlineClients = await restSelectStrict("tauros_clients");
       }
-    }
 
-    const localOrders = getLocalOrders();
-    const localClients = getLocalClients();
+      const salesFromClients = onlineClients
+        .map(saleFromClientRecord)
+        .filter(Boolean);
 
-    const salesFromClients = onlineClients
-      .map(saleFromClientRecord)
-      .filter(Boolean);
-
-    const orderMap = new Map();
-    [...onlineOrders, ...salesFromClients, ...localOrders].forEach((order) => {
-      if (order && order.id) orderMap.set(Number(order.id), order);
-    });
-
-    const clientMap = new Map();
-    [...onlineClients.map(normalizeClient), ...localClients]
-      .filter((client) => client.password !== "VENDA_CONFIRMADA")
-      .forEach((client) => {
-        if (client && client.email) clientMap.set(client.email, client);
+      const orderMap = new Map();
+      [...onlineOrders, ...salesFromClients].forEach((order) => {
+        if (order && order.id) orderMap.set(Number(order.id), order);
       });
 
-    const finalOrders = onlyLast24Hours(Array.from(orderMap.values()))
-      .sort((a, b) => Number(b.id) - Number(a.id));
-    const finalClients = Array.from(clientMap.values());
+      const finalOrders = onlyLast24Hours(Array.from(orderMap.values()))
+        .sort((a, b) => Number(b.id) - Number(a.id));
 
-    setOrders(finalOrders);
-    setClients(finalClients);
-    saveLocalOrders(finalOrders);
+      const finalClients = onlineClients
+        .map(normalizeClient)
+        .filter((client) => client.password !== "VENDA_CONFIRMADA");
 
-    if (showMessage) {
-      notify(finalOrders.length ? "Vendas atualizadas!" : "Nenhuma venda nas últimas 24h.");
+      setOrders(finalOrders);
+      setClients(finalClients);
+
+      if (showMessage) {
+        notify(finalOrders.length ? "Vendas atualizadas!" : "Nenhuma venda nas últimas 24h.");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar vendas:", error);
+      if (showMessage) notify("Erro ao atualizar vendas. Confira Supabase URL/KEY e SQL.");
+    } finally {
+      setLoadingSales(false);
     }
   }
 
@@ -605,7 +648,7 @@ export default function App() {
             <h2>Painel Admin Privado</h2><p>Compras e clientes são puxados do Supabase online.</p><p>Pix fixo: <b>{PIX_KEY_FIXA}</b></p>
             <img className="admin-qr" src={QR_PIX_FIXO} alt="QR Pix" />
             <div className="admin-actions">
-              <button onClick={() => pullSales(true)}><RefreshCcw /> Puxar compras</button>
+              <button onClick={() => pullSales(true)} disabled={loadingSales}><RefreshCcw /> {loadingSales ? "Atualizando..." : "Puxar compras"}</button>
               <button onClick={downloadSales}><Download /> Baixar vendas</button>
               <button onClick={() => window.open(DISCORD_LINK, "_blank")}><MessageCircle /> Abrir Discord</button>
               <button onClick={clearOrders}><Trash2 /> Limpar vendas</button>
@@ -615,7 +658,7 @@ export default function App() {
             <h3>Vendas confirmadas</h3>
             <div className="admin-list">
               {orders.length === 0 ? (
-                <small>Nenhuma venda confirmada ainda.</small>
+                <small>Nenhuma venda confirmada nas últimas 24h.</small>
               ) : (
                 orders.map((order) => (
                   <div className="sale-row" key={order.id}>

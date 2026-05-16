@@ -1,16 +1,17 @@
-STORE TAUROS - VENDAS 24H SYNC CORRIGIDO
+STORE TAUROS - SERVER SYNC REAL
 
-Ajustes feitos:
-- Ao confirmar compra, aparece apenas: "Compra confirmada!"
-- A venda tenta salvar online por 2 métodos: Supabase SDK e REST direto.
-- A venda é salva em tauros_orders e também como VENDA_CONFIRMADA em tauros_clients.
-- O botão "Puxar compras" agora busca vendas online e locais.
-- A aba "Vendas confirmadas" mostra vendas das últimas 24h.
-- Admins com senha conseguem ver cliente, produto, quantidade, valor e data.
+O que foi corrigido:
+- Compra só confirma se conseguir enviar para o servidor/Supabase.
+- Não mostra mais confirmação local falsa.
+- Botão Puxar compras não fica travado; mostra "Atualizando..." e volta.
+- Admin busca vendas reais online das últimas 24h.
+- Vendas aparecem com cliente, contato, produto, quantidade, total e data.
+- Venda é salva em tauros_orders e também como backup em tauros_clients.
 
-IMPORTANTE:
-Execute o SUPABASE_SQL_DEFINITIVO.txt no Supabase SQL Editor e publique esta pasta nova.
-Se o Supabase estiver com URL/KEY errada, vendas de outros aparelhos não vão sincronizar.
+Obrigatório:
+1. Execute SUPABASE_SQL_DEFINITIVO.txt no Supabase.
+2. Publique esta pasta nova na Vercel/GitHub.
+3. Teste em outro celular: confirmar compra → admin → puxar compras.
 
 Admin:
 Senha: admtauros

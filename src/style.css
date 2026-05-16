@@ -3,3 +3,5 @@
 .sale-row b{color:#fff;font-size:16px}
 .sale-row span{color:#ddd;font-size:14px}
 .sale-row small{color:#b9e8ff}
+
+button:disabled{opacity:.65;cursor:not-allowed;filter:grayscale(.15)}

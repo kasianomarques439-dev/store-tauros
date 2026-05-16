@@ -1,5 +1,5 @@
--- SQL DEFINITIVO STORE TAUROS - VENDAS ONLINE 24H
--- Rode no Supabase SQL Editor e clique em Run.
+-- SQL STORE TAUROS - VENDAS ONLINE REAIS
+-- Execute este arquivo no Supabase SQL Editor e clique em Run.
 
 drop policy if exists "clientes insert public" on public.tauros_clients;
 drop policy if exists "clientes select public" on public.tauros_clients;
