@@ -1,20 +1,15 @@
-STORE TAUROS - CORREÇÃO FAILED TO FETCH
+STORE TAUROS - ADMIN VENDAS CORRIGIDO
 
-Correção aplicada:
-- Criar conta não trava mais em "Failed to fetch".
-- Se Supabase falhar, o site entra com fallback local automaticamente.
-- Login também tem fallback local.
-- Pedido também é salvo localmente se o Supabase falhar.
-- Painel admin puxa compras do Supabase e também dados locais.
+Correções:
+- Ao confirmar compra, o pedido agora é salvo imediatamente.
+- Painel admin mostra vendas confirmadas com nome do cliente, email/contato, produto, quantidade e total.
+- Botão Puxar compras carrega vendas do Supabase e também vendas locais.
+- Todos os admins com senha admtauros conseguem abrir o painel.
+- Para todos os admins/dispositivos verem as mesmas vendas, execute o SUPABASE_SQL_DEFINITIVO.txt no Supabase e publique essa pasta nova.
 
 IMPORTANTE:
-Para as compras aparecerem entre dispositivos diferentes, o Supabase precisa aceitar conexão.
-Execute o arquivo SUPABASE_SQL_DEFINITIVO.txt no SQL Editor e publique novamente.
-
-Se ainda aparecer modo local:
-1. Confira se a URL e KEY do Supabase em src/config.js estão corretas.
-2. Confira se o projeto Supabase não está pausado.
-3. Confira se o SQL foi executado com sucesso.
+Se o Supabase estiver sem conexão, o site ainda salva vendas localmente no aparelho.
+Para sincronizar entre dispositivos diferentes, o Supabase precisa estar funcionando.
 
 Admin:
 Senha: admtauros
