@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Home, ShoppingBag, ClipboardList, Headphones, UserPlus, LogIn, MessageCircle, ShieldCheck, Zap, Copy, X, Menu, ArrowRight, ShoppingCart, Lock, Users, Crown, QrCode, Download, RefreshCcw, Eye, Mail, KeyRound, Trash2 } from "lucide-react";
+import {
+  Home, ShoppingBag, ClipboardList, Headphones, UserPlus, LogIn, MessageCircle,
+  ShieldCheck, Zap, Copy, X, Menu, ArrowRight, ShoppingCart, Lock, Users,
+  Crown, QrCode, Download, RefreshCcw, Eye, Mail, KeyRound, Trash2
+} from "lucide-react";
 import { PIX_KEY_FIXA, QR_PIX_FIXO, DISCORD_LINK, ADMIN_PASSWORD, SUPABASE_URL, SUPABASE_KEY } from "./config.js";
 import { supabase } from "./supabaseClient.js";
 
@@ -19,37 +23,13 @@ function money(value) {
   return Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function getLocalClients() {
-  try {
-    return JSON.parse(localStorage.getItem("tauros_clients_backup") || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveLocalClients(clients) {
-  localStorage.setItem("tauros_clients_backup", JSON.stringify(clients));
-}
-
-function getLocalOrders() {
-  try {
-    return JSON.parse(localStorage.getItem("tauros_orders_backup") || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveLocalOrders(orders) {
-  localStorage.setItem("tauros_orders_backup", JSON.stringify(orders));
-}
-
 function normalizeClient(row) {
   return {
     id: row.id,
-    discord: row.discord || row.name || "Cliente",
-    email: row.email || row.contact || "",
+    discord: row.discord || "Cliente",
+    email: row.email || "",
     password: row.password || "",
-    created_at: row.created_at || row.createdAt || "",
+    created_at: row.created_at || "",
   };
 }
 
@@ -59,62 +39,9 @@ function onlyLast24Hours(orders) {
 
   return orders.filter((order) => {
     const idTime = Number(order.id);
-
     if (!Number.isFinite(idTime)) return true;
-
     return now - idTime <= oneDay;
   });
-}
-
-function makeSaleClientRecord(order) {
-  return {
-    id: Number(order.id),
-    discord: `VENDA_CONFIRMADA | ${order.client || "Cliente"} | ${order.product || "Produto"} | ${order.quantity || 1}x | ${order.total || ""}`,
-    email: `venda-${order.id}@storetauros.local`,
-    password: "VENDA_CONFIRMADA",
-    created_at: order.date || new Date().toLocaleString("pt-BR"),
-  };
-}
-
-function saleFromClientRecord(client) {
-  if (!client || client.password !== "VENDA_CONFIRMADA") return null;
-  const parts = String(client.discord || "").split("|").map((item) => item.trim());
-  return {
-    id: client.id,
-    product: parts[2] || "Produto",
-    quantity: parts[3]?.replace("x", "") || "1",
-    total: parts[4] || "",
-    client: parts[1] || "Cliente",
-    contact: client.email || "",
-    date: client.created_at || "",
-    status: "Compra confirmada pelo cliente",
-  };
-}
-
-async function restInsertStrict(table, payload) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Prefer": "return=representation",
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!response.ok) throw new Error(await response.text());
-  return response.json();
-}
-
-async function restSelectStrict(table) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&order=id.desc`, {
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-    },
-  });
-  if (!response.ok) throw new Error(await response.text());
-  return response.json();
 }
 
 function makeSaleClientRecord(order) {
@@ -142,19 +69,6 @@ function saleFromClientRecord(client) {
     date: client.created_at || "",
     status: "Compra confirmada pelo cliente",
   };
-}
-
-function onlyLast24Hours(orders) {
-  const now = Date.now();
-  const oneDay = 24 * 60 * 60 * 1000;
-
-  return orders.filter((order) => {
-    const idTime = Number(order.id);
-
-    if (!Number.isFinite(idTime)) return true;
-
-    return now - idTime <= oneDay;
-  });
 }
 
 async function restInsert(table, payload) {
@@ -170,8 +84,7 @@ async function restInsert(table, payload) {
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Erro REST ${response.status}`);
+    throw new Error(await response.text());
   }
 
   return response.json();
@@ -187,8 +100,7 @@ async function restSelect(table) {
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Erro REST ${response.status}`);
+    throw new Error(await response.text());
   }
 
   return response.json();
@@ -205,8 +117,7 @@ async function restDeleteOrders() {
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Erro REST ${response.status}`);
+    throw new Error(await response.text());
   }
 }
 
@@ -214,8 +125,13 @@ export default function App() {
   const [menu, setMenu] = useState(false);
   const [authMode, setAuthMode] = useState("login");
   const [currentUser, setCurrentUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("tauros_current_user") || "null"); } catch { return null; }
+    try {
+      return JSON.parse(localStorage.getItem("tauros_current_user") || "null");
+    } catch {
+      return null;
+    }
   });
+
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({ discord: "", email: "", password: "" });
   const [activeCategory, setActiveCategory] = useState(null);
@@ -245,6 +161,7 @@ export default function App() {
 
   async function register(event) {
     event.preventDefault();
+
     if (!registerForm.discord || !registerForm.email || !registerForm.password) {
       notify("Preencha todos os campos.");
       return;
@@ -260,46 +177,13 @@ export default function App() {
 
     try {
       const { error } = await supabase.from("tauros_clients").insert([newClient]);
-
-      if (error) {
-        console.error("Erro Supabase cadastro:", error);
-
-        const { data: existing } = await supabase
-          .from("tauros_clients")
-          .select("*")
-          .eq("email", registerForm.email)
-          .maybeSingle();
-
-        if (existing) {
-          const user = normalizeClient(existing);
-          localStorage.setItem("tauros_current_user", JSON.stringify(user));
-          setCurrentUser(user);
-          notify("Conta encontrada. Login realizado!");
-          return;
-        }
-
-        // Se for erro de duplicidade ou política, não trava a entrada.
-        throw error;
-      }
-
+      if (error) throw error;
       localStorage.setItem("tauros_current_user", JSON.stringify(newClient));
       setCurrentUser(newClient);
       notify("Conta criada com sucesso!");
-      return;
     } catch (error) {
-      console.error("Falha ao conectar Supabase:", error);
-
-      // Fallback para não travar o cliente caso a Vercel/Supabase bloqueie conexão.
-      const localClients = getLocalClients();
-      const exists = localClients.find((client) => client.email === newClient.email);
-
-      if (!exists) {
-        saveLocalClients([newClient, ...localClients]);
-      }
-
-      localStorage.setItem("tauros_current_user", JSON.stringify(newClient));
-      setCurrentUser(newClient);
-      notify("Conta criada. Modo local ativado.");
+      console.error("Erro ao criar conta:", error);
+      notify("Erro ao criar conta. Verifique o Supabase.");
     }
   }
 
@@ -314,29 +198,19 @@ export default function App() {
         .eq("password", loginForm.password)
         .maybeSingle();
 
-      if (!error && data) {
-        const user = normalizeClient(data);
-        localStorage.setItem("tauros_current_user", JSON.stringify(user));
-        setCurrentUser(user);
-        notify("Login realizado!");
+      if (error || !data) {
+        notify("Email ou senha incorretos.");
         return;
       }
+
+      const user = normalizeClient(data);
+      localStorage.setItem("tauros_current_user", JSON.stringify(user));
+      setCurrentUser(user);
+      notify("Login realizado!");
     } catch (error) {
-      console.error("Falha no login Supabase:", error);
+      console.error("Erro no login:", error);
+      notify("Erro no login. Verifique o Supabase.");
     }
-
-    const localUser = getLocalClients().find(
-      (client) => client.email === loginForm.email && client.password === loginForm.password
-    );
-
-    if (!localUser) {
-      notify("Email ou senha incorretos.");
-      return;
-    }
-
-    localStorage.setItem("tauros_current_user", JSON.stringify(localUser));
-    setCurrentUser(localUser);
-    notify("Login realizado!");
   }
 
   function logout() {
@@ -362,8 +236,8 @@ export default function App() {
       product: selected.name,
       quantity: Number(quantity),
       total: money(total),
-      client: currentUser.discord || currentUser.name || "Cliente",
-      contact: currentUser.email || currentUser.contact || "",
+      client: currentUser.discord || "Cliente",
+      contact: currentUser.email || "",
       date: new Date().toLocaleString("pt-BR"),
       status: "Compra confirmada pelo cliente",
     };
@@ -376,12 +250,12 @@ export default function App() {
       if (error) throw error;
       savedOnline = true;
     } catch (error) {
-      console.error("SDK tauros_orders falhou:", error);
+      console.error("Erro SDK tauros_orders:", error);
       try {
-        await restInsertStrict("tauros_orders", order);
+        await restInsert("tauros_orders", order);
         savedOnline = true;
       } catch (restError) {
-        console.error("REST tauros_orders falhou:", restError);
+        console.error("Erro REST tauros_orders:", restError);
       }
     }
 
@@ -390,12 +264,12 @@ export default function App() {
       if (error) throw error;
       savedOnline = true;
     } catch (error) {
-      console.error("SDK venda em tauros_clients falhou:", error);
+      console.error("Erro SDK venda em clientes:", error);
       try {
-        await restInsertStrict("tauros_clients", saleRecord);
+        await restInsert("tauros_clients", saleRecord);
         savedOnline = true;
       } catch (restError) {
-        console.error("REST venda em tauros_clients falhou:", restError);
+        console.error("Erro REST venda em clientes:", restError);
       }
     }
 
@@ -422,11 +296,12 @@ export default function App() {
           .from("tauros_orders")
           .select("*")
           .order("id", { ascending: false });
+
         if (ordersResponse.error) throw ordersResponse.error;
         onlineOrders = ordersResponse.data || [];
       } catch (error) {
-        console.error("SDK puxar orders falhou:", error);
-        onlineOrders = await restSelectStrict("tauros_orders");
+        console.error("Erro SDK puxar orders:", error);
+        onlineOrders = await restSelect("tauros_orders");
       }
 
       try {
@@ -434,18 +309,17 @@ export default function App() {
           .from("tauros_clients")
           .select("*")
           .order("id", { ascending: false });
+
         if (clientsResponse.error) throw clientsResponse.error;
         onlineClients = clientsResponse.data || [];
       } catch (error) {
-        console.error("SDK puxar clients falhou:", error);
-        onlineClients = await restSelectStrict("tauros_clients");
+        console.error("Erro SDK puxar clients:", error);
+        onlineClients = await restSelect("tauros_clients");
       }
 
-      const salesFromClients = onlineClients
-        .map(saleFromClientRecord)
-        .filter(Boolean);
-
+      const salesFromClients = onlineClients.map(saleFromClientRecord).filter(Boolean);
       const orderMap = new Map();
+
       [...onlineOrders, ...salesFromClients].forEach((order) => {
         if (order && order.id) orderMap.set(Number(order.id), order);
       });
@@ -464,7 +338,7 @@ export default function App() {
         notify(finalOrders.length ? "Vendas atualizadas!" : "Nenhuma venda nas últimas 24h.");
       }
     } catch (error) {
-      console.error("Erro ao atualizar vendas:", error);
+      console.error("Erro ao puxar vendas:", error);
       if (showMessage) notify("Erro ao atualizar vendas. Confira Supabase URL/KEY e SQL.");
     } finally {
       setLoadingSales(false);
@@ -475,6 +349,7 @@ export default function App() {
     const data = orders.map((order) =>
       `${order.id};${order.date};${order.client};${order.contact};${order.product};${order.quantity};${order.total};${order.status}`
     ).join("\n");
+
     const csv = "ID;Data;Cliente;Contato;Produto;Quantidade;Total;Status\n" + data;
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -492,11 +367,11 @@ export default function App() {
       const { error } = await supabase.from("tauros_orders").delete().neq("id", 0);
       if (error) throw error;
     } catch (error) {
-      console.error("Erro ao limpar tauros_orders:", error);
+      console.error("Erro ao limpar orders:", error);
       try {
         await restDeleteOrders();
       } catch (restError) {
-        console.error("Erro REST limpar vendas:", restError);
+        console.error("Erro REST limpar orders:", restError);
       }
     }
 
@@ -506,7 +381,6 @@ export default function App() {
       console.error("Erro ao limpar vendas em clients:", error);
     }
 
-    saveLocalOrders([]);
     setOrders([]);
     notify("Vendas limpas.");
   }
@@ -515,20 +389,25 @@ export default function App() {
     return (
       <div className="auth-page">
         <div className="auth-bg"></div>
+
         <div className="auth-card">
           <img src="/assets/topo-store-tauros.jpeg" alt="Store Tauros" className="auth-banner" />
           <h1>Store Tauros</h1>
           <p>Acesso exclusivo. Entre ou crie sua conta para acessar a loja.</p>
+
           <div className="auth-tabs">
             <button className={authMode === "login" ? "active" : ""} onClick={() => setAuthMode("login")}>Entrar</button>
             <button className={authMode === "register" ? "active" : ""} onClick={() => setAuthMode("register")}>Criar conta</button>
           </div>
+
           {authMode === "login" ? (
             <form onSubmit={login} className="auth-form">
               <label><Mail size={18} /> Email</label>
               <input type="email" value={loginForm.email} onChange={(event) => setLoginForm({ ...loginForm, email: event.target.value })} placeholder="seuemail@gmail.com" />
+
               <label><KeyRound size={18} /> Senha</label>
               <input type="password" value={loginForm.password} onChange={(event) => setLoginForm({ ...loginForm, password: event.target.value })} placeholder="Sua senha" />
+
               <button type="submit"><LogIn /> Entrar no site</button>
               <span onClick={() => setAuthMode("register")}>Ainda não tem conta? Criar conta</span>
             </form>
@@ -536,15 +415,19 @@ export default function App() {
             <form onSubmit={register} className="auth-form">
               <label><MessageCircle size={18} /> Nome do Discord</label>
               <input value={registerForm.discord} onChange={(event) => setRegisterForm({ ...registerForm, discord: event.target.value })} placeholder="Seu nome no Discord" />
+
               <label><Mail size={18} /> Email</label>
               <input type="email" value={registerForm.email} onChange={(event) => setRegisterForm({ ...registerForm, email: event.target.value })} placeholder="seuemail@gmail.com" />
+
               <label><KeyRound size={18} /> Senha</label>
               <input type="password" value={registerForm.password} onChange={(event) => setRegisterForm({ ...registerForm, password: event.target.value })} placeholder="Crie uma senha" />
+
               <button type="submit"><UserPlus /> Criar conta e acessar</button>
               <span onClick={() => setAuthMode("login")}>Já tenho conta. Entrar</span>
             </form>
           )}
         </div>
+
         {toast && <div className="toast">{toast}</div>}
       </div>
     );
@@ -554,11 +437,13 @@ export default function App() {
     <div className="page">
       <div className="site-bg"></div>
       <button className="mobile-menu" onClick={() => setMenu(!menu)}><Menu /></button>
+
       <aside className={`sidebar ${menu ? "open" : ""}`}>
         <div className="logo">
           <img src="/assets/topo-store-tauros.jpeg" alt="Tauros" />
           <div><h1>TAUROS</h1><span>STORE</span></div>
         </div>
+
         <nav>
           <a href="#inicio"><Home /> Início</a>
           <a href="#produtos"><ShoppingBag /> Produtos</a>
@@ -569,10 +454,12 @@ export default function App() {
           <p>ADMIN</p>
           <button onClick={adminLogin}><Lock /> Painel Admin</button>
         </nav>
+
         <button className="discord-box" onClick={() => window.open(DISCORD_LINK, "_blank")}>
           <MessageCircle /><b>Entrar no Discord</b><small>Resgate seu pedido</small><ArrowRight />
         </button>
       </aside>
+
       <main className="content">
         <section className="hero" id="inicio">
           <div className="hero-left">
@@ -580,27 +467,42 @@ export default function App() {
             <h2>Bem-vindo, {currentUser.discord}</h2>
             <h1>Store Tauros!</h1>
             <p>Sua loja premium de produtos digitais para Discord. Compre, pague via Pix e resgate seu pedido diretamente no nosso servidor.</p>
+
             <div className="badges">
-              <div><Zap /> Entrega rápida</div><div><ShieldCheck /> 100% seguro</div><div><Headphones /> Suporte 24/7</div>
+              <div><Zap /> Entrega rápida</div>
+              <div><ShieldCheck /> 100% seguro</div>
+              <div><Headphones /> Suporte 24/7</div>
             </div>
           </div>
+
           <div className="hero-banner"><img src="/assets/topo-store-tauros.jpeg" alt="Banner Store Tauros" /></div>
         </section>
+
         <section className="categories" id="produtos">
-          <div className="section-title"><h2>Nossos Produtos</h2><p>Clique em uma pasta para abrir as opções de compra.</p></div>
+          <div className="section-title">
+            <h2>Nossos Produtos</h2>
+            <p>Clique em uma pasta para abrir as opções de compra.</p>
+          </div>
+
           {!activeCategory && (
             <div className="folder-grid">
               {categories.map((cat) => (
                 <button className="folder-card" key={cat.id} onClick={() => setActiveCategory(cat.id)}>
                   <img src={cat.image} alt={cat.title} />
-                  <div><h3>{cat.title}</h3><p>{cat.subtitle}</p><span>Acessar produtos <ArrowRight size={18} /></span></div>
+                  <div>
+                    <h3>{cat.title}</h3>
+                    <p>{cat.subtitle}</p>
+                    <span>Acessar produtos <ArrowRight size={18} /></span>
+                  </div>
                 </button>
               ))}
             </div>
           )}
+
           {activeCategory && (
             <>
               <button className="back-btn" onClick={() => setActiveCategory(null)}>← Voltar para pastas</button>
+
               <div className="product-grid">
                 {visibleProducts.map((product) => {
                   const Icon = product.icon;
@@ -608,8 +510,13 @@ export default function App() {
                     <article className="product-card" key={product.id}>
                       <img src={product.image} alt={product.name} />
                       <div className="product-info">
-                        <Icon /><h3>{product.name}</h3><p>{product.desc}</p><strong>{money(product.price)}</strong>
-                        <button onClick={() => { setSelected(product); setQuantity(1); }}><ShoppingCart size={18} /> Comprar agora</button>
+                        <Icon />
+                        <h3>{product.name}</h3>
+                        <p>{product.desc}</p>
+                        <strong>{money(product.price)}</strong>
+                        <button onClick={() => { setSelected(product); setQuantity(1); }}>
+                          <ShoppingCart size={18} /> Comprar agora
+                        </button>
                       </div>
                     </article>
                   );
@@ -618,46 +525,77 @@ export default function App() {
             </>
           )}
         </section>
+
         <section className="orders" id="pedidos">
           <h2>Meus pedidos</h2>
-          {orders.filter((order) => order.contact === currentUser.email).length === 0 ? <p>Nenhum pedido ainda.</p> : orders.filter((order) => order.contact === currentUser.email).map((order) => (
-            <div className="order" key={order.id}><b>{order.product}</b><span>{order.quantity}x • {order.total}</span><small>{order.status}</small></div>
-          ))}
+          {orders.filter((order) => order.contact === currentUser.email).length === 0 ? (
+            <p>Nenhum pedido ainda.</p>
+          ) : (
+            orders.filter((order) => order.contact === currentUser.email).map((order) => (
+              <div className="order" key={order.id}>
+                <b>{order.product}</b>
+                <span>{order.quantity}x • {order.total}</span>
+                <small>{order.status}</small>
+              </div>
+            ))
+          )}
         </section>
       </main>
+
       {selected && (
         <div className="modal">
           <div className="modal-card">
             <button className="close" onClick={() => setSelected(null)}><X /></button>
             <img src={selected.image} alt={selected.name} />
-            <h2>{selected.name}</h2><p>{selected.desc}</p>
+            <h2>{selected.name}</h2>
+            <p>{selected.desc}</p>
+
             <label>Quantidade</label>
             <input type="number" min="1" value={quantity} onChange={(event) => setQuantity(Math.max(1, Number(event.target.value)))} />
+
             <div className="total"><span>Total:</span><b>{money(total)}</b></div>
+
             <div className="pix-modal">
               <h3><QrCode /> Pagamento via Pix</h3>
               <img className="qr-public" src={QR_PIX_FIXO} alt="QR Code Pix" />
               <p className="pix-key">{PIX_KEY_FIXA}</p>
-              <button onClick={() => navigator.clipboard.writeText(PIX_KEY_FIXA).then(() => notify("Chave Pix copiada!"))}><Copy /> Copiar chave Pix</button>
+              <button onClick={() => navigator.clipboard.writeText(PIX_KEY_FIXA).then(() => notify("Chave Pix copiada!"))}>
+                <Copy /> Copiar chave Pix
+              </button>
             </div>
+
             <button className="finish" onClick={finishOrder}>Confirmar compra e ir para o Discord</button>
           </div>
         </div>
       )}
+
       {admin && (
         <div className="modal">
           <div className="admin-card">
             <button className="close" onClick={() => setAdmin(false)}><X /></button>
-            <h2>Painel Admin Privado</h2><p>Compras e clientes são puxados do Supabase online.</p><p>Pix fixo: <b>{PIX_KEY_FIXA}</b></p>
+            <h2>Painel Admin Privado</h2>
+            <p>Compras confirmadas das últimas 24h aparecem aqui.</p>
+            <p>Pix fixo: <b>{PIX_KEY_FIXA}</b></p>
             <img className="admin-qr" src={QR_PIX_FIXO} alt="QR Pix" />
+
             <div className="admin-actions">
-              <button onClick={() => pullSales(true)} disabled={loadingSales}><RefreshCcw /> {loadingSales ? "Atualizando..." : "Puxar compras"}</button>
+              <button onClick={() => pullSales(true)} disabled={loadingSales}>
+                <RefreshCcw /> {loadingSales ? "Atualizando..." : "Puxar compras"}
+              </button>
               <button onClick={downloadSales}><Download /> Baixar vendas</button>
               <button onClick={() => window.open(DISCORD_LINK, "_blank")}><MessageCircle /> Abrir Discord</button>
               <button onClick={clearOrders}><Trash2 /> Limpar vendas</button>
             </div>
+
             <h3>Clientes</h3>
-            <div className="admin-list">{clients.length === 0 ? <small>Nenhum cliente.</small> : clients.map((client) => <small key={client.id}>{client.discord} • {client.email} • {client.created_at}</small>)}</div>
+            <div className="admin-list">
+              {clients.length === 0 ? (
+                <small>Nenhum cliente.</small>
+              ) : (
+                clients.map((client) => <small key={client.id}>{client.discord} • {client.email} • {client.created_at}</small>)
+              )}
+            </div>
+
             <h3>Vendas confirmadas</h3>
             <div className="admin-list">
               {orders.length === 0 ? (
@@ -677,6 +615,7 @@ export default function App() {
           </div>
         </div>
       )}
+
       {toast && <div className="toast">{toast}</div>}
     </div>
   );

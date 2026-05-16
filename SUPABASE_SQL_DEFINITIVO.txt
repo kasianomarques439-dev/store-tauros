@@ -1,6 +1,4 @@
--- SQL STORE TAUROS - VENDAS ONLINE REAIS
--- Execute este arquivo no Supabase SQL Editor e clique em Run.
-
+-- SQL STORE TAUROS FINAL SEM ERRO
 drop policy if exists "clientes insert public" on public.tauros_clients;
 drop policy if exists "clientes select public" on public.tauros_clients;
 drop policy if exists "clientes update public" on public.tauros_clients;

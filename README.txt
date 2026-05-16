@@ -1,17 +1,27 @@
-STORE TAUROS - SERVER SYNC REAL
+STORE TAUROS - FINAL SEM ERRO
 
-O que foi corrigido:
-- Compra só confirma se conseguir enviar para o servidor/Supabase.
-- Não mostra mais confirmação local falsa.
-- Botão Puxar compras não fica travado; mostra "Atualizando..." e volta.
-- Admin busca vendas reais online das últimas 24h.
-- Vendas aparecem com cliente, contato, produto, quantidade, total e data.
-- Venda é salva em tauros_orders e também como backup em tauros_clients.
+Esta pasta foi refeita limpa para remover os erros:
+- makeSaleClientRecord already been declared
+- saleFromClientRecord already been declared
+- onlyLast24Hours already been declared
 
-Obrigatório:
+Use SOMENTE os arquivos desta pasta no GitHub:
+- public
+- src
+- index.html
+- package.json
+- vite.config.js
+- README.txt
+- SUPABASE_SQL_DEFINITIVO.txt
+
+Não misture com arquivos antigos.
+
+Depois:
 1. Execute SUPABASE_SQL_DEFINITIVO.txt no Supabase.
-2. Publique esta pasta nova na Vercel/GitHub.
-3. Teste em outro celular: confirmar compra → admin → puxar compras.
+2. Copie esta pasta limpa para o repositório.
+3. Commit.
+4. Push origin.
+5. Redeploy na Vercel.
 
 Admin:
 Senha: admtauros
