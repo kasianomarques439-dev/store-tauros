@@ -19,6 +19,30 @@ function money(value) {
   return Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function getLocalClients() {
+  try {
+    return JSON.parse(localStorage.getItem("tauros_clients_backup") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalClients(clients) {
+  localStorage.setItem("tauros_clients_backup", JSON.stringify(clients));
+}
+
+function getLocalOrders() {
+  try {
+    return JSON.parse(localStorage.getItem("tauros_orders_backup") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalOrders(orders) {
+  localStorage.setItem("tauros_orders_backup", JSON.stringify(orders));
+}
+
 function normalizeClient(row) {
   return {
     id: row.id,
@@ -76,52 +100,84 @@ export default function App() {
       created_at: new Date().toLocaleString("pt-BR"),
     };
 
-    const { error } = await supabase.from("tauros_clients").insert([newClient]);
+    try {
+      const { error } = await supabase.from("tauros_clients").insert([newClient]);
 
-    if (error) {
-      console.error("Erro Supabase cadastro:", error);
-      const { data: existing } = await supabase
-        .from("tauros_clients")
-        .select("*")
-        .eq("email", registerForm.email)
-        .eq("password", registerForm.password)
-        .maybeSingle();
+      if (error) {
+        console.error("Erro Supabase cadastro:", error);
 
-      if (existing) {
-        const user = normalizeClient(existing);
-        localStorage.setItem("tauros_current_user", JSON.stringify(user));
-        setCurrentUser(user);
-        notify("Conta encontrada. Login realizado!");
-        return;
+        const { data: existing } = await supabase
+          .from("tauros_clients")
+          .select("*")
+          .eq("email", registerForm.email)
+          .maybeSingle();
+
+        if (existing) {
+          const user = normalizeClient(existing);
+          localStorage.setItem("tauros_current_user", JSON.stringify(user));
+          setCurrentUser(user);
+          notify("Conta encontrada. Login realizado!");
+          return;
+        }
+
+        // Se for erro de duplicidade ou política, não trava a entrada.
+        throw error;
       }
 
-      notify(`Erro ao criar conta: ${error.message || "verifique o Supabase"}`);
+      localStorage.setItem("tauros_current_user", JSON.stringify(newClient));
+      setCurrentUser(newClient);
+      notify("Conta criada com sucesso!");
       return;
-    }
+    } catch (error) {
+      console.error("Falha ao conectar Supabase:", error);
 
-    localStorage.setItem("tauros_current_user", JSON.stringify(newClient));
-    setCurrentUser(newClient);
-    notify("Conta criada com sucesso!");
+      // Fallback para não travar o cliente caso a Vercel/Supabase bloqueie conexão.
+      const localClients = getLocalClients();
+      const exists = localClients.find((client) => client.email === newClient.email);
+
+      if (!exists) {
+        saveLocalClients([newClient, ...localClients]);
+      }
+
+      localStorage.setItem("tauros_current_user", JSON.stringify(newClient));
+      setCurrentUser(newClient);
+      notify("Conta criada. Modo local ativado.");
+    }
   }
 
   async function login(event) {
     event.preventDefault();
-    const { data, error } = await supabase
-      .from("tauros_clients")
-      .select("*")
-      .eq("email", loginForm.email)
-      .eq("password", loginForm.password)
-      .maybeSingle();
 
-    if (error || !data) {
-      console.error("Erro Supabase login:", error);
+    try {
+      const { data, error } = await supabase
+        .from("tauros_clients")
+        .select("*")
+        .eq("email", loginForm.email)
+        .eq("password", loginForm.password)
+        .maybeSingle();
+
+      if (!error && data) {
+        const user = normalizeClient(data);
+        localStorage.setItem("tauros_current_user", JSON.stringify(user));
+        setCurrentUser(user);
+        notify("Login realizado!");
+        return;
+      }
+    } catch (error) {
+      console.error("Falha no login Supabase:", error);
+    }
+
+    const localUser = getLocalClients().find(
+      (client) => client.email === loginForm.email && client.password === loginForm.password
+    );
+
+    if (!localUser) {
       notify("Email ou senha incorretos.");
       return;
     }
 
-    const user = normalizeClient(data);
-    localStorage.setItem("tauros_current_user", JSON.stringify(user));
-    setCurrentUser(user);
+    localStorage.setItem("tauros_current_user", JSON.stringify(localUser));
+    setCurrentUser(localUser);
     notify("Login realizado!");
   }
 
@@ -154,11 +210,13 @@ export default function App() {
       status: "Resgatar pedido no Discord",
     };
 
-    const { error } = await supabase.from("tauros_orders").insert([order]);
-    if (error) {
+    try {
+      const { error } = await supabase.from("tauros_orders").insert([order]);
+      if (error) throw error;
+    } catch (error) {
       console.error("Erro Supabase pedido:", error);
-      notify(`Erro ao salvar pedido: ${error.message || "verifique o Supabase"}`);
-      return;
+      const localOrders = getLocalOrders();
+      saveLocalOrders([order, ...localOrders]);
     }
 
     setOrders((old) => [order, ...old]);
@@ -168,25 +226,54 @@ export default function App() {
   }
 
   async function pullSales(showMessage = true) {
-    const { data: ordersData, error: ordersError } = await supabase
-      .from("tauros_orders")
-      .select("*")
-      .order("id", { ascending: false });
+    let ordersData = [];
+    let clientsData = [];
 
-    const { data: clientsData, error: clientsError } = await supabase
-      .from("tauros_clients")
-      .select("*")
-      .order("id", { ascending: false });
+    try {
+      const ordersResponse = await supabase
+        .from("tauros_orders")
+        .select("*")
+        .order("id", { ascending: false });
 
-    if (ordersError || clientsError) {
-      console.error("Erro puxar dados:", ordersError || clientsError);
-      if (showMessage) notify(`Erro ao puxar compras: ${(ordersError || clientsError)?.message || "Supabase"}`);
-      return;
+      const clientsResponse = await supabase
+        .from("tauros_clients")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (ordersResponse.error || clientsResponse.error) {
+        throw ordersResponse.error || clientsResponse.error;
+      }
+
+      ordersData = ordersResponse.data || [];
+      clientsData = clientsResponse.data || [];
+    } catch (error) {
+      console.error("Erro puxar dados Supabase:", error);
+      ordersData = getLocalOrders();
+      clientsData = getLocalClients();
+
+      if (showMessage) {
+        notify("Supabase sem conexão. Mostrando dados locais.");
+      }
     }
 
-    setOrders(ordersData || []);
-    setClients((clientsData || []).map(normalizeClient));
-    if (showMessage) notify((ordersData || []).length ? "Compras puxadas com sucesso." : "Nenhuma compra encontrada.");
+    const localOrders = getLocalOrders();
+    const localClients = getLocalClients();
+
+    const orderMap = new Map();
+    [...ordersData, ...localOrders].forEach((order) => orderMap.set(order.id, order));
+
+    const clientMap = new Map();
+    [...clientsData.map(normalizeClient), ...localClients].forEach((client) => clientMap.set(client.email, client));
+
+    const finalOrders = Array.from(orderMap.values()).sort((a, b) => b.id - a.id);
+    const finalClients = Array.from(clientMap.values());
+
+    setOrders(finalOrders);
+    setClients(finalClients);
+
+    if (showMessage) {
+      notify(finalOrders.length ? "Compras puxadas com sucesso." : "Nenhuma compra encontrada.");
+    }
   }
 
   function downloadSales() {
@@ -205,11 +292,15 @@ export default function App() {
 
   async function clearOrders() {
     if (!confirm("Deseja limpar todas as vendas?")) return;
-    const { error } = await supabase.from("tauros_orders").delete().neq("id", 0);
-    if (error) {
-      notify(`Erro ao limpar vendas: ${error.message || "Supabase"}`);
-      return;
+
+    try {
+      const { error } = await supabase.from("tauros_orders").delete().neq("id", 0);
+      if (error) throw error;
+    } catch (error) {
+      console.error("Erro ao limpar Supabase:", error);
     }
+
+    saveLocalOrders([]);
     setOrders([]);
     notify("Vendas limpas.");
   }
