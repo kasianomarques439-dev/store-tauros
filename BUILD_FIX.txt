@@ -1,0 +1,7 @@
+CORREÇÃO DE BUILD
+
+Erro corrigido:
+- Unterminated regular expression
+- fechamento quebrado no JSX do App.jsx
+
+Agora o projeto deve publicar normalmente na Vercel.
