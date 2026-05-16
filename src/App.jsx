@@ -53,6 +53,33 @@ function normalizeClient(row) {
   };
 }
 
+function makeSaleClientRecord(order) {
+  return {
+    id: Number(order.id),
+    discord: `VENDA_CONFIRMADA | ${order.client || "Cliente"} | ${order.product || "Produto"} | ${order.quantity || 1}x | ${order.total || ""}`,
+    email: `venda-${order.id}@storetauros.local`,
+    password: "VENDA_CONFIRMADA",
+    created_at: order.date || new Date().toLocaleString("pt-BR"),
+  };
+}
+
+function saleFromClientRecord(client) {
+  if (!client || client.password !== "VENDA_CONFIRMADA") return null;
+
+  const parts = String(client.discord || "").split("|").map((item) => item.trim());
+
+  return {
+    id: client.id,
+    product: parts[2] || "Produto",
+    quantity: parts[3]?.replace("x", "") || "1",
+    total: parts[4] || "",
+    client: parts[1] || "Cliente",
+    contact: client.email || "",
+    date: client.created_at || "",
+    status: "Compra confirmada pelo cliente",
+  };
+}
+
 export default function App() {
   const [menu, setMenu] = useState(false);
   const [authMode, setAuthMode] = useState("login");
@@ -204,30 +231,47 @@ export default function App() {
       product: selected.name,
       quantity: Number(quantity),
       total: money(total),
-      client: currentUser.discord,
-      contact: currentUser.email,
+      client: currentUser.discord || currentUser.name || "Cliente",
+      contact: currentUser.email || currentUser.contact || "",
       date: new Date().toLocaleString("pt-BR"),
-      status: "Resgatar pedido no Discord",
+      status: "Compra confirmada pelo cliente",
     };
 
-    try {
-      const { error } = await supabase.from("tauros_orders").insert([order]);
-      if (error) throw error;
-    } catch (error) {
-      console.error("Erro Supabase pedido:", error);
-      const localOrders = getLocalOrders();
+    // 1) Salva localmente para aparecer no admin do mesmo aparelho imediatamente.
+    const localOrders = getLocalOrders();
+    if (!localOrders.some((item) => item.id === order.id)) {
       saveLocalOrders([order, ...localOrders]);
     }
 
-    setOrders((old) => [order, ...old]);
-    notify("Pedido registrado! Abrindo Discord...");
+    setOrders((old) => [order, ...old.filter((item) => item.id !== order.id)]);
+
+    // 2) Tenta salvar na tabela de vendas normal.
+    try {
+      await supabase.from("tauros_orders").insert([order]);
+    } catch (error) {
+      console.error("Erro na tabela tauros_orders:", error);
+    }
+
+    // 3) Salva também como registro especial na tabela tauros_clients.
+    // Essa tabela já está funcionando no seu site, então os admins de outros aparelhos conseguem puxar.
+    try {
+      const saleRecord = makeSaleClientRecord(order);
+      const { error: saleError } = await supabase.from("tauros_clients").insert([saleRecord]);
+      if (saleError) throw saleError;
+      notify("Compra confirmada e enviada para o painel admin!");
+    } catch (error) {
+      console.error("Erro ao salvar venda no canal admin:", error);
+      notify("Compra confirmada localmente. Verifique o Supabase para aparecer em outros aparelhos.");
+    }
+
     setSelected(null);
     setTimeout(() => window.open(DISCORD_LINK, "_blank"), 700);
   }
 
   async function pullSales(showMessage = true) {
-    let ordersData = [];
-    let clientsData = [];
+    let onlineOrders = [];
+    let onlineClients = [];
+    let supabaseOk = false;
 
     try {
       const ordersResponse = await supabase
@@ -235,44 +279,59 @@ export default function App() {
         .select("*")
         .order("id", { ascending: false });
 
+      if (!ordersResponse.error) {
+        onlineOrders = ordersResponse.data || [];
+      }
+    } catch (error) {
+      console.error("Erro ao puxar tauros_orders:", error);
+    }
+
+    try {
       const clientsResponse = await supabase
         .from("tauros_clients")
         .select("*")
         .order("id", { ascending: false });
 
-      if (ordersResponse.error || clientsResponse.error) {
-        throw ordersResponse.error || clientsResponse.error;
-      }
+      if (clientsResponse.error) throw clientsResponse.error;
 
-      ordersData = ordersResponse.data || [];
-      clientsData = clientsResponse.data || [];
+      onlineClients = clientsResponse.data || [];
+      supabaseOk = true;
     } catch (error) {
-      console.error("Erro puxar dados Supabase:", error);
-      ordersData = getLocalOrders();
-      clientsData = getLocalClients();
-
-      if (showMessage) {
-        notify("Supabase sem conexão. Mostrando dados locais.");
-      }
+      console.error("Erro ao puxar tauros_clients:", error);
     }
 
     const localOrders = getLocalOrders();
     const localClients = getLocalClients();
 
+    // Vendas vindas da tabela de clientes, criadas como registro especial.
+    const salesFromClients = onlineClients
+      .map(saleFromClientRecord)
+      .filter(Boolean);
+
     const orderMap = new Map();
-    [...ordersData, ...localOrders].forEach((order) => orderMap.set(order.id, order));
+    [...onlineOrders, ...salesFromClients, ...localOrders].forEach((order) => {
+      if (order && order.id) orderMap.set(Number(order.id), order);
+    });
 
     const clientMap = new Map();
-    [...clientsData.map(normalizeClient), ...localClients].forEach((client) => clientMap.set(client.email, client));
+    [...onlineClients.map(normalizeClient), ...localClients]
+      .filter((client) => client.password !== "VENDA_CONFIRMADA")
+      .forEach((client) => {
+        if (client && client.email) clientMap.set(client.email, client);
+      });
 
-    const finalOrders = Array.from(orderMap.values()).sort((a, b) => b.id - a.id);
+    const finalOrders = Array.from(orderMap.values()).sort((a, b) => Number(b.id) - Number(a.id));
     const finalClients = Array.from(clientMap.values());
 
     setOrders(finalOrders);
     setClients(finalClients);
 
     if (showMessage) {
-      notify(finalOrders.length ? "Compras puxadas com sucesso." : "Nenhuma compra encontrada.");
+      if (finalOrders.length) {
+        notify("Vendas confirmadas puxadas com sucesso.");
+      } else {
+        notify(supabaseOk ? "Nenhuma venda confirmada ainda." : "Não conectou no Supabase. Veja a URL/KEY.");
+      }
     }
   }
 
@@ -452,8 +511,22 @@ export default function App() {
             </div>
             <h3>Clientes</h3>
             <div className="admin-list">{clients.length === 0 ? <small>Nenhum cliente.</small> : clients.map((client) => <small key={client.id}>{client.discord} • {client.email} • {client.created_at}</small>)}</div>
-            <h3>Vendas</h3>
-            <div className="admin-list">{orders.length === 0 ? <small>Nenhuma venda.</small> : orders.map((order) => <small key={order.id}>{order.product} • {order.client} • {order.contact} • {order.total} • {order.date}</small>)}</div>
+            <h3>Vendas confirmadas</h3>
+            <div className="admin-list">
+              {orders.length === 0 ? (
+                <small>Nenhuma venda confirmada ainda.</small>
+              ) : (
+                orders.map((order) => (
+                  <div className="sale-row" key={order.id}>
+                    <b>{order.product}</b>
+                    <span>Cliente: {order.client || "Não informado"}</span>
+                    <span>Email/contato: {order.contact || "Não informado"}</span>
+                    <span>Quantidade: {order.quantity} • Total: {order.total}</span>
+                    <small>{order.status || "Compra confirmada"} • {order.date}</small>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}
