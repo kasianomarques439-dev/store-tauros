@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
 import {
   Home, ShoppingBag, ClipboardList, Headphones, UserPlus, LogIn, MessageCircle,
   ShieldCheck, Zap, Copy, X, Menu, ArrowRight, ShoppingCart, Lock, Users,
-  Crown, QrCode, Download, RefreshCcw, Eye, Mail, KeyRound, Trash2, Wand2, Sparkles, Star, Bell, Ticket, Bot, TimerReset, Percent, Search, Filter
+  Crown, QrCode, Download, RefreshCcw, Eye, Mail, KeyRound, Trash2,
+  Wand2, Sparkles, Star, Bell, Ticket, Bot, TimerReset, Percent, Search, Filter
 } from "lucide-react";
 import { PIX_KEY_FIXA, QR_PIX_FIXO, DISCORD_LINK, ADMIN_PASSWORD, SUPABASE_URL, SUPABASE_KEY } from "./config.js";
 import { supabase } from "./supabaseClient.js";
@@ -711,7 +711,7 @@ export default function App() {
           <div className="admin-card">
             <button className="close" onClick={() => setAdmin(false)}><X /></button>
             <h2>{adminRole === "admin" ? "Painel ADM" : "Painel Suporte"}</h2>
-            <p>Compras confirmadas das últimas 24h aparecem aqui.</p>
+            <p>Compras confirmadas aparecem aqui. O painel atualiza a cada 15 segundos.</p>
             <p>Pix fixo: <b>{PIX_KEY_FIXA}</b></p>
             <img className="admin-qr" src={QR_PIX_FIXO} alt="QR Pix" />
 
@@ -721,8 +721,13 @@ export default function App() {
                 <option value="24h">Últimas 24h</option>
                 <option value="all">Todas</option>
               </select>
+
               <label><Search size={16} /> Buscar</label>
-              <input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="cliente, email ou produto" />
+              <input
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="cliente, email ou produto"
+              />
             </div>
 
             <div className="admin-actions">
@@ -739,7 +744,11 @@ export default function App() {
               {clients.length === 0 ? (
                 <small>Nenhum cliente.</small>
               ) : (
-                clients.map((client) => <small key={client.id}>{client.discord} • {client.email} • {client.created_at}</small>)
+                clients.map((client) => (
+                  <small key={client.id}>
+                    {client.discord} • {client.email} • {client.created_at}
+                  </small>
+                ))
               )}
             </div>
 
@@ -755,13 +764,14 @@ export default function App() {
                     <span>Email/contato: {order.contact || "Não informado"}</span>
                     <span>Quantidade: {order.quantity} • Total: {order.total}</span>
                     <small>Status: {order.status || "Pendente"} • {order.date}</small>
+
                     {adminRole === "admin" && (
                       <div className="status-actions">
                         <button onClick={() => updateOrderStatus(order, "Pago")}>Pago</button>
                         <button onClick={() => updateOrderStatus(order, "Em entrega")}>Em entrega</button>
                         <button onClick={() => updateOrderStatus(order, "Finalizado")}>Finalizado</button>
                       </div>
-                    )
+                    )}
                   </div>
                 ))
               )}
