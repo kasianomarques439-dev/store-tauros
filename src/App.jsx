@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Home, ShoppingBag, ClipboardList, Headphones, UserPlus, LogIn, MessageCircle,
-  ShieldCheck, Zap, Copy, X, Menu, ArrowRight, ShoppingCart, Lock, Users,
-  Crown, QrCode, Download, RefreshCcw, Eye, Mail, KeyRound, Trash2
-} from "lucide-react";
+import { Home, ShoppingBag, ClipboardList, Headphones, UserPlus, LogIn, MessageCircle, ShieldCheck, Zap, Copy, X, Menu, ArrowRight, ShoppingCart, Lock, Users, Crown, QrCode, Download, RefreshCcw, Eye, Mail, KeyRound, Trash2 } from "lucide-react";
 import { PIX_KEY_FIXA, QR_PIX_FIXO, DISCORD_LINK, ADMIN_PASSWORD } from "./config.js";
 import { supabase } from "./supabaseClient.js";
 
@@ -23,17 +19,22 @@ function money(value) {
   return Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function normalizeClient(row) {
+  return {
+    id: row.id,
+    discord: row.discord || row.name || "Cliente",
+    email: row.email || row.contact || "",
+    password: row.password || "",
+    created_at: row.created_at || row.createdAt || "",
+  };
+}
+
 export default function App() {
   const [menu, setMenu] = useState(false);
   const [authMode, setAuthMode] = useState("login");
   const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("tauros_current_user") || "null");
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(localStorage.getItem("tauros_current_user") || "null"); } catch { return null; }
   });
-
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({ discord: "", email: "", password: "" });
   const [activeCategory, setActiveCategory] = useState(null);
@@ -57,31 +58,13 @@ export default function App() {
 
   function notify(message) {
     setToast(message);
-    setTimeout(() => setToast(""), 3000);
+    setTimeout(() => setToast(""), 3500);
   }
 
   async function register(event) {
     event.preventDefault();
-
     if (!registerForm.discord || !registerForm.email || !registerForm.password) {
       notify("Preencha todos os campos.");
-      return;
-    }
-
-    const { data: existing, error: findError } = await supabase
-      .from("tauros_clients")
-      .select("*")
-      .eq("email", registerForm.email)
-      .maybeSingle();
-
-    if (findError) {
-      notify("Erro ao verificar cadastro. Execute o SUPABASE_SQL.");
-      return;
-    }
-
-    if (existing) {
-      notify("Email já cadastrado. Faça login.");
-      setAuthMode("login");
       return;
     }
 
@@ -96,8 +79,23 @@ export default function App() {
     const { error } = await supabase.from("tauros_clients").insert([newClient]);
 
     if (error) {
-      notify("Erro ao criar conta. Confira o SQL do Supabase.");
-      console.error(error);
+      console.error("Erro Supabase cadastro:", error);
+      const { data: existing } = await supabase
+        .from("tauros_clients")
+        .select("*")
+        .eq("email", registerForm.email)
+        .eq("password", registerForm.password)
+        .maybeSingle();
+
+      if (existing) {
+        const user = normalizeClient(existing);
+        localStorage.setItem("tauros_current_user", JSON.stringify(user));
+        setCurrentUser(user);
+        notify("Conta encontrada. Login realizado!");
+        return;
+      }
+
+      notify(`Erro ao criar conta: ${error.message || "verifique o Supabase"}`);
       return;
     }
 
@@ -108,7 +106,6 @@ export default function App() {
 
   async function login(event) {
     event.preventDefault();
-
     const { data, error } = await supabase
       .from("tauros_clients")
       .select("*")
@@ -117,12 +114,14 @@ export default function App() {
       .maybeSingle();
 
     if (error || !data) {
+      console.error("Erro Supabase login:", error);
       notify("Email ou senha incorretos.");
       return;
     }
 
-    localStorage.setItem("tauros_current_user", JSON.stringify(data));
-    setCurrentUser(data);
+    const user = normalizeClient(data);
+    localStorage.setItem("tauros_current_user", JSON.stringify(user));
+    setCurrentUser(user);
     notify("Login realizado!");
   }
 
@@ -156,10 +155,9 @@ export default function App() {
     };
 
     const { error } = await supabase.from("tauros_orders").insert([order]);
-
     if (error) {
-      notify("Erro ao salvar pedido no banco.");
-      console.error(error);
+      console.error("Erro Supabase pedido:", error);
+      notify(`Erro ao salvar pedido: ${error.message || "verifique o Supabase"}`);
       return;
     }
 
@@ -181,24 +179,20 @@ export default function App() {
       .order("id", { ascending: false });
 
     if (ordersError || clientsError) {
-      console.error(ordersError || clientsError);
-      if (showMessage) notify("Erro ao puxar compras. Confira o Supabase SQL.");
+      console.error("Erro puxar dados:", ordersError || clientsError);
+      if (showMessage) notify(`Erro ao puxar compras: ${(ordersError || clientsError)?.message || "Supabase"}`);
       return;
     }
 
     setOrders(ordersData || []);
-    setClients(clientsData || []);
-
-    if (showMessage) {
-      notify((ordersData || []).length ? "Compras puxadas com sucesso." : "Nenhuma compra encontrada.");
-    }
+    setClients((clientsData || []).map(normalizeClient));
+    if (showMessage) notify((ordersData || []).length ? "Compras puxadas com sucesso." : "Nenhuma compra encontrada.");
   }
 
   function downloadSales() {
     const data = orders.map((order) =>
       `${order.id};${order.date};${order.client};${order.contact};${order.product};${order.quantity};${order.total};${order.status}`
     ).join("\n");
-
     const csv = "ID;Data;Cliente;Contato;Produto;Quantidade;Total;Status\n" + data;
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -211,15 +205,11 @@ export default function App() {
 
   async function clearOrders() {
     if (!confirm("Deseja limpar todas as vendas?")) return;
-
     const { error } = await supabase.from("tauros_orders").delete().neq("id", 0);
-
     if (error) {
-      notify("Erro ao limpar vendas.");
-      console.error(error);
+      notify(`Erro ao limpar vendas: ${error.message || "Supabase"}`);
       return;
     }
-
     setOrders([]);
     notify("Vendas limpas.");
   }
@@ -228,25 +218,20 @@ export default function App() {
     return (
       <div className="auth-page">
         <div className="auth-bg"></div>
-
         <div className="auth-card">
           <img src="/assets/topo-store-tauros.jpeg" alt="Store Tauros" className="auth-banner" />
           <h1>Store Tauros</h1>
           <p>Acesso exclusivo. Entre ou crie sua conta para acessar a loja.</p>
-
           <div className="auth-tabs">
             <button className={authMode === "login" ? "active" : ""} onClick={() => setAuthMode("login")}>Entrar</button>
             <button className={authMode === "register" ? "active" : ""} onClick={() => setAuthMode("register")}>Criar conta</button>
           </div>
-
           {authMode === "login" ? (
             <form onSubmit={login} className="auth-form">
               <label><Mail size={18} /> Email</label>
               <input type="email" value={loginForm.email} onChange={(event) => setLoginForm({ ...loginForm, email: event.target.value })} placeholder="seuemail@gmail.com" />
-
               <label><KeyRound size={18} /> Senha</label>
               <input type="password" value={loginForm.password} onChange={(event) => setLoginForm({ ...loginForm, password: event.target.value })} placeholder="Sua senha" />
-
               <button type="submit"><LogIn /> Entrar no site</button>
               <span onClick={() => setAuthMode("register")}>Ainda não tem conta? Criar conta</span>
             </form>
@@ -254,19 +239,15 @@ export default function App() {
             <form onSubmit={register} className="auth-form">
               <label><MessageCircle size={18} /> Nome do Discord</label>
               <input value={registerForm.discord} onChange={(event) => setRegisterForm({ ...registerForm, discord: event.target.value })} placeholder="Seu nome no Discord" />
-
               <label><Mail size={18} /> Email</label>
               <input type="email" value={registerForm.email} onChange={(event) => setRegisterForm({ ...registerForm, email: event.target.value })} placeholder="seuemail@gmail.com" />
-
               <label><KeyRound size={18} /> Senha</label>
               <input type="password" value={registerForm.password} onChange={(event) => setRegisterForm({ ...registerForm, password: event.target.value })} placeholder="Crie uma senha" />
-
               <button type="submit"><UserPlus /> Criar conta e acessar</button>
               <span onClick={() => setAuthMode("login")}>Já tenho conta. Entrar</span>
             </form>
           )}
         </div>
-
         {toast && <div className="toast">{toast}</div>}
       </div>
     );
@@ -276,13 +257,11 @@ export default function App() {
     <div className="page">
       <div className="site-bg"></div>
       <button className="mobile-menu" onClick={() => setMenu(!menu)}><Menu /></button>
-
       <aside className={`sidebar ${menu ? "open" : ""}`}>
         <div className="logo">
           <img src="/assets/topo-store-tauros.jpeg" alt="Tauros" />
           <div><h1>TAUROS</h1><span>STORE</span></div>
         </div>
-
         <nav>
           <a href="#inicio"><Home /> Início</a>
           <a href="#produtos"><ShoppingBag /> Produtos</a>
@@ -293,12 +272,10 @@ export default function App() {
           <p>ADMIN</p>
           <button onClick={adminLogin}><Lock /> Painel Admin</button>
         </nav>
-
         <button className="discord-box" onClick={() => window.open(DISCORD_LINK, "_blank")}>
           <MessageCircle /><b>Entrar no Discord</b><small>Resgate seu pedido</small><ArrowRight />
         </button>
       </aside>
-
       <main className="content">
         <section className="hero" id="inicio">
           <div className="hero-left">
@@ -306,42 +283,27 @@ export default function App() {
             <h2>Bem-vindo, {currentUser.discord}</h2>
             <h1>Store Tauros!</h1>
             <p>Sua loja premium de produtos digitais para Discord. Compre, pague via Pix e resgate seu pedido diretamente no nosso servidor.</p>
-
             <div className="badges">
-              <div><Zap /> Entrega rápida</div>
-              <div><ShieldCheck /> 100% seguro</div>
-              <div><Headphones /> Suporte 24/7</div>
+              <div><Zap /> Entrega rápida</div><div><ShieldCheck /> 100% seguro</div><div><Headphones /> Suporte 24/7</div>
             </div>
           </div>
-
           <div className="hero-banner"><img src="/assets/topo-store-tauros.jpeg" alt="Banner Store Tauros" /></div>
         </section>
-
         <section className="categories" id="produtos">
-          <div className="section-title">
-            <h2>Nossos Produtos</h2>
-            <p>Clique em uma pasta para abrir as opções de compra.</p>
-          </div>
-
+          <div className="section-title"><h2>Nossos Produtos</h2><p>Clique em uma pasta para abrir as opções de compra.</p></div>
           {!activeCategory && (
             <div className="folder-grid">
               {categories.map((cat) => (
                 <button className="folder-card" key={cat.id} onClick={() => setActiveCategory(cat.id)}>
                   <img src={cat.image} alt={cat.title} />
-                  <div>
-                    <h3>{cat.title}</h3>
-                    <p>{cat.subtitle}</p>
-                    <span>Acessar produtos <ArrowRight size={18} /></span>
-                  </div>
+                  <div><h3>{cat.title}</h3><p>{cat.subtitle}</p><span>Acessar produtos <ArrowRight size={18} /></span></div>
                 </button>
               ))}
             </div>
           )}
-
           {activeCategory && (
             <>
               <button className="back-btn" onClick={() => setActiveCategory(null)}>← Voltar para pastas</button>
-
               <div className="product-grid">
                 {visibleProducts.map((product) => {
                   const Icon = product.icon;
@@ -349,13 +311,8 @@ export default function App() {
                     <article className="product-card" key={product.id}>
                       <img src={product.image} alt={product.name} />
                       <div className="product-info">
-                        <Icon />
-                        <h3>{product.name}</h3>
-                        <p>{product.desc}</p>
-                        <strong>{money(product.price)}</strong>
-                        <button onClick={() => { setSelected(product); setQuantity(1); }}>
-                          <ShoppingCart size={18} /> Comprar agora
-                        </button>
+                        <Icon /><h3>{product.name}</h3><p>{product.desc}</p><strong>{money(product.price)}</strong>
+                        <button onClick={() => { setSelected(product); setQuantity(1); }}><ShoppingCart size={18} /> Comprar agora</button>
                       </div>
                     </article>
                   );
@@ -364,87 +321,51 @@ export default function App() {
             </>
           )}
         </section>
-
         <section className="orders" id="pedidos">
           <h2>Meus pedidos</h2>
-          {orders.filter((order) => order.contact === currentUser.email).length === 0 ? (
-            <p>Nenhum pedido ainda.</p>
-          ) : (
-            orders.filter((order) => order.contact === currentUser.email).map((order) => (
-              <div className="order" key={order.id}>
-                <b>{order.product}</b>
-                <span>{order.quantity}x • {order.total}</span>
-                <small>{order.status}</small>
-              </div>
-            ))
-          )}
+          {orders.filter((order) => order.contact === currentUser.email).length === 0 ? <p>Nenhum pedido ainda.</p> : orders.filter((order) => order.contact === currentUser.email).map((order) => (
+            <div className="order" key={order.id}><b>{order.product}</b><span>{order.quantity}x • {order.total}</span><small>{order.status}</small></div>
+          ))}
         </section>
       </main>
-
       {selected && (
         <div className="modal">
           <div className="modal-card">
             <button className="close" onClick={() => setSelected(null)}><X /></button>
             <img src={selected.image} alt={selected.name} />
-            <h2>{selected.name}</h2>
-            <p>{selected.desc}</p>
-
+            <h2>{selected.name}</h2><p>{selected.desc}</p>
             <label>Quantidade</label>
             <input type="number" min="1" value={quantity} onChange={(event) => setQuantity(Math.max(1, Number(event.target.value)))} />
-
             <div className="total"><span>Total:</span><b>{money(total)}</b></div>
-
             <div className="pix-modal">
               <h3><QrCode /> Pagamento via Pix</h3>
               <img className="qr-public" src={QR_PIX_FIXO} alt="QR Code Pix" />
               <p className="pix-key">{PIX_KEY_FIXA}</p>
-              <button onClick={() => navigator.clipboard.writeText(PIX_KEY_FIXA).then(() => notify("Chave Pix copiada!"))}>
-                <Copy /> Copiar chave Pix
-              </button>
+              <button onClick={() => navigator.clipboard.writeText(PIX_KEY_FIXA).then(() => notify("Chave Pix copiada!"))}><Copy /> Copiar chave Pix</button>
             </div>
-
             <button className="finish" onClick={finishOrder}>Confirmar compra e ir para o Discord</button>
           </div>
         </div>
       )}
-
       {admin && (
         <div className="modal">
           <div className="admin-card">
             <button className="close" onClick={() => setAdmin(false)}><X /></button>
-            <h2>Painel Admin Privado</h2>
-            <p>Compras e clientes agora são puxados do Supabase online.</p>
-            <p>Pix fixo: <b>{PIX_KEY_FIXA}</b></p>
+            <h2>Painel Admin Privado</h2><p>Compras e clientes são puxados do Supabase online.</p><p>Pix fixo: <b>{PIX_KEY_FIXA}</b></p>
             <img className="admin-qr" src={QR_PIX_FIXO} alt="QR Pix" />
-
             <div className="admin-actions">
               <button onClick={() => pullSales(true)}><RefreshCcw /> Puxar compras</button>
               <button onClick={downloadSales}><Download /> Baixar vendas</button>
               <button onClick={() => window.open(DISCORD_LINK, "_blank")}><MessageCircle /> Abrir Discord</button>
               <button onClick={clearOrders}><Trash2 /> Limpar vendas</button>
             </div>
-
             <h3>Clientes</h3>
-            <div className="admin-list">
-              {clients.length === 0 ? (
-                <small>Nenhum cliente.</small>
-              ) : (
-                clients.map((client) => <small key={client.id}>{client.discord} • {client.email} • {client.created_at}</small>)
-              )}
-            </div>
-
+            <div className="admin-list">{clients.length === 0 ? <small>Nenhum cliente.</small> : clients.map((client) => <small key={client.id}>{client.discord} • {client.email} • {client.created_at}</small>)}</div>
             <h3>Vendas</h3>
-            <div className="admin-list">
-              {orders.length === 0 ? (
-                <small>Nenhuma venda.</small>
-              ) : (
-                orders.map((order) => <small key={order.id}>{order.product} • {order.client} • {order.contact} • {order.total} • {order.date}</small>)
-              )}
-            </div>
+            <div className="admin-list">{orders.length === 0 ? <small>Nenhuma venda.</small> : orders.map((order) => <small key={order.id}>{order.product} • {order.client} • {order.contact} • {order.total} • {order.date}</small>)}</div>
           </div>
         </div>
       )}
-
       {toast && <div className="toast">{toast}</div>}
     </div>
   );
