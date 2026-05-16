@@ -56,9 +56,13 @@ function normalizeClient(row) {
 function onlyLast24Hours(orders) {
   const now = Date.now();
   const oneDay = 24 * 60 * 60 * 1000;
+
   return orders.filter((order) => {
     const idTime = Number(order.id);
-    return Number.isFinite(idTime) ? now - idTime <= oneDay : true;
+
+    if (!Number.isFinite(idTime)) return true;
+
+    return now - idTime <= oneDay;
   });
 }
 
@@ -143,14 +147,13 @@ function saleFromClientRecord(client) {
 function onlyLast24Hours(orders) {
   const now = Date.now();
   const oneDay = 24 * 60 * 60 * 1000;
+
   return orders.filter((order) => {
-    const byId = Number(order.id);
-    if (Number.isFinite(byId) && now - byId <= oneDay) return true;
+    const idTime = Number(order.id);
 
-    const parsedDate = Date.parse(String(order.date || "").replace(",", ""));
-    if (Number.isFinite(parsedDate) && now - parsedDate <= oneDay) return true;
+    if (!Number.isFinite(idTime)) return true;
 
-    return false;
+    return now - idTime <= oneDay;
   });
 }
 
