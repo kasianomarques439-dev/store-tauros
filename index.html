@@ -62,18 +62,45 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 .toast{display:none;position:fixed;bottom:20px;right:20px;background:linear-gradient(90deg,#7a2dff,#ff36d2);padding:15px 20px;border-radius:14px;font-weight:900;z-index:80}
 .footer{margin-top:25px;color:#b7a7cf;text-align:center;font-size:13px}
 @media(max-width:900px){.app{display:block}.sidebar{position:relative;width:100%;height:auto}.main{padding:14px}.hero{grid-template-columns:1fr;padding:24px}.hero h2{font-size:38px}.features{grid-template-columns:1fr 1fr}.product{grid-template-columns:1fr}.product img{width:100%;height:160px}.payment{grid-template-columns:1fr}.top{display:block}.topActions{margin-top:12px}}
+
+.logoImg{width:72px;height:72px;border-radius:16px;object-fit:cover;box-shadow:0 0 22px rgba(0,68,255,.65);border:1px solid rgba(80,130,255,.65)}
+.loginGate{position:fixed;inset:0;z-index:999;background:radial-gradient(circle at top,#1b0b39,#05010b 55%,#000);display:grid;place-items:center;padding:20px}
+.loginGateBox{width:min(95vw,470px);border:1px solid rgba(124,44,255,.8);border-radius:26px;background:linear-gradient(180deg,rgba(20,5,40,.96),rgba(5,1,12,.96));box-shadow:0 0 45px rgba(124,44,255,.45);padding:30px;text-align:center}
+.loginGateBox img{width:150px;height:150px;object-fit:cover;border-radius:24px;margin-bottom:18px}
+.loginGateBox h2{font-size:32px;margin-bottom:8px;color:#fff}
+.loginGateBox p{color:#d8c7ef;margin-bottom:18px}
+.loginGateBox input{width:100%;padding:15px;border-radius:14px;border:1px solid rgba(124,44,255,.55);background:#06010d;color:white;margin:8px 0}
+.loginGateBox button{width:100%;border:none;border-radius:14px;padding:15px;margin-top:12px;background:linear-gradient(90deg,#6e25ff,#ff34d4);color:#fff;font-weight:900;cursor:pointer}
+.foundersGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:16px 0}
+.founderStat{padding:18px;border-radius:16px;border:1px solid rgba(124,44,255,.55);background:rgba(255,255,255,.05)}
+.founderStat b{display:block;color:#ff54de;font-size:26px;margin-top:6px}
+
 </style>
 </head>
 <body>
+
+<div class="loginGate" id="loginGate">
+  <div class="loginGateBox">
+    <img src="assets/logo-tauros-store.png" alt="Tauros Store">
+    <h2>Acessar Store Tauros</h2>
+    <p>Entre com nome de usuário, e-mail e senha para acessar o site.</p>
+    <input id="gateUsername" placeholder="Nome de usuário">
+    <input id="gateEmail" placeholder="E-mail">
+    <input id="gatePassword" type="password" placeholder="Senha">
+    <button onclick="enterSite()">Entrar no site</button>
+    <button onclick="enterSite(true)" style="background:transparent;border:1px solid rgba(124,44,255,.7)">Criar conta</button>
+  </div>
+</div>
+
 <div class="app">
 <aside class="sidebar">
-  <div class="logo"><div class="logoBadge">♉</div><h1>TAUROS<br><span>STORE</span></h1></div>
+  <div class="logo"><img class="logoImg" src="assets/logo-tauros-store.png" alt="Tauros Store"><h1>TAUROS<br><span>STORE</span></h1></div>
   <div class="navTitle">Menu</div>
   <div class="nav">
     <button onclick="goHome()">🏠 Início</button>
     <button onclick="scrollToProducts()">🛒 Produtos</button>
     <button onclick="openLogin()">👤 Login / Criar conta</button>
-    <button onclick="openSupport()">🎧 Suporte</button>
+    <button onclick="openSupport()" onclick="window.open('https://discordapp.com/channels/1500900705077166342/1501667181556138116','_blank')">🎧 Suporte</button>
     <button onclick="openFounders()">👑 Fundadores</button>
     <button onclick="openAdmin()">🔐 Painel Admin</button>
   </div>
@@ -143,7 +170,16 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 <div class="modalWrap" id="loginModal"><div class="modal"><button class="close" onclick="closeModal('loginModal')">×</button><h2>Acessar conta</h2><input id="loginEmail" placeholder="E-mail"><input id="loginPassword" type="password" placeholder="Senha"><div class="row"><button onclick="login()">Entrar</button><button onclick="createAccount()">Criar conta</button></div></div></div>
 <div class="modalWrap" id="buyModal"><div class="modal"><button class="close" onclick="closeModal('buyModal')">×</button><h2>Confirmar compra</h2><p id="buyInfo"></p><input id="customerName" placeholder="Seu nome ou Discord"><input id="customerContact" placeholder="E-mail ou contato"><div class="row"><button onclick="confirmBuy()">Confirmar compra</button></div></div></div>
 <div class="modalWrap" id="supportModal"><div class="modal"><button class="close" onclick="closeModal('supportModal')">×</button><h2>Suporte</h2><p>Abra um ticket no Discord para receber seu produto após o pagamento.</p><br><button class="primary" onclick="window.open('https://discord.com','_blank')">Abrir Discord</button></div></div>
-<div class="modalWrap" id="foundersModal"><div class="modal"><button class="close" onclick="closeModal('foundersModal')">×</button><h2>Fundadores</h2><p>Área dos fundadores da Store Tauros.</p><br><p><b>Dono:</b> Store Tauros</p><p><b>Equipe:</b> Suporte Tauros</p></div></div>
+<div class="modalWrap" id="foundersModal"><div class="modal"><button class="close" onclick="closeModal('foundersModal')">×</button>
+<h2>Área dos Fundadores</h2>
+<p>Acompanhe rendimento da semana, cadastros e vendas registradas no site.</p>
+<div class="foundersGrid">
+  <div class="founderStat">Rendimento da semana<b id="weekRevenue">R$ 0,00</b></div>
+  <div class="founderStat">Pessoas cadastradas<b id="registeredUsers">0</b></div>
+  <div class="founderStat">Vendas da semana<b id="weekOrders">0</b></div>
+</div>
+<p><b>Dono:</b> Store Tauros</p><p><b>Equipe:</b> Suporte Tauros</p>
+</div></div>
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -187,7 +223,7 @@ function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t
 function closeModal(id){document.getElementById(id).style.display="none";}
 function openLogin(){document.getElementById("loginModal").style.display="grid";}
 function openSupport(){document.getElementById("supportModal").style.display="grid";}
-function openFounders(){document.getElementById("foundersModal").style.display="grid";}
+function openFounders(){updateFounderStats();document.getElementById("foundersModal").style.display="grid";}
 function copyPix(){navigator.clipboard.writeText("taurosorg@gmail.com");toast("Chave Pix copiada!");}
 function scrollToProducts(){document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});}
 function goHome(){window.scrollTo({top:0,behavior:"smooth"});}
@@ -279,9 +315,43 @@ function login(){closeModal("loginModal");toast("Login salvo localmente.");}
 function createAccount(){closeModal("loginModal");toast("Conta criada localmente.");}
 function openCart(){renderOrders();document.getElementById("orders").scrollIntoView({behavior:"smooth"});}
 
+
+function getUsers(){try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}catch{return[]}}
+function setUsers(u){localStorage.setItem("tauros_users",JSON.stringify(u));}
+function enterSite(create=false){
+  const username=document.getElementById("gateUsername").value.trim();
+  const email=document.getElementById("gateEmail").value.trim();
+  const password=document.getElementById("gatePassword").value.trim();
+  if(!username || !email || !password){toast("Preencha usuário, e-mail e senha.");return;}
+  let users=getUsers();
+  if(create || !users.find(u=>u.email===email)){
+    users=[{id:Date.now(),username,email,createdAt:new Date().toLocaleString("pt-BR")},...users];
+    setUsers(users);
+  }
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
+  document.getElementById("loginGate").style.display="none";
+  toast("Bem-vindo, "+username+"!");
+}
+function updateFounderStats(){
+  const orders=localOrders();
+  const total=orders.reduce((sum,o)=>sum+(Number(o.total)||0),0);
+  document.getElementById("weekRevenue").textContent=money(total);
+  document.getElementById("registeredUsers").textContent=getUsers().length;
+  document.getElementById("weekOrders").textContent=orders.length;
+}
+
 renderFolders();
 openCategory("membros");
 renderOrders();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const supportBtns=[...document.querySelectorAll('*')].filter(e=>e.textContent && e.textContent.includes('Suporte'));
+  supportBtns.forEach(btn=>{
+    btn.style.cursor='pointer';
+  });
+});
 </script>
 </body>
 </html>

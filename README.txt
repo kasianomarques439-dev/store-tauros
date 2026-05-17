@@ -27,3 +27,9 @@ Senha admin:
 
 
 QR Codes individuais adicionados em assets/ e ligados aos produtos.
+
+ATUALIZAÇÕES:
+- Logo da lateral trocado pela imagem Tauros Store.
+- QR Pix principal trocado pelo novo QR enviado.
+- Tela de login obrigatória antes de acessar o site.
+- Área Fundadores com rendimento total, pessoas cadastradas e vendas.
