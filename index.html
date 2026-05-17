@@ -3,76 +3,186 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Store Tauros</title>
+
 <style>
 body{
 margin:0;
 font-family:Arial;
-background:url('assets/fundo-login.jpeg') center/cover fixed;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-}
-.overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.70);
-}
-.login{
-position:relative;
-z-index:2;
-width:420px;
-background:rgba(10,10,20,.92);
-border:2px solid #6f00ff;
-border-radius:20px;
-padding:30px;
-box-shadow:0 0 30px #6f00ff;
-text-align:center;
+background:#050008;
 color:white;
 }
-.login img{
+
+.bg{
+position:fixed;
+inset:0;
+background:url('assets/fundo-login.png') center/cover no-repeat;
+opacity:0.25;
+z-index:-1;
+}
+
+.login-screen{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.login-box{
+width:430px;
+background:rgba(0,0,0,0.75);
+border:2px solid #8a2cff;
+border-radius:25px;
+padding:30px;
+text-align:center;
+box-shadow:0 0 25px #8a2cff;
+backdrop-filter:blur(10px);
+}
+
+.logo{
 width:180px;
 border-radius:20px;
 margin-bottom:20px;
 }
+
 input{
 width:100%;
-padding:14px;
-margin-top:10px;
-border-radius:10px;
-border:1px solid #6f00ff;
-background:#12051f;
+padding:15px;
+margin-top:14px;
+border-radius:12px;
+border:2px solid #8a2cff;
+background:#12001f;
 color:white;
+box-sizing:border-box;
 }
+
 button{
 width:100%;
-padding:14px;
-margin-top:14px;
+padding:15px;
+margin-top:15px;
 border:none;
-border-radius:10px;
-background:linear-gradient(90deg,#5b00ff,#ae00ff);
+border-radius:12px;
+background:linear-gradient(90deg,#6f00ff,#d000ff);
 color:white;
 font-weight:bold;
 cursor:pointer;
+transition:0.2s;
+}
+
+button:hover{
+transform:scale(1.03);
+box-shadow:0 0 20px #b100ff;
+}
+
+button:active{
+transform:scale(0.95);
+}
+
+#discordField{
+display:none;
+}
+
+#site{
+display:none;
+padding:30px;
 }
 </style>
 </head>
-<body>
-<div class="overlay"></div>
 
-<div class="login">
-<img src="assets/logo-tauros.png">
+<body>
+
+<div class="bg"></div>
+
+<div id="loginScreen" class="login-screen">
+
+<div class="login-box">
+
+<img src="assets/logo-tauros-store.png" class="logo">
 
 <h1>STORE TAUROS</h1>
 
-<input placeholder="Email">
-<input placeholder="Senha" type="password">
+<input type="text" id="discord" placeholder="Nome Discord">
 
-<button>LOGIN</button>
-<button>CRIAR CONTA</button>
+<input type="email" id="email" placeholder="Email">
+
+<input type="password" id="senha" placeholder="Senha">
+
+<button id="btnLogin">LOGIN</button>
+
+<button id="btnCreate">CRIAR CONTA</button>
 
 </div>
+</div>
+
+<div id="site">
+<h1>Bem-vindo à Store Tauros</h1>
+<p>Login realizado com sucesso.</p>
+</div>
+
+<script>
+
+function getUsers(){
+return JSON.parse(localStorage.getItem("tauros_users") || "[]")
+}
+
+function saveUsers(users){
+localStorage.setItem("tauros_users", JSON.stringify(users))
+}
+
+document.getElementById("btnCreate").addEventListener("click",()=>{
+
+const discord=document.getElementById("discord").value.trim()
+const email=document.getElementById("email").value.trim()
+const senha=document.getElementById("senha").value.trim()
+
+if(!discord || !email || !senha){
+alert("Preencha todos os campos")
+return
+}
+
+const users=getUsers()
+
+if(users.find(u=>u.email===email)){
+alert("Conta já existe")
+return
+}
+
+users.push({
+discord,
+email,
+senha
+})
+
+saveUsers(users)
+
+alert("Conta criada com sucesso")
+
+})
+
+document.getElementById("btnLogin").addEventListener("click",()=>{
+
+const email=document.getElementById("email").value.trim()
+const senha=document.getElementById("senha").value.trim()
+
+const users=getUsers()
+
+const user=users.find(
+u=>u.email===email && u.senha===senha
+)
+
+if(user){
+
+document.getElementById("loginScreen").style.display="none"
+document.getElementById("site").style.display="block"
+
+}else{
+alert("Conta inválida")
+}
+
+})
+
+</script>
 
 </body>
 </html>
