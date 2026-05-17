@@ -1,0 +1,3 @@
+Para funcionar no Vercel/GitHub deixe index.html e a pasta assets juntos na raiz do repositório.
+Não coloque o index.html dentro de outra pasta sem a assets ao lado.
+Framework: Other. Build/Install/Output vazio/desligado.

@@ -499,5 +499,80 @@ openCategory("membros");
 renderOrders();
 </script>
 
+
+<script>
+function taurosGetUsers(){
+ return JSON.parse(localStorage.getItem("tauros_users") || "[]");
+}
+function taurosSaveUsers(users){
+ localStorage.setItem("tauros_users", JSON.stringify(users));
+}
+
+function setGateMode(mode){
+ document.getElementById("loginForm").style.display = mode==="login" ? "block":"none";
+ document.getElementById("createForm").style.display = mode==="create" ? "block":"none";
+}
+
+function createGateUser(){
+ const username=document.getElementById("createUsername").value.trim();
+ const email=document.getElementById("createEmail").value.trim().toLowerCase();
+ const password=document.getElementById("createPassword").value.trim();
+
+ if(!username || !email || !password){
+   alert("Preencha todos os campos.");
+   return;
+ }
+
+ let users=taurosGetUsers();
+
+ if(users.find(u=>u.email===email)){
+   alert("Conta já existe.");
+   return;
+ }
+
+ users.push({
+   username,
+   email,
+   password
+ });
+
+ taurosSaveUsers(users);
+
+ localStorage.setItem("tauros_logged_user", JSON.stringify({
+   username,
+   email
+ }));
+
+ alert("Conta criada com sucesso!");
+
+ document.getElementById("loginGate").style.display="none";
+}
+
+function loginGateUser(){
+ const email=document.getElementById("gateEmail").value.trim().toLowerCase();
+ const password=document.getElementById("gatePassword").value.trim();
+
+ let users=taurosGetUsers();
+
+ let user=users.find(
+   u=>u.email===email && u.password===password
+ );
+
+ if(!user){
+   alert("Email ou senha incorretos.");
+   return;
+ }
+
+ localStorage.setItem("tauros_logged_user", JSON.stringify({
+   username:user.username,
+   email:user.email
+ }));
+
+ alert("Login realizado!");
+
+ document.getElementById("loginGate").style.display="none";
+}
+</script>
+
 </body>
 </html>
