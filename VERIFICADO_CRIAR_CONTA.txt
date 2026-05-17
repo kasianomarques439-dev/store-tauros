@@ -1,0 +1,1 @@
+Criar conta corrigido: formulário inicial e modal salvam conta no localStorage e tentam salvar no Supabase.

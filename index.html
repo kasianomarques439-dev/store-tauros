@@ -191,23 +191,26 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 
 <div class="modalWrap" id="loginModal"><div class="modal"><button class="close" onclick="closeModal('loginModal')">×</button>
 <h2>Área do Cliente</h2>
-<p>Use uma conta existente ou cadastre uma nova.</p>
+<p>Entre com sua conta ou crie uma nova.</p>
+
 <div class="loginTabs">
   <button id="modalTabLogin" class="active" onclick="setModalLoginMode('login')">Login</button>
   <button id="modalTabCreate" onclick="setModalLoginMode('create')">Criar conta</button>
 </div>
+
 <div id="modalLoginForm">
   <input id="loginEmail" placeholder="E-mail">
   <input id="loginPassword" type="password" placeholder="Senha">
   <div class="row"><button onclick="login()">Entrar</button></div>
 </div>
+
 <div id="modalCreateForm" style="display:none">
   <input id="modalDiscordName" placeholder="Nome do Discord">
   <input id="modalCreateEmail" placeholder="E-mail">
   <input id="modalCreatePassword" type="password" placeholder="Senha">
   <div class="row"><button onclick="createAccount()">Criar conta</button></div>
 </div>
-</div></div></div>
+</div></div>
 <div class="modalWrap" id="buyModal"><div class="modal"><button class="close" onclick="closeModal('buyModal')">×</button><h2>Confirmar compra</h2><p id="buyInfo"></p><input id="customerName" placeholder="Seu nome ou Discord"><input id="customerContact" placeholder="E-mail ou contato"><div class="row"><button onclick="confirmBuy()">Confirmar compra</button></div></div></div>
 <div class="modalWrap" id="supportModal"><div class="modal"><button class="close" onclick="closeModal('supportModal')">×</button>
 <h2>Área de Suporte</h2>
@@ -337,88 +340,19 @@ function clearOrders(){if(confirm("Limpar vendas locais?")){setLocalOrders([]);r
 const FUNDADOR_PASSWORD = "fundtauros";
 const SUPORTE_PASSWORD = "sptauros";
 
-function getUsers(){try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}catch{return[]}}
-function setUsers(u){localStorage.setItem("tauros_users",JSON.stringify(u));}
 
-async function saveUserToSupabase(user){
-  if(!supabaseClient) return;
-  try{
-    await supabaseClient.from("tauros_clients").insert({
-      id:user.id,
-      discord:user.username,
-      email:user.email,
-      password:user.password,
-      created_at:user.createdAt
-    });
-  }catch(e){console.log("Supabase user save:", e);}
-}
 
-function setGateMode(mode){
-  document.getElementById("loginForm").style.display = mode==="login" ? "block" : "none";
-  document.getElementById("createForm").style.display = mode==="create" ? "block" : "none";
-  document.getElementById("tabLogin").classList.toggle("active", mode==="login");
-  document.getElementById("tabCreate").classList.toggle("active", mode==="create");
-}
 
-function createGateUser(){
-  const username=document.getElementById("createUsername").value.trim();
-  const email=document.getElementById("createEmail").value.trim().toLowerCase();
-  const password=document.getElementById("createPassword").value.trim();
-  if(!username || !email || !password){toast("Preencha nome Discord, e-mail e senha.");return;}
-  let users=getUsers();
-  if(users.find(u=>u.email===email)){toast("Este e-mail já tem conta. Faça login.");setGateMode("login");return;}
-  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
-  users=[user,...users];
-  setUsers(users);
-  saveUserToSupabase(user);
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
-  document.getElementById("loginGate").style.display="none";
-  toast("Conta criada! Bem-vindo, "+username+"!");
-}
 
-function loginGateUser(){
-  const email=document.getElementById("gateEmail").value.trim().toLowerCase();
-  const password=document.getElementById("gatePassword").value.trim();
-  if(!email || !password){toast("Digite e-mail e senha.");return;}
-  const user=getUsers().find(u=>u.email===email && u.password===password);
-  if(!user){toast("Conta não encontrada ou senha incorreta. Crie uma conta primeiro.");return;}
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
-  document.getElementById("loginGate").style.display="none";
-  toast("Login realizado, "+user.username+"!");
-}
 
-function setModalLoginMode(mode){
-  document.getElementById("modalLoginForm").style.display = mode==="login" ? "block" : "none";
-  document.getElementById("modalCreateForm").style.display = mode==="create" ? "block" : "none";
-  document.getElementById("modalTabLogin").classList.toggle("active", mode==="login");
-  document.getElementById("modalTabCreate").classList.toggle("active", mode==="create");
-}
 
-function login(){
-  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
-  const password=document.getElementById("loginPassword").value.trim();
-  const user=getUsers().find(u=>u.email===email && u.password===password);
-  if(!user){toast("Login inválido. Use uma conta criada.");return;}
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
-  closeModal("loginModal");
-  toast("Login realizado!");
-}
 
-function createAccount(){
-  const username=document.getElementById("modalDiscordName").value.trim();
-  const email=document.getElementById("modalCreateEmail").value.trim().toLowerCase();
-  const password=document.getElementById("modalCreatePassword").value.trim();
-  if(!username || !email || !password){toast("Preencha nome Discord, e-mail e senha.");return;}
-  let users=getUsers();
-  if(users.find(u=>u.email===email)){toast("Este e-mail já existe.");return;}
-  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
-  users=[user,...users];
-  setUsers(users);
-  saveUserToSupabase(user);
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
-  closeModal("loginModal");
-  toast("Conta criada!");
-}
+
+
+
+
+
+
 
 function openFounders(){
   const pass=prompt("Senha dos fundadores:");
@@ -475,6 +409,89 @@ function renderAdmin(){
     <small>${o.date} • ${o.status}</small>
   </div>
   `).join("") : "<p>Nenhuma venda encontrada.</p>";
+}
+
+
+function getUsers(){
+  try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}
+  catch{return[]}
+}
+function setUsers(users){
+  localStorage.setItem("tauros_users",JSON.stringify(users));
+}
+async function saveUserToSupabase(user){
+  if(!supabaseClient) return;
+  try{
+    await supabaseClient.from("tauros_clients").insert({
+      id:user.id,
+      discord:user.username,
+      email:user.email,
+      password:user.password,
+      created_at:user.createdAt
+    });
+  }catch(e){console.log("Supabase user save:",e);}
+}
+function setGateMode(mode){
+  document.getElementById("loginForm").style.display=mode==="login"?"block":"none";
+  document.getElementById("createForm").style.display=mode==="create"?"block":"none";
+  document.getElementById("tabLogin").classList.toggle("active",mode==="login");
+  document.getElementById("tabCreate").classList.toggle("active",mode==="create");
+}
+function createGateUser(){
+  const username=document.getElementById("createUsername").value.trim();
+  const email=document.getElementById("createEmail").value.trim().toLowerCase();
+  const password=document.getElementById("createPassword").value.trim();
+  if(!username||!email||!password){toast("Preencha nome Discord, e-mail e senha.");return;}
+  const users=getUsers();
+  if(users.find(u=>u.email===email)){toast("Este e-mail já existe. Faça login.");setGateMode("login");return;}
+  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
+  users.unshift(user);
+  setUsers(users);
+  saveUserToSupabase(user);
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
+  document.getElementById("loginGate").style.display="none";
+  toast("Conta criada com sucesso!");
+}
+function loginGateUser(){
+  const email=document.getElementById("gateEmail").value.trim().toLowerCase();
+  const password=document.getElementById("gatePassword").value.trim();
+  if(!email||!password){toast("Digite e-mail e senha.");return;}
+  const user=getUsers().find(u=>u.email===email && u.password===password);
+  if(!user){toast("Conta não encontrada ou senha incorreta.");return;}
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
+  document.getElementById("loginGate").style.display="none";
+  toast("Login realizado!");
+}
+function setModalLoginMode(mode){
+  document.getElementById("modalLoginForm").style.display=mode==="login"?"block":"none";
+  document.getElementById("modalCreateForm").style.display=mode==="create"?"block":"none";
+  document.getElementById("modalTabLogin").classList.toggle("active",mode==="login");
+  document.getElementById("modalTabCreate").classList.toggle("active",mode==="create");
+}
+function login(){
+  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
+  const password=document.getElementById("loginPassword").value.trim();
+  if(!email||!password){toast("Digite e-mail e senha.");return;}
+  const user=getUsers().find(u=>u.email===email && u.password===password);
+  if(!user){toast("Login inválido. Crie uma conta primeiro.");return;}
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
+  closeModal("loginModal");
+  toast("Login realizado!");
+}
+function createAccount(){
+  const username=document.getElementById("modalDiscordName").value.trim();
+  const email=document.getElementById("modalCreateEmail").value.trim().toLowerCase();
+  const password=document.getElementById("modalCreatePassword").value.trim();
+  if(!username||!email||!password){toast("Preencha nome Discord, e-mail e senha.");return;}
+  const users=getUsers();
+  if(users.find(u=>u.email===email)){toast("Este e-mail já existe. Faça login.");setModalLoginMode("login");return;}
+  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
+  users.unshift(user);
+  setUsers(users);
+  saveUserToSupabase(user);
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
+  closeModal("loginModal");
+  toast("Conta criada com sucesso!");
 }
 
 renderFolders();
