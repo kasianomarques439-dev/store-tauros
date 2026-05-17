@@ -316,7 +316,7 @@ async function loadOrdersFromSupabase(){
 
 function openAdmin(){
   const pass = prompt("Senha admin:");
-  if(pass!=="admtauros" && pass!=="stadm"){toast("Senha incorreta.");return;}
+  if(pass!=="admtauros"){toast("Senha incorreta.");return;}
   document.getElementById("adminPanel").style.display="block";
   renderAdmin();
   document.getElementById("adminPanel").scrollIntoView({behavior:"smooth"});
@@ -427,9 +427,7 @@ function openFounders(){
   document.getElementById("foundersModal").style.display="grid";
 }
 
-function openSupport(){
-  const pass=prompt("Senha do suporte:");
-  if(pass!==SUPORTE_PASSWORD){toast("Senha do suporte incorreta.");return;}
+function openSupport(){window.open("https://discordapp.com/channels/1500900705077166342/1501667181556138116","_blank");}
   renderSupportPanel();
   document.getElementById("supportModal").style.display="grid";
 }
@@ -447,6 +445,37 @@ function renderSupportPanel(){
   `).join("") : "<p>Nenhum pedido encontrado.</p>";
 }
 
+
+
+function updateFounderStats(){
+  const orders=localOrders();
+  const users=getUsers();
+  const total=orders.reduce((sum,o)=>sum+(Number(o.total)||0),0);
+  document.getElementById("weekRevenue").textContent=money(total);
+  document.getElementById("registeredUsers").textContent=users.length;
+  document.getElementById("weekOrders").textContent=orders.length;
+}
+
+function openFounders(){
+  const pass=prompt("Senha dos fundadores:");
+  if(pass!=="fundtauros"){toast("Senha incorreta.");return;}
+  updateFounderStats();
+  document.getElementById("foundersModal").style.display="grid";
+}
+
+function renderAdmin(){
+  const q=(document.getElementById("search")?.value||"").toLowerCase();
+  const list=localOrders().filter(o=>(o.product+o.client+o.contact).toLowerCase().includes(q));
+  document.getElementById("adminOrders").innerHTML = list.length ? list.map(o=>`
+  <div class="order">
+    <b>${o.product}</b>
+    <span>Cliente: ${o.client}</span>
+    <span>Contato: ${o.contact}</span>
+    <span>Total: ${money(Number(o.total))}</span>
+    <small>${o.date} • ${o.status}</small>
+  </div>
+  `).join("") : "<p>Nenhuma venda encontrada.</p>";
+}
 
 renderFolders();
 openCategory("membros");
