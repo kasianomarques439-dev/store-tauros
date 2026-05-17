@@ -1,12 +1,348 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Store Tauros</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+    body{background:#05010f;color:white}
+    .app{min-height:100vh;display:flex}
+    .sidebar{width:285px;min-height:100vh;position:sticky;top:0;padding:28px;background:rgba(9,3,28,.96);border-right:1px solid #6d28d9}
+    .brand{font-size:34px;font-weight:900;line-height:.9}
+    .brand span{display:block;color:#fff}.brand strong{color:#8b5cf6}
+    .subtitle{margin:15px 0 28px;color:#c4b5fd}
+    nav,.panel-buttons{display:grid;gap:12px}
+    button{border:0;border-radius:14px;padding:14px;color:#fff;background:linear-gradient(90deg,#7c3aed,#2563eb);font-weight:800;cursor:pointer}
+    nav button{background:#16082f;border:1px solid #392064;text-align:left}
+    nav button.active{background:linear-gradient(90deg,#7c3aed,#2563eb)}
+    .panel-buttons{margin-top:28px}.access{margin-top:18px;display:grid;gap:5px;color:#c4b5fd}
+    .content{flex:1;padding:34px}
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center;min-height:300px;padding:34px;border-radius:30px;background:radial-gradient(circle at 80% 10%,rgba(124,58,237,.45),transparent 35%),linear-gradient(135deg,#12052a,#030712);border:1px solid rgba(124,58,237,.7);overflow:hidden}
+    .hero h1{font-size:48px;margin:14px 0}.hero p{font-size:18px;color:#ddd6fe}
+    .hero img{width:100%;height:240px;object-fit:cover;border-radius:24px;border:1px solid rgba(255,255,255,.16)}
+    .pill{padding:10px 14px;border-radius:999px;background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.5);color:#ddd6fe}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:25px 0}
+    .mini-card{padding:18px;border-radius:18px;background:rgba(17,6,36,.88);border:1px solid rgba(124,58,237,.5);font-weight:800}
+    .products,.payment,.orders,.admin{margin-top:25px;padding:28px;border-radius:30px;background:rgba(10,3,30,.75);border:1px solid rgba(124,58,237,.55)}
+    .section-title{margin-bottom:20px}.section-title p{color:#c4b5fd;margin-top:6px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+    .product,.order,.admin-order{padding:20px;border-radius:22px;background:#110624;border:1px solid #4c1d95}
+    .product img{width:100%;height:150px;object-fit:cover;border-radius:18px;margin-bottom:14px}
+    .product h3{margin-bottom:8px}.product p{color:#d8b4fe;min-height:45px}
+    .product strong{display:block;font-size:24px;margin:16px 0}
+    .payment-grid{display:grid;grid-template-columns:180px 1fr;gap:22px;align-items:center}
+    .payment-grid img{width:180px;height:180px;object-fit:cover;background:#fff;border-radius:18px;padding:8px}
+    .payment-grid strong{display:block;margin:12px 0;color:#c4b5fd;word-break:break-all}
+    .orders{display:grid;gap:12px}.order{display:grid;gap:5px}
+    .admin input{width:100%;margin:18px 0;padding:14px;border-radius:14px;border:1px solid #6d28d9;background:#05010f;color:#fff}
+    .admin-actions,.status{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    .admin-list{display:grid;gap:12px}.admin-order{display:grid;gap:6px}.status button{padding:10px 12px;font-size:13px}
+    .toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:16px 20px;border-radius:16px;background:linear-gradient(90deg,#7c3aed,#2563eb);box-shadow:0 0 20px rgba(124,58,237,.55)}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:grid;place-items:center;padding:20px;z-index:60}
+    .modal-box{width:min(95vw,430px);padding:28px;border-radius:24px;background:#110624;border:1px solid #8b5cf6;position:relative}
+    .close{position:absolute;right:12px;top:12px;width:38px;height:38px;border-radius:50%;padding:0}
+    @media(max-width:900px){.app{display:block}.sidebar{width:100%;min-height:auto;position:relative}.content{padding:18px}.hero{grid-template-columns:1fr}.hero h1{font-size:34px}.cards{grid-template-columns:1fr}.payment-grid{grid-template-columns:1fr}.payment-grid img{width:160px;height:160px}}
+  </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><span>STORE</span><strong>TAUROS</strong></div>
+      <p class="subtitle">Loja digital premium</p>
+      <nav id="nav"></nav>
+      <div class="panel-buttons">
+        <button onclick="openPanel('support')">Login Suporte</button>
+        <button onclick="openPanel('adm')">Login ADM</button>
+      </div>
+      <div class="access">
+        <small>Suporte: sptauros</small>
+        <small>ADM: stadm</small>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="hero">
+        <div>
+          <span class="pill">+500 clientes • +3 mil vendas</span>
+          <h1>Bem-vindo à Store Tauros</h1>
+          <p>Produtos Discord, impulsos, Spotify, Nitro Link e design de servidor.</p>
+        </div>
+        <img src="assets/banner.jpg" alt="Store Tauros">
+      </section>
+
+      <section class="cards">
+        <div class="mini-card">Entrega rápida</div>
+        <div class="mini-card">Suporte ativo</div>
+        <div class="mini-card">Pagamento via Pix</div>
+        <div class="mini-card">Painel ADM/Suporte</div>
+      </section>
+
+      <section class="products">
+        <div class="section-title">
+          <h2 id="categoryTitle">Produtos</h2>
+          <p>Escolha o produto e confirme sua compra.</p>
+        </div>
+        <div class="grid" id="productsGrid"></div>
+      </section>
+
+      <section class="payment">
+        <h2>Pagamento Pix</h2>
+        <div class="payment-grid">
+          <img src="assets/qr-pix.jpg" alt="QR Pix">
+          <div>
+            <p>Chave Pix permanente:</p>
+            <strong id="pixKey">taurosorg@gmail.com</strong>
+            <button onclick="copyPix()">Copiar chave Pix</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="orders">
+        <h2>Meus pedidos / vendas recentes</h2>
+        <div id="ordersList"><p>Nenhuma compra confirmada ainda.</p></div>
+      </section>
+
+      <section class="admin" id="adminPanel" style="display:none">
+        <h2 id="panelTitle">Painel</h2>
+        <p id="panelDesc"></p>
+        <input id="searchInput" placeholder="Buscar cliente, produto ou status" oninput="renderAdmin()">
+        <div class="admin-actions">
+          <button onclick="renderAdmin(); notify('Vendas atualizadas!')">Puxar compras</button>
+          <button onclick="clearOrders()">Limpar vendas</button>
+        </div>
+        <div class="admin-list" id="adminList"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal"></div>
+  <div id="toast"></div>
+
+  <script>
+    const PIX_KEY = 'taurosorg@gmail.com';
+    const ADM_PASSWORD = 'stadm';
+    const SUPPORT_PASSWORD = 'sptauros';
+    let activeCategory = 'membros';
+    let panel = '';
+
+    const categories = [
+      { id: 'membros', name: 'Membros Discord' },
+      { id: 'contas', name: 'Contas Nitradas' },
+      { id: 'nitro', name: 'Nitro Link' },
+      { id: 'impulsos', name: 'Impulsos' },
+      { id: 'spotify', name: 'Spotify' },
+      { id: 'design', name: 'Design' }
+    ];
+
+    const products = [
+      { category: 'membros', name: 'Membros Online', description: '100 membros online para servidor Discord', price: 10.00, image: 'assets/membros.jpg' },
+      { category: 'membros', name: 'Membros Reais', description: '100 membros reais para servidor Discord', price: 3.80, image: 'assets/membros.jpg' },
+      { category: 'membros', name: 'Membros Premium', description: '100 membros premium para servidor Discord', price: 6.50, image: 'assets/membros.jpg' },
+      { category: 'contas', name: 'Conta Nitrada 1 Mês', description: 'Conta Discord nitrada com entrega digital', price: 6.00, image: 'assets/nitrada.jpg' },
+      { category: 'nitro', name: 'Nitro Link 1 Mês', description: 'Link de Nitro para ativar na sua conta', price: 1.99, image: 'assets/nitro.jpg' },
+      { category: 'nitro', name: 'Ativação Link', description: 'Ativação segura do Nitro Link na sua conta', price: 2.00, image: 'assets/nitro.jpg' },
+      { category: 'impulsos', name: 'Impulsos 2x', description: '2 impulsos para seu servidor Discord', price: 3.50, image: 'assets/impulsos.jpg' },
+      { category: 'impulsos', name: 'Impulsos 4x', description: '4 impulsos para seu servidor Discord', price: 7.00, image: 'assets/impulsos.jpg' },
+      { category: 'impulsos', name: 'Impulsos 8x', description: '8 impulsos para seu servidor Discord', price: 10.50, image: 'assets/impulsos.jpg' },
+      { category: 'impulsos', name: 'Impulsos 14x', description: '14 impulsos para seu servidor Discord', price: 21.99, image: 'assets/impulsos.jpg' },
+      { category: 'spotify', name: 'Spotify Premium 1 Mês', description: 'Spotify Premium mensal', price: 8.00, image: 'assets/spotify.jpg' },
+      { category: 'design', name: 'Design de Servidor', description: 'Organização, cargos, canais e visual completo do servidor', price: 50.00, image: 'assets/design.jpg' }
+    ];
+
+    function currency(value) {
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function getOrders() {
+      try { return JSON.parse(localStorage.getItem('store_tauros_orders') || '[]'); }
+      catch { return []; }
+    }
+
+    function saveOrders(list) {
+      localStorage.setItem('store_tauros_orders', JSON.stringify(list));
+    }
+
+    function notify(text) {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = '<div class="toast">' + text + '</div>';
+      setTimeout(() => toast.innerHTML = '', 3000);
+    }
+
+    function renderNav() {
+      const nav = document.getElementById('nav');
+      nav.innerHTML = categories.map(cat => `
+        <button class="${activeCategory === cat.id ? 'active' : ''}" onclick="setCategory('${cat.id}')">${cat.name}</button>
+      `).join('');
+    }
+
+    function setCategory(id) {
+      activeCategory = id;
+      render();
+    }
+
+    function renderProducts() {
+      const title = document.getElementById('categoryTitle');
+      const cat = categories.find(item => item.id === activeCategory);
+      title.textContent = cat ? cat.name : 'Produtos';
+
+      document.getElementById('productsGrid').innerHTML = products
+        .filter(product => product.category === activeCategory)
+        .map(product => `
+          <article class="product">
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            <strong>${currency(product.price)}</strong>
+            <button onclick='buy(${JSON.stringify(product)})'>Comprar agora</button>
+          </article>
+        `).join('');
+    }
+
+    function buy(product) {
+      const customer = prompt('Digite seu nome ou Discord:');
+      if (!customer) {
+        notify('Digite seu nome para confirmar.');
+        return;
+      }
+
+      const order = {
+        id: Date.now(),
+        customer,
+        product: product.name,
+        price: product.price,
+        status: 'Pendente',
+        date: new Date().toLocaleString('pt-BR')
+      };
+
+      const updated = [order, ...getOrders()];
+      saveOrders(updated);
+      renderOrders();
+      renderAdmin();
+      openModal(order);
+      notify('Compra confirmada!');
+    }
+
+    function renderOrders() {
+      const orders = getOrders();
+      const box = document.getElementById('ordersList');
+
+      if (!orders.length) {
+        box.innerHTML = '<p>Nenhuma compra confirmada ainda.</p>';
+        return;
+      }
+
+      box.innerHTML = orders.slice(0, 5).map(order => `
+        <div class="order">
+          <b>${order.product}</b>
+          <span>${order.customer} • ${currency(order.price)} • ${order.status}</span>
+          <small>${order.date}</small>
+        </div>
+      `).join('');
+    }
+
+    function openPanel(type) {
+      const password = prompt(type === 'adm' ? 'Digite a senha ADM:' : 'Digite a senha Suporte:');
+      const correct = type === 'adm' ? ADM_PASSWORD : SUPPORT_PASSWORD;
+
+      if (password !== correct) {
+        notify('Senha incorreta.');
+        return;
+      }
+
+      panel = type;
+      document.getElementById('adminPanel').style.display = 'block';
+      document.getElementById('panelTitle').textContent = type === 'adm' ? 'Painel ADM' : 'Painel Suporte';
+      document.getElementById('panelDesc').textContent = type === 'adm' ? 'Acesso completo para vendas e status.' : 'Acesso para acompanhar pedidos.';
+      renderAdmin();
+      notify(type === 'adm' ? 'Painel ADM aberto.' : 'Painel Suporte aberto.');
+    }
+
+    function renderAdmin() {
+      const box = document.getElementById('adminList');
+      if (!box) return;
+
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+      const filtered = getOrders().filter(order => {
+        const text = `${order.customer} ${order.product} ${order.status}`.toLowerCase();
+        return text.includes(search);
+      });
+
+      if (!filtered.length) {
+        box.innerHTML = '<p>Nenhuma venda encontrada.</p>';
+        return;
+      }
+
+      box.innerHTML = filtered.map(order => `
+        <div class="admin-order">
+          <b>${order.product}</b>
+          <span>Cliente: ${order.customer}</span>
+          <span>Valor: ${currency(order.price)}</span>
+          <small>Status: ${order.status} • ${order.date}</small>
+          ${panel === 'adm' ? `
+            <div class="status">
+              <button onclick="updateStatus(${order.id}, 'Pago')">Pago</button>
+              <button onclick="updateStatus(${order.id}, 'Em entrega')">Em entrega</button>
+              <button onclick="updateStatus(${order.id}, 'Finalizado')">Finalizado</button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function updateStatus(id, status) {
+      const updated = getOrders().map(order => order.id === id ? { ...order, status } : order);
+      saveOrders(updated);
+      renderOrders();
+      renderAdmin();
+      notify('Status atualizado.');
+    }
+
+    function clearOrders() {
+      if (panel !== 'adm') {
+        notify('Somente ADM pode limpar vendas.');
+        return;
+      }
+
+      if (!confirm('Deseja limpar todas as vendas?')) return;
+      saveOrders([]);
+      renderOrders();
+      renderAdmin();
+      notify('Vendas limpas.');
+    }
+
+    function openModal(order) {
+      document.getElementById('modal').innerHTML = `
+        <div class="modal">
+          <div class="modal-box">
+            <button class="close" onclick="closeModal()">×</button>
+            <h2>Compra confirmada!</h2>
+            <p>Produto: <b>${order.product}</b></p>
+            <p>Cliente: <b>${order.customer}</b></p>
+            <p>Status: <b>${order.status}</b></p>
+            <p>Após pagar via Pix, abra o suporte para receber.</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function closeModal() {
+      document.getElementById('modal').innerHTML = '';
+    }
+
+    function copyPix() {
+      navigator.clipboard.writeText(PIX_KEY);
+      notify('Chave Pix copiada!');
+    }
+
+    function render() {
+      renderNav();
+      renderProducts();
+      renderOrders();
+      renderAdmin();
+    }
+
+    render();
+  </script>
 </body>
 </html>
