@@ -1,0 +1,1 @@
+Login/Criar conta separados e sincronização de contas com Supabase aplicada.

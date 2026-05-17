@@ -392,6 +392,11 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   .features{grid-template-columns:1fr!important}
 }
 
+
+.loginTabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}
+.loginTabs button{border:1px solid rgba(124,44,255,.65);border-radius:13px;padding:13px;background:rgba(255,255,255,.05);color:white;font-weight:900;cursor:pointer}
+.loginTabs button.active{background:linear-gradient(90deg,#6e25ff,#ff34d4);box-shadow:0 0 18px rgba(124,44,255,.7)}
+
 </style>
 </head>
 <body>
@@ -563,10 +568,10 @@ function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t
 function closeModal(id){document.getElementById(id).style.display="none";}
 function openLogin(){document.getElementById("loginModal").style.display="grid";}
 function openSupport(){window.open("https://discord.gg/WPH5Xc58cm","_blank");}
-function openFounders(){
+async function openFounders(){
   const pass = prompt("Senha fundador:");
   if(pass !== "donotauros"){toast("Senha incorreta.");return;}
-  updateFounderStats();
+  await updateFounderStats();
   document.getElementById("foundersModal").style.display="grid";
 }
 function copyPix(){navigator.clipboard.writeText("taurosorg@gmail.com");toast("Chave Pix copiada!");}
@@ -641,22 +646,24 @@ async function loadOrdersFromSupabase(){
     const {data,error}=await supabaseClient.from("tauros_orders").select("*").order("id",{ascending:false});
     if(error) throw error;
     setLocalOrders(data||[]);
+    await loadUsersFromSupabase();
     renderOrders();
     renderAdmin();
     updateFounderStats();
-    toast("Compras puxadas com sucesso.");
+    toast("Dados puxados com sucesso.");
   }catch(e){
     console.log(e);
     renderAdmin();
     updateFounderStats();
-    toast("Mostrando vendas locais.");
+    toast("Mostrando dados locais.");
   }
 }
 
-function openAdmin(){
+async function openAdmin(){
   const pass = prompt("Senha admin:");
   if(pass!=="admtauros"){toast("Senha incorreta.");return;}
   document.getElementById("adminPanel").style.display="block";
+  await loadUsersFromSupabase();
   renderAdmin();
   document.getElementById("adminPanel").scrollIntoView({behavior:"smooth"});
 }
@@ -672,9 +679,11 @@ function renderAdmin(){
   if(document.getElementById("adminTotalMoney")) document.getElementById("adminTotalMoney").textContent = money(total);
 
   const list = orders.filter(o=>(o.product+o.client+o.contact+o.status).toLowerCase().includes(q));
-  document.getElementById("adminOrders").innerHTML = list.length ? list.map(o=>`
-    <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
-  `).join("") : "<p>Nenhum pedido encontrado.</p>";
+  if(document.getElementById("adminOrders")){
+    document.getElementById("adminOrders").innerHTML = list.length ? list.map(o=>`
+      <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
+    `).join("") : "<p>Nenhum pedido encontrado.</p>";
+  }
 
   if(document.getElementById("adminUsers")){
     document.getElementById("adminUsers").innerHTML = users.length ? users.map(u=>`
@@ -692,88 +701,131 @@ function openCart(){renderOrders();document.getElementById("orders").scrollIntoV
 
 
 
+
+
+
+
+
+
+
+
+
+
 function getUsers(){try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}catch{return[]}}
 function setUsers(u){localStorage.setItem("tauros_users",JSON.stringify(u));}
 
+function setGateTab(tab){
+  document.getElementById("gateLoginForm").style.display = tab==="login" ? "block" : "none";
+  document.getElementById("gateCreateForm").style.display = tab==="create" ? "block" : "none";
+  document.getElementById("gateTabLogin").classList.toggle("active", tab==="login");
+  document.getElementById("gateTabCreate").classList.toggle("active", tab==="create");
+}
+
 async function saveClientToSupabase(user){
-  if(!supabaseClient) return;
+  if(!supabaseClient) return false;
   try{
-    await supabaseClient.from("tauros_clients").insert({
+    const {error}=await supabaseClient.from("tauros_clients").upsert({
       id:user.id,
-      discord:user.username || user.discord || user.email,
+      discord:user.username,
       email:user.email,
-      password:user.password || "",
+      password:user.password,
       created_at:user.createdAt
-    });
+    },{onConflict:"email"});
+    if(error) throw error;
+    return true;
   }catch(e){
-    console.log("Erro ao salvar cliente no Supabase:", e);
+    console.log("Erro ao salvar cliente no Supabase:",e);
+    return false;
   }
 }
 
-function enterSite(create=false){
-  const username=document.getElementById("gateUsername").value.trim();
-  const email=document.getElementById("gateEmail").value.trim().toLowerCase();
-  const password=document.getElementById("gatePassword").value.trim();
-
-  if(!email || !password){
-    toast("Preencha e-mail e senha.");
-    return;
+async function loadUsersFromSupabase(){
+  if(!supabaseClient) return getUsers();
+  try{
+    const {data,error}=await supabaseClient.from("tauros_clients").select("*").order("id",{ascending:false});
+    if(error) throw error;
+    const mapped=(data||[]).map(u=>({
+      id:u.id,
+      username:u.discord || u.email,
+      email:u.email,
+      password:u.password || "",
+      createdAt:u.created_at || ""
+    }));
+    setUsers(mapped);
+    return mapped;
+  }catch(e){
+    console.log("Erro ao puxar clientes:",e);
+    return getUsers();
   }
+}
 
-  let users=getUsers();
+async function createGateUser(){
+  const username=document.getElementById("gateCreateUsername").value.trim();
+  const email=document.getElementById("gateCreateEmail").value.trim().toLowerCase();
+  const password=document.getElementById("gateCreatePassword").value.trim();
 
-  if(create){
-    if(!username){toast("Preencha o nome de usuário.");return;}
-    if(users.find(u=>u.email===email)){toast("Este e-mail já possui conta.");return;}
+  if(!username || !email || !password){toast("Preencha nome Discord, e-mail e senha.");return;}
 
-    const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
-    users=[user,...users];
-    setUsers(users);
-    saveClientToSupabase(user);
-    localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
-    document.getElementById("loginGate").style.display="none";
-    toast("Conta criada com sucesso!");
-    updateFounderStats();
-    return;
-  }
+  let users=await loadUsersFromSupabase();
 
+  if(users.find(u=>u.email===email)){toast("Este e-mail já possui conta.");setGateTab("login");return;}
+
+  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
+  users=[user,...users];
+  setUsers(users);
+  await saveClientToSupabase(user);
+
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
+  document.getElementById("loginGate").style.display="none";
+  toast("Conta criada com sucesso!");
+  updateFounderStats();
+  renderAdmin();
+}
+
+async function loginGateUser(){
+  const email=document.getElementById("gateLoginEmail").value.trim().toLowerCase();
+  const password=document.getElementById("gateLoginPassword").value.trim();
+
+  if(!email || !password){toast("Preencha e-mail e senha.");return;}
+
+  const users=await loadUsersFromSupabase();
   const user=users.find(u=>u.email===email && u.password===password);
-  if(!user){
-    toast("Conta não encontrada ou senha incorreta.");
-    return;
-  }
+
+  if(!user){toast("Conta não encontrada ou senha incorreta.");return;}
 
   localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
   document.getElementById("loginGate").style.display="none";
   toast("Bem-vindo, "+user.username+"!");
 }
 
-function login(){
+async function login(){
   const email=document.getElementById("loginEmail").value.trim().toLowerCase();
   const password=document.getElementById("loginPassword").value.trim();
-  const user=getUsers().find(u=>u.email===email && u.password===password);
+  const users=await loadUsersFromSupabase();
+  const user=users.find(u=>u.email===email && u.password===password);
   if(!user){toast("Conta não encontrada ou senha incorreta.");return;}
   closeModal("loginModal");
   toast("Login realizado.");
 }
 
-function createAccount(){
+async function createAccount(){
   const email=document.getElementById("loginEmail").value.trim().toLowerCase();
   const password=document.getElementById("loginPassword").value.trim();
   if(!email || !password){toast("Preencha e-mail e senha.");return;}
-  let users=getUsers();
+  let users=await loadUsersFromSupabase();
   if(users.find(u=>u.email===email)){toast("Este e-mail já possui conta.");return;}
   const user={id:Date.now(),username:email.split("@")[0],email,password,createdAt:new Date().toLocaleString("pt-BR")};
   users=[user,...users];
   setUsers(users);
-  saveClientToSupabase(user);
+  await saveClientToSupabase(user);
   closeModal("loginModal");
   toast("Conta criada e salva.");
   updateFounderStats();
+  renderAdmin();
 }
 
-
-function updateFounderStats(){
+async function updateFounderStats(){
+  await loadUsersFromSupabase();
   const orders=localOrders();
   const users=getUsers();
   const total=orders.reduce((sum,o)=>sum+(Number(o.total)||0),0);

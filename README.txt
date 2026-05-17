@@ -51,3 +51,10 @@ ATUALIZAÇÃO PAINÉIS:
 ATUALIZAÇÃO RESPONSIVA:
 - PC mantém sidebar lateral e layout largo.
 - Mobile usa botão ☰, menu lateral recolhível, cards em uma coluna, QR em popup e visual adaptado.
+
+ATUALIZAÇÃO LOGIN ABAS + BANCO:
+- Login agora tem aba separada: email + senha.
+- Criar conta agora tem aba separada: nome Discord + email + senha.
+- Novas contas tentam salvar em tauros_clients no Supabase.
+- Admin e Fundadores puxam contas novas do Supabase e exibem logins cadastrados.
+- Para funcionar entre dispositivos, cole SUPABASE_URL e SUPABASE_ANON_KEY no index.html e execute o SUPABASE_SQL.txt.
