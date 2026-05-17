@@ -1,3 +1,0 @@
-makeSaleClientRecord: 1
-saleFromClientRecord: 1
-onlyLast24Hours: 1

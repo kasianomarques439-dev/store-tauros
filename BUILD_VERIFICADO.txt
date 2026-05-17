@@ -1,1 +1,0 @@
-App.jsx corrigido e bloco do painel ADM refeito para remover erro 'Unterminated regular expression'.
