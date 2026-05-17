@@ -33,3 +33,11 @@ ATUALIZAÇÕES:
 - QR Pix principal trocado pelo novo QR enviado.
 - Tela de login obrigatória antes de acessar o site.
 - Área Fundadores com rendimento total, pessoas cadastradas e vendas.
+
+CORREÇÕES DE LOGIN / PERMISSÕES:
+- Ao abrir o site aparece a tela de acesso.
+- Login só entra com e-mail e senha já cadastrados.
+- Criar conta pede Nome Discord, E-mail e Senha.
+- Área Fundadores pede senha: fundtauros
+- Área Suporte pede senha: sptauros
+- Suporte mostra apenas logins cadastrados e pedidos.

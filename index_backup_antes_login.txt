@@ -75,45 +75,23 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 .founderStat{padding:18px;border-radius:16px;border:1px solid rgba(124,44,255,.55);background:rgba(255,255,255,.05)}
 .founderStat b{display:block;color:#ff54de;font-size:26px;margin-top:6px}
 
-
-.loginTabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.loginTabs button{border:1px solid rgba(124,44,255,.65);border-radius:12px;padding:12px;background:rgba(255,255,255,.04);color:white;font-weight:900;cursor:pointer}
-.loginTabs button.active{background:linear-gradient(90deg,#6e25ff,#ff34d4)}
-.supportGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:16px}
-.supportCard{border:1px solid rgba(124,44,255,.55);border-radius:16px;padding:16px;background:rgba(255,255,255,.05)}
-.supportCard b{color:#ff54de;font-size:22px;display:block;margin-top:6px}
-.supportList{max-height:260px;overflow:auto;margin-top:12px;display:grid;gap:10px}
-
 </style>
 </head>
 <body>
-
 
 <div class="loginGate" id="loginGate">
   <div class="loginGateBox">
     <img src="assets/logo-tauros-store.png" alt="Tauros Store">
     <h2>Acessar Store Tauros</h2>
-    <p>Entre com uma conta existente ou crie uma conta nova.</p>
-
-    <div class="loginTabs">
-      <button id="tabLogin" class="active" onclick="setGateMode('login')">Login</button>
-      <button id="tabCreate" onclick="setGateMode('create')">Criar conta</button>
-    </div>
-
-    <div id="loginForm">
-      <input id="gateEmail" placeholder="E-mail">
-      <input id="gatePassword" type="password" placeholder="Senha">
-      <button onclick="loginGateUser()">Entrar</button>
-    </div>
-
-    <div id="createForm" style="display:none">
-      <input id="createUsername" placeholder="Nome do Discord">
-      <input id="createEmail" placeholder="E-mail">
-      <input id="createPassword" type="password" placeholder="Senha">
-      <button onclick="createGateUser()">Criar conta</button>
-    </div>
+    <p>Entre com nome de usuário, e-mail e senha para acessar o site.</p>
+    <input id="gateUsername" placeholder="Nome de usuário">
+    <input id="gateEmail" placeholder="E-mail">
+    <input id="gatePassword" type="password" placeholder="Senha">
+    <button onclick="enterSite()">Entrar no site</button>
+    <button onclick="enterSite(true)" style="background:transparent;border:1px solid rgba(124,44,255,.7)">Criar conta</button>
   </div>
 </div>
+
 <div class="app">
 <aside class="sidebar">
   <div class="logo"><img class="logoImg" src="assets/logo-tauros-store.png" alt="Tauros Store"><h1>TAUROS<br><span>STORE</span></h1></div>
@@ -189,38 +167,9 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 </main>
 </div>
 
-<div class="modalWrap" id="loginModal"><div class="modal"><button class="close" onclick="closeModal('loginModal')">×</button>
-<h2>Área do Cliente</h2>
-<p>Use uma conta existente ou cadastre uma nova.</p>
-<div class="loginTabs">
-  <button id="modalTabLogin" class="active" onclick="setModalLoginMode('login')">Login</button>
-  <button id="modalTabCreate" onclick="setModalLoginMode('create')">Criar conta</button>
-</div>
-<div id="modalLoginForm">
-  <input id="loginEmail" placeholder="E-mail">
-  <input id="loginPassword" type="password" placeholder="Senha">
-  <div class="row"><button onclick="login()">Entrar</button></div>
-</div>
-<div id="modalCreateForm" style="display:none">
-  <input id="modalDiscordName" placeholder="Nome do Discord">
-  <input id="modalCreateEmail" placeholder="E-mail">
-  <input id="modalCreatePassword" type="password" placeholder="Senha">
-  <div class="row"><button onclick="createAccount()">Criar conta</button></div>
-</div>
-</div></div></div>
+<div class="modalWrap" id="loginModal"><div class="modal"><button class="close" onclick="closeModal('loginModal')">×</button><h2>Acessar conta</h2><input id="loginEmail" placeholder="E-mail"><input id="loginPassword" type="password" placeholder="Senha"><div class="row"><button onclick="login()">Entrar</button><button onclick="createAccount()">Criar conta</button></div></div></div>
 <div class="modalWrap" id="buyModal"><div class="modal"><button class="close" onclick="closeModal('buyModal')">×</button><h2>Confirmar compra</h2><p id="buyInfo"></p><input id="customerName" placeholder="Seu nome ou Discord"><input id="customerContact" placeholder="E-mail ou contato"><div class="row"><button onclick="confirmBuy()">Confirmar compra</button></div></div></div>
-<div class="modalWrap" id="supportModal"><div class="modal"><button class="close" onclick="closeModal('supportModal')">×</button>
-<h2>Área de Suporte</h2>
-<p>Veja os logins cadastrados e os pedidos feitos no site.</p>
-<div class="supportGrid">
-  <div class="supportCard">Total de logins<b id="supportUsersCount">0</b></div>
-  <div class="supportCard">Total de pedidos<b id="supportOrdersCount">0</b></div>
-</div>
-<h3 style="margin-top:18px">Logins cadastrados</h3>
-<div class="supportList" id="supportUsersList"></div>
-<h3 style="margin-top:18px">Pedidos</h3>
-<div class="supportList" id="supportOrdersList"></div>
-</div></div>
+<div class="modalWrap" id="supportModal"><div class="modal"><button class="close" onclick="closeModal('supportModal')">×</button><h2>Suporte</h2><p>Abra um ticket no Discord para receber seu produto após o pagamento.</p><br><button class="primary" onclick="window.open('https://discordapp.com/channels/1500900705077166342/1501667181556138116','_blank')">Abrir Ticket Discord</button></div></div>
 <div class="modalWrap" id="foundersModal"><div class="modal"><button class="close" onclick="closeModal('foundersModal')">×</button>
 <h2>Área dos Fundadores</h2>
 <p>Acompanhe rendimento da semana, cadastros e vendas registradas no site.</p>
@@ -273,7 +222,38 @@ function money(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BR
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000);}
 function closeModal(id){document.getElementById(id).style.display="none";}
 function openLogin(){document.getElementById("loginModal").style.display="grid";}
+function openSupport(){window.open("https://discordapp.com/channels/1500900705077166342/1501667181556138116","_blank");}
+function openFounders(){updateFounderStats();document.getElementById("foundersModal").style.display="grid";}
+function copyPix(){navigator.clipboard.writeText("taurosorg@gmail.com");toast("Chave Pix copiada!");}
+function scrollToProducts(){document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});}
+function goHome(){window.scrollTo({top:0,behavior:"smooth"});}
 
+function renderFolders(){
+  document.getElementById("folderGrid").innerHTML = categories.map(c=>`
+    <div class="folder" onclick="openCategory('${c.id}')">
+      <img src="${c.img}" alt="${c.title}">
+      <div class="folderInfo"><h3>${c.title}</h3><p>${c.desc}</p><b>Acessar produtos →</b></div>
+    </div>
+  `).join("");
+}
+
+function openCategory(cat){
+  const c = categories.find(x=>x.id===cat);
+  document.getElementById("listTitle").textContent = c.title;
+  document.getElementById("listDesc").textContent = c.desc;
+  document.getElementById("productGrid").innerHTML = products.filter(p=>p.cat===cat).map(p=>`
+    <div class="product">
+      <img src="${p.img}" alt="${p.name}">
+      <div>
+        <h3>${p.name}</h3>
+        <p>${p.desc}</p>
+        <span class="price">${money(p.price)}</span>
+        <button onclick='buy(${JSON.stringify(p)})'>Comprar agora</button>
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("productListSection").scrollIntoView({behavior:"smooth"});
+}
 
 function buy(product){
   currentProduct = product;
@@ -331,122 +311,34 @@ function renderAdmin(){
 }
 
 function clearOrders(){if(confirm("Limpar vendas locais?")){setLocalOrders([]);renderOrders();renderAdmin();toast("Vendas locais limpas.");}}
+function login(){closeModal("loginModal");toast("Login salvo localmente.");}
+function createAccount(){closeModal("loginModal");toast("Conta criada localmente.");}
+function openCart(){renderOrders();document.getElementById("orders").scrollIntoView({behavior:"smooth"});}
 
-
-
-const FUNDADOR_PASSWORD = "fundtauros";
-const SUPORTE_PASSWORD = "sptauros";
 
 function getUsers(){try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}catch{return[]}}
 function setUsers(u){localStorage.setItem("tauros_users",JSON.stringify(u));}
-
-async function saveUserToSupabase(user){
-  if(!supabaseClient) return;
-  try{
-    await supabaseClient.from("tauros_clients").insert({
-      id:user.id,
-      discord:user.username,
-      email:user.email,
-      password:user.password,
-      created_at:user.createdAt
-    });
-  }catch(e){console.log("Supabase user save:", e);}
-}
-
-function setGateMode(mode){
-  document.getElementById("loginForm").style.display = mode==="login" ? "block" : "none";
-  document.getElementById("createForm").style.display = mode==="create" ? "block" : "none";
-  document.getElementById("tabLogin").classList.toggle("active", mode==="login");
-  document.getElementById("tabCreate").classList.toggle("active", mode==="create");
-}
-
-function createGateUser(){
-  const username=document.getElementById("createUsername").value.trim();
-  const email=document.getElementById("createEmail").value.trim().toLowerCase();
-  const password=document.getElementById("createPassword").value.trim();
-  if(!username || !email || !password){toast("Preencha nome Discord, e-mail e senha.");return;}
-  let users=getUsers();
-  if(users.find(u=>u.email===email)){toast("Este e-mail já tem conta. Faça login.");setGateMode("login");return;}
-  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
-  users=[user,...users];
-  setUsers(users);
-  saveUserToSupabase(user);
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
-  document.getElementById("loginGate").style.display="none";
-  toast("Conta criada! Bem-vindo, "+username+"!");
-}
-
-function loginGateUser(){
-  const email=document.getElementById("gateEmail").value.trim().toLowerCase();
+function enterSite(create=false){
+  const username=document.getElementById("gateUsername").value.trim();
+  const email=document.getElementById("gateEmail").value.trim();
   const password=document.getElementById("gatePassword").value.trim();
-  if(!email || !password){toast("Digite e-mail e senha.");return;}
-  const user=getUsers().find(u=>u.email===email && u.password===password);
-  if(!user){toast("Conta não encontrada ou senha incorreta. Crie uma conta primeiro.");return;}
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
-  document.getElementById("loginGate").style.display="none";
-  toast("Login realizado, "+user.username+"!");
-}
-
-function setModalLoginMode(mode){
-  document.getElementById("modalLoginForm").style.display = mode==="login" ? "block" : "none";
-  document.getElementById("modalCreateForm").style.display = mode==="create" ? "block" : "none";
-  document.getElementById("modalTabLogin").classList.toggle("active", mode==="login");
-  document.getElementById("modalTabCreate").classList.toggle("active", mode==="create");
-}
-
-function login(){
-  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
-  const password=document.getElementById("loginPassword").value.trim();
-  const user=getUsers().find(u=>u.email===email && u.password===password);
-  if(!user){toast("Login inválido. Use uma conta criada.");return;}
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
-  closeModal("loginModal");
-  toast("Login realizado!");
-}
-
-function createAccount(){
-  const username=document.getElementById("modalDiscordName").value.trim();
-  const email=document.getElementById("modalCreateEmail").value.trim().toLowerCase();
-  const password=document.getElementById("modalCreatePassword").value.trim();
-  if(!username || !email || !password){toast("Preencha nome Discord, e-mail e senha.");return;}
+  if(!username || !email || !password){toast("Preencha usuário, e-mail e senha.");return;}
   let users=getUsers();
-  if(users.find(u=>u.email===email)){toast("Este e-mail já existe.");return;}
-  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
-  users=[user,...users];
-  setUsers(users);
-  saveUserToSupabase(user);
+  if(create || !users.find(u=>u.email===email)){
+    users=[{id:Date.now(),username,email,createdAt:new Date().toLocaleString("pt-BR")},...users];
+    setUsers(users);
+  }
   localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
-  closeModal("loginModal");
-  toast("Conta criada!");
+  document.getElementById("loginGate").style.display="none";
+  toast("Bem-vindo, "+username+"!");
 }
-
-function openFounders(){
-  const pass=prompt("Senha dos fundadores:");
-  if(pass!==FUNDADOR_PASSWORD){toast("Senha dos fundadores incorreta.");return;}
-  updateFounderStats();
-  document.getElementById("foundersModal").style.display="grid";
-}
-
-function openSupport(){
-  const pass=prompt("Senha do suporte:");
-  if(pass!==SUPORTE_PASSWORD){toast("Senha do suporte incorreta.");return;}
-  renderSupportPanel();
-  document.getElementById("supportModal").style.display="grid";
-}
-
-function renderSupportPanel(){
-  const users=getUsers();
+function updateFounderStats(){
   const orders=localOrders();
-  document.getElementById("supportUsersCount").textContent=users.length;
-  document.getElementById("supportOrdersCount").textContent=orders.length;
-  document.getElementById("supportUsersList").innerHTML = users.length ? users.map(u=>`
-    <div class="order"><b>${u.username}</b><span>${u.email}</span><small>${u.createdAt}</small></div>
-  `).join("") : "<p>Nenhum login cadastrado.</p>";
-  document.getElementById("supportOrdersList").innerHTML = orders.length ? orders.map(o=>`
-    <div class="order"><b>${o.product}</b><span>${o.client} • ${o.contact}</span><small>${money(Number(o.total))} • ${o.status}</small></div>
-  `).join("") : "<p>Nenhum pedido encontrado.</p>";
+  const total=orders.reduce((sum,o)=>sum+(Number(o.total)||0),0);
+  document.getElementById("weekRevenue").textContent=money(total);
+  document.getElementById("registeredUsers").textContent=getUsers().length;
+  document.getElementById("weekOrders").textContent=orders.length;
 }
-
 
 renderFolders();
 openCategory("membros");
