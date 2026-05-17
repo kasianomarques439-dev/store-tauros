@@ -100,7 +100,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
     <button onclick="goHome()">🏠 Início</button>
     <button onclick="scrollToProducts()">🛒 Produtos</button>
     <button onclick="openLogin()">👤 Login / Criar conta</button>
-    <button onclick="openSupport()" onclick="window.open('https://discordapp.com/channels/1500900705077166342/1501667181556138116','_blank')">🎧 Suporte</button>
+    <button onclick="openSupport()">🎧 Suporte</button>
     <button onclick="openFounders()">👑 Fundadores</button>
     <button onclick="openAdmin()">🔐 Painel Admin</button>
   </div>
@@ -169,7 +169,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 
 <div class="modalWrap" id="loginModal"><div class="modal"><button class="close" onclick="closeModal('loginModal')">×</button><h2>Acessar conta</h2><input id="loginEmail" placeholder="E-mail"><input id="loginPassword" type="password" placeholder="Senha"><div class="row"><button onclick="login()">Entrar</button><button onclick="createAccount()">Criar conta</button></div></div></div>
 <div class="modalWrap" id="buyModal"><div class="modal"><button class="close" onclick="closeModal('buyModal')">×</button><h2>Confirmar compra</h2><p id="buyInfo"></p><input id="customerName" placeholder="Seu nome ou Discord"><input id="customerContact" placeholder="E-mail ou contato"><div class="row"><button onclick="confirmBuy()">Confirmar compra</button></div></div></div>
-<div class="modalWrap" id="supportModal"><div class="modal"><button class="close" onclick="closeModal('supportModal')">×</button><h2>Suporte</h2><p>Abra um ticket no Discord para receber seu produto após o pagamento.</p><br><button class="primary" onclick="window.open('https://discord.com','_blank')">Abrir Discord</button></div></div>
+<div class="modalWrap" id="supportModal"><div class="modal"><button class="close" onclick="closeModal('supportModal')">×</button><h2>Suporte</h2><p>Abra um ticket no Discord para receber seu produto após o pagamento.</p><br><button class="primary" onclick="window.open('https://discordapp.com/channels/1500900705077166342/1501667181556138116','_blank')">Abrir Ticket Discord</button></div></div>
 <div class="modalWrap" id="foundersModal"><div class="modal"><button class="close" onclick="closeModal('foundersModal')">×</button>
 <h2>Área dos Fundadores</h2>
 <p>Acompanhe rendimento da semana, cadastros e vendas registradas no site.</p>
@@ -222,7 +222,7 @@ function money(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BR
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000);}
 function closeModal(id){document.getElementById(id).style.display="none";}
 function openLogin(){document.getElementById("loginModal").style.display="grid";}
-function openSupport(){document.getElementById("supportModal").style.display="grid";}
+function openSupport(){window.open("https://discordapp.com/channels/1500900705077166342/1501667181556138116","_blank");}
 function openFounders(){updateFounderStats();document.getElementById("foundersModal").style.display="grid";}
 function copyPix(){navigator.clipboard.writeText("taurosorg@gmail.com");toast("Chave Pix copiada!");}
 function scrollToProducts(){document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});}
@@ -345,13 +345,5 @@ openCategory("membros");
 renderOrders();
 </script>
 
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-  const supportBtns=[...document.querySelectorAll('*')].filter(e=>e.textContent && e.textContent.includes('Suporte'));
-  supportBtns.forEach(btn=>{
-    btn.style.cursor='pointer';
-  });
-});
-</script>
 </body>
 </html>
