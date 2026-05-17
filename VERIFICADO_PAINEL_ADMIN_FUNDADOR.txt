@@ -1,0 +1,1 @@
+Painéis admin/fundador atualizados com pedidos, logins e lucro. Mensagem Supabase não configurado removida.

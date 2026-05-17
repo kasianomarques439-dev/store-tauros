@@ -100,7 +100,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
     <button onclick="goHome()">🏠 Início</button>
     <button onclick="scrollToProducts()">🛒 Produtos</button>
     <button onclick="openLogin()">👤 Login / Criar conta</button>
-    <button onclick="openSupport()" onclick="window.open('https://discordapp.com/channels/1500900705077166342/1501667181556138116','_blank')">🎧 Suporte</button>
+    <button onclick="openSupport()">🎧 Suporte</button>
     <button onclick="openFounders()">👑 Fundadores</button>
     <button onclick="openAdmin()">🔐 Painel Admin</button>
   </div>
@@ -158,9 +158,21 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 
   <section class="section adminPanel" id="adminPanel">
     <h2>Painel Admin</h2>
-    <input class="search" id="search" placeholder="Buscar venda" oninput="renderAdmin()">
-    <div class="adminActions"><button onclick="loadOrdersFromSupabase()">Puxar compras</button><button onclick="clearOrders()">Limpar vendas locais</button></div>
+    <div class="adminActions">
+      <button onclick="loadOrdersFromSupabase()">Puxar compras</button>
+      <button onclick="renderAdmin()">Atualizar painel</button>
+      <button onclick="clearOrders()">Limpar vendas locais</button>
+    </div>
+    <input class="search" id="search" placeholder="Buscar pedido, cliente ou contato" oninput="renderAdmin()">
+    <div class="foundersGrid">
+      <div class="founderStat">Pedidos<b id="adminTotalOrders">0</b></div>
+      <div class="founderStat">Logins<b id="adminTotalUsers">0</b></div>
+      <div class="founderStat">Vendas<b id="adminTotalMoney">R$ 0,00</b></div>
+    </div>
+    <h3 style="margin-top:18px">Tabela de pedidos</h3>
     <div class="orders" id="adminOrders"></div>
+    <h3 style="margin-top:18px">Tabela de logins</h3>
+    <div class="orders" id="adminUsers"></div>
   </section>
 
   <div class="footer">© 2026 Store Tauros • Suporte e Fundadores</div>
@@ -169,16 +181,24 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 
 <div class="modalWrap" id="loginModal"><div class="modal"><button class="close" onclick="closeModal('loginModal')">×</button><h2>Acessar conta</h2><input id="loginEmail" placeholder="E-mail"><input id="loginPassword" type="password" placeholder="Senha"><div class="row"><button onclick="login()">Entrar</button><button onclick="createAccount()">Criar conta</button></div></div></div>
 <div class="modalWrap" id="buyModal"><div class="modal"><button class="close" onclick="closeModal('buyModal')">×</button><h2>Confirmar compra</h2><p id="buyInfo"></p><input id="customerName" placeholder="Seu nome ou Discord"><input id="customerContact" placeholder="E-mail ou contato"><div class="row"><button onclick="confirmBuy()">Confirmar compra</button></div></div></div>
-<div class="modalWrap" id="supportModal"><div class="modal"><button class="close" onclick="closeModal('supportModal')">×</button><h2>Suporte</h2><p>Abra um ticket no Discord para receber seu produto após o pagamento.</p><br><button class="primary" onclick="window.open('https://discord.com','_blank')">Abrir Discord</button></div></div>
+
 <div class="modalWrap" id="foundersModal"><div class="modal"><button class="close" onclick="closeModal('foundersModal')">×</button>
-<h2>Área dos Fundadores</h2>
-<p>Acompanhe rendimento da semana, cadastros e vendas registradas no site.</p>
-<div class="foundersGrid">
-  <div class="founderStat">Rendimento da semana<b id="weekRevenue">R$ 0,00</b></div>
-  <div class="founderStat">Pessoas cadastradas<b id="registeredUsers">0</b></div>
-  <div class="founderStat">Vendas da semana<b id="weekOrders">0</b></div>
+<h2>Painel Fundadores</h2>
+<p>Rendimento, lucro, pedidos e logins cadastrados.</p>
+<div class="adminActions">
+  <button onclick="loadOrdersFromSupabase();updateFounderStats()">Puxar compras</button>
+  <button onclick="updateFounderStats()">Atualizar painel</button>
 </div>
-<p><b>Dono:</b> Store Tauros</p><p><b>Equipe:</b> Suporte Tauros</p>
+<div class="foundersGrid">
+  <div class="founderStat">Rendimento total<b id="weekRevenue">R$ 0,00</b></div>
+  <div class="founderStat">Lucro ganho<b id="founderProfit">R$ 0,00</b></div>
+  <div class="founderStat">Pessoas cadastradas<b id="registeredUsers">0</b></div>
+  <div class="founderStat">Vendas registradas<b id="weekOrders">0</b></div>
+</div>
+<h3 style="margin-top:18px">Tabela de pedidos</h3>
+<div class="orders" id="founderOrders"></div>
+<h3 style="margin-top:18px">Tabela de logins</h3>
+<div class="orders" id="founderUsers"></div>
 </div></div>
 <div class="toast" id="toast"></div>
 
@@ -222,8 +242,13 @@ function money(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BR
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000);}
 function closeModal(id){document.getElementById(id).style.display="none";}
 function openLogin(){document.getElementById("loginModal").style.display="grid";}
-function openSupport(){document.getElementById("supportModal").style.display="grid";}
-function openFounders(){updateFounderStats();document.getElementById("foundersModal").style.display="grid";}
+function openSupport(){window.open("https://discord.gg/WPH5Xc58cm","_blank");}
+function openFounders(){
+  const pass = prompt("Senha fundador:");
+  if(pass !== "donotauros"){toast("Senha incorreta.");return;}
+  updateFounderStats();
+  document.getElementById("foundersModal").style.display="grid";
+}
 function copyPix(){navigator.clipboard.writeText("taurosorg@gmail.com");toast("Chave Pix copiada!");}
 function scrollToProducts(){document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});}
 function goHome(){window.scrollTo({top:0,behavior:"smooth"});}
@@ -285,18 +310,32 @@ function renderOrders(){
 }
 
 async function loadOrdersFromSupabase(){
-  if(!supabaseClient){renderAdmin();toast("Supabase não configurado. Mostrando vendas locais.");return;}
+  if(!supabaseClient){
+    renderAdmin();
+    updateFounderStats();
+    renderOrders();
+    toast("Compras carregadas.");
+    return;
+  }
   try{
     const {data,error}=await supabaseClient.from("tauros_orders").select("*").order("id",{ascending:false});
     if(error) throw error;
     setLocalOrders(data||[]);
-    renderOrders();renderAdmin();toast("Compras puxadas do Supabase!");
-  }catch(e){toast("Erro ao puxar compras.");renderAdmin();}
+    renderOrders();
+    renderAdmin();
+    updateFounderStats();
+    toast("Compras puxadas com sucesso.");
+  }catch(e){
+    console.log(e);
+    renderAdmin();
+    updateFounderStats();
+    toast("Mostrando vendas locais.");
+  }
 }
 
 function openAdmin(){
   const pass = prompt("Senha admin:");
-  if(pass!=="admtauros" && pass!=="stadm"){toast("Senha incorreta.");return;}
+  if(pass!=="admtauros"){toast("Senha incorreta.");return;}
   document.getElementById("adminPanel").style.display="block";
   renderAdmin();
   document.getElementById("adminPanel").scrollIntoView({behavior:"smooth"});
@@ -304,40 +343,138 @@ function openAdmin(){
 
 function renderAdmin(){
   const q = (document.getElementById("search")?.value || "").toLowerCase();
-  const list = localOrders().filter(o=>(o.product+o.client+o.contact+o.status).toLowerCase().includes(q));
+  const orders = localOrders();
+  const users = getUsers();
+  const total = orders.reduce((s,o)=>s+(Number(o.total)||0),0);
+
+  if(document.getElementById("adminTotalOrders")) document.getElementById("adminTotalOrders").textContent = orders.length;
+  if(document.getElementById("adminTotalUsers")) document.getElementById("adminTotalUsers").textContent = users.length;
+  if(document.getElementById("adminTotalMoney")) document.getElementById("adminTotalMoney").textContent = money(total);
+
+  const list = orders.filter(o=>(o.product+o.client+o.contact+o.status).toLowerCase().includes(q));
   document.getElementById("adminOrders").innerHTML = list.length ? list.map(o=>`
     <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
-  `).join("") : "<p>Nenhuma venda encontrada.</p>";
+  `).join("") : "<p>Nenhum pedido encontrado.</p>";
+
+  if(document.getElementById("adminUsers")){
+    document.getElementById("adminUsers").innerHTML = users.length ? users.map(u=>`
+      <div class="order"><b>${u.username || u.email}</b><span>E-mail: ${u.email}</span><small>Criado: ${u.createdAt || "sem data"}</small></div>
+    `).join("") : "<p>Nenhum login cadastrado.</p>";
+  }
 }
 
 function clearOrders(){if(confirm("Limpar vendas locais?")){setLocalOrders([]);renderOrders();renderAdmin();toast("Vendas locais limpas.");}}
-function login(){closeModal("loginModal");toast("Login salvo localmente.");}
-function createAccount(){closeModal("loginModal");toast("Conta criada localmente.");}
+
+
 function openCart(){renderOrders();document.getElementById("orders").scrollIntoView({behavior:"smooth"});}
+
+
+
 
 
 function getUsers(){try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}catch{return[]}}
 function setUsers(u){localStorage.setItem("tauros_users",JSON.stringify(u));}
+
+async function saveClientToSupabase(user){
+  if(!supabaseClient) return;
+  try{
+    await supabaseClient.from("tauros_clients").insert({
+      id:user.id,
+      discord:user.username || user.discord || user.email,
+      email:user.email,
+      password:user.password || "",
+      created_at:user.createdAt
+    });
+  }catch(e){
+    console.log("Erro ao salvar cliente no Supabase:", e);
+  }
+}
+
 function enterSite(create=false){
   const username=document.getElementById("gateUsername").value.trim();
-  const email=document.getElementById("gateEmail").value.trim();
+  const email=document.getElementById("gateEmail").value.trim().toLowerCase();
   const password=document.getElementById("gatePassword").value.trim();
-  if(!username || !email || !password){toast("Preencha usuário, e-mail e senha.");return;}
-  let users=getUsers();
-  if(create || !users.find(u=>u.email===email)){
-    users=[{id:Date.now(),username,email,createdAt:new Date().toLocaleString("pt-BR")},...users];
-    setUsers(users);
+
+  if(!email || !password){
+    toast("Preencha e-mail e senha.");
+    return;
   }
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
+
+  let users=getUsers();
+
+  if(create){
+    if(!username){toast("Preencha o nome de usuário.");return;}
+    if(users.find(u=>u.email===email)){toast("Este e-mail já possui conta.");return;}
+
+    const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
+    users=[user,...users];
+    setUsers(users);
+    saveClientToSupabase(user);
+    localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
+    document.getElementById("loginGate").style.display="none";
+    toast("Conta criada com sucesso!");
+    updateFounderStats();
+    return;
+  }
+
+  const user=users.find(u=>u.email===email && u.password===password);
+  if(!user){
+    toast("Conta não encontrada ou senha incorreta.");
+    return;
+  }
+
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
   document.getElementById("loginGate").style.display="none";
-  toast("Bem-vindo, "+username+"!");
+  toast("Bem-vindo, "+user.username+"!");
 }
+
+function login(){
+  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
+  const password=document.getElementById("loginPassword").value.trim();
+  const user=getUsers().find(u=>u.email===email && u.password===password);
+  if(!user){toast("Conta não encontrada ou senha incorreta.");return;}
+  closeModal("loginModal");
+  toast("Login realizado.");
+}
+
+function createAccount(){
+  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
+  const password=document.getElementById("loginPassword").value.trim();
+  if(!email || !password){toast("Preencha e-mail e senha.");return;}
+  let users=getUsers();
+  if(users.find(u=>u.email===email)){toast("Este e-mail já possui conta.");return;}
+  const user={id:Date.now(),username:email.split("@")[0],email,password,createdAt:new Date().toLocaleString("pt-BR")};
+  users=[user,...users];
+  setUsers(users);
+  saveClientToSupabase(user);
+  closeModal("loginModal");
+  toast("Conta criada e salva.");
+  updateFounderStats();
+}
+
+
 function updateFounderStats(){
   const orders=localOrders();
+  const users=getUsers();
   const total=orders.reduce((sum,o)=>sum+(Number(o.total)||0),0);
+  const lucro=total*0.35;
+
   document.getElementById("weekRevenue").textContent=money(total);
-  document.getElementById("registeredUsers").textContent=getUsers().length;
+  if(document.getElementById("founderProfit")) document.getElementById("founderProfit").textContent=money(lucro);
+  document.getElementById("registeredUsers").textContent=users.length;
   document.getElementById("weekOrders").textContent=orders.length;
+
+  if(document.getElementById("founderOrders")){
+    document.getElementById("founderOrders").innerHTML = orders.length ? orders.map(o=>`
+      <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
+    `).join("") : "<p>Nenhum pedido registrado.</p>";
+  }
+
+  if(document.getElementById("founderUsers")){
+    document.getElementById("founderUsers").innerHTML = users.length ? users.map(u=>`
+      <div class="order"><b>${u.username || u.email}</b><span>E-mail: ${u.email}</span><small>Criado: ${u.createdAt || "sem data"}</small></div>
+    `).join("") : "<p>Nenhum login cadastrado.</p>";
+  }
 }
 
 renderFolders();

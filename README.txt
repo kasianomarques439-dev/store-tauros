@@ -33,3 +33,17 @@ ATUALIZAÇÕES:
 - QR Pix principal trocado pelo novo QR enviado.
 - Tela de login obrigatória antes de acessar o site.
 - Área Fundadores com rendimento total, pessoas cadastradas e vendas.
+
+ALTERAÇÕES FEITAS:
+- Senha Fundadores: donotauros
+- Senha Painel Admin: admtauros
+- Suporte abre direto: https://discord.gg/WPH5Xc58cm
+- Criar conta salva no localStorage e tenta salvar na tabela tauros_clients do Supabase.
+- SQL atualizado com tauros_clients e tauros_orders.
+
+ATUALIZAÇÃO PAINÉIS:
+- Admin agora abre tabela de pedidos, logins, total de vendas e botão puxar compras.
+- Fundadores agora abre pedidos, logins, rendimento total e lucro ganho.
+- Mensagem 'Supabase não configurado...' removida; agora mostra compras locais sem erro.
+- Senha Admin: admtauros
+- Senha Fundador: donotauros
