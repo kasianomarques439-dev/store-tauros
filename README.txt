@@ -1,43 +1,19 @@
-STORE TAUROS - SITE ANTIGO COM SPOTIFY E SUPABASE
+STORE TAUROS SUPER FINAL
 
-Arquivos necessários no GitHub:
-- index.html
-- assets/
+Contém:
+- Produtos visíveis com imagens
+- QR separado para cada produto
+- Login e criar conta
+- Salvar conta no Supabase se configurar URL/ANON KEY
+- Salvar pedido no Supabase se configurar URL/ANON KEY
+- Painel Admin completo
+- Painel Fundador avançado com renda/economia
+- Suporte Discord
+- Sem npm e sem Vite
 
-Configuração Vercel:
-- Framework: Other
-- Build Command: desligado/vazio
-- Install Command: desligado/vazio
-- Output Directory: desligado/vazio
+Senhas:
+Admin: admtauros
+Fundador: fundadortauros
 
-Supabase:
-No index.html procure:
-const SUPABASE_URL = "";
-const SUPABASE_ANON_KEY = "";
-
-Cole sua URL e sua ANON KEY.
-
-Produtos Spotify:
-- Spotify Individual 1 mês: R$20,00
-- Spotify Individual 1 ano: R$65,00
-
-Senha admin:
-- admtauros
-- stadm
-
-
-QR Codes individuais adicionados em assets/ e ligados aos produtos.
-
-ATUALIZAÇÕES:
-- Logo da lateral trocado pela imagem Tauros Store.
-- QR Pix principal trocado pelo novo QR enviado.
-- Tela de login obrigatória antes de acessar o site.
-- Área Fundadores com rendimento total, pessoas cadastradas e vendas.
-
-CORREÇÕES DE LOGIN / PERMISSÕES:
-- Ao abrir o site aparece a tela de acesso.
-- Login só entra com e-mail e senha já cadastrados.
-- Criar conta pede Nome Discord, E-mail e Senha.
-- Área Fundadores pede senha: fundtauros
-- Área Suporte pede senha: sptauros
-- Suporte mostra apenas logins cadastrados e pedidos.
+Pix automático real:
+Este arquivo usa QR Pix fixo por produto. Para confirmação automática real de pagamento, precisa integrar uma API de pagamento como Mercado Pago, Asaas ou Efí com backend.
