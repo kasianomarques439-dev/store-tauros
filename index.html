@@ -397,25 +397,68 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 .loginTabs button{border:1px solid rgba(124,44,255,.65);border-radius:13px;padding:13px;background:rgba(255,255,255,.05);color:white;font-weight:900;cursor:pointer}
 .loginTabs button.active{background:linear-gradient(90deg,#6e25ff,#ff34d4);box-shadow:0 0 18px rgba(124,44,255,.7)}
 
+
+/* LOGIN EM DOIS CANAIS */
+.loginTabs{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px!important;
+  margin:15px 0 18px!important;
+}
+.loginTabs button{
+  width:100%!important;
+  border:1px solid rgba(124,44,255,.75)!important;
+  border-radius:14px!important;
+  padding:14px!important;
+  background:rgba(255,255,255,.05)!important;
+  color:white!important;
+  font-weight:900!important;
+  cursor:pointer!important;
+}
+.loginTabs button.active{
+  background:linear-gradient(90deg,#6e25ff,#ff34d4)!important;
+  box-shadow:0 0 18px rgba(124,44,255,.75)!important;
+}
+#gateLoginForm h3,#gateCreateForm h3{
+  margin:10px 0!important;
+  color:#e7c8ff!important;
+  font-size:22px!important;
+}
+
 </style>
 </head>
 <body>
 <button class="mobileMenuBtn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
 
+
 <div class="loginGate" id="loginGate">
   <div class="loginGateBox">
     <img src="assets/logo-tauros-store.png" alt="Tauros Store">
     <h2>Acessar Store Tauros</h2>
-    <p>Entre com nome de usuário, e-mail e senha para acessar o site.</p>
-    <input id="gateUsername" placeholder="Nome de usuário">
-    <input id="gateEmail" placeholder="E-mail">
-    <input id="gatePassword" type="password" placeholder="Senha">
-    <button onclick="enterSite()">Entrar no site</button>
-    <button onclick="enterSite(true)" style="background:transparent;border:1px solid rgba(124,44,255,.7)">Criar conta</button>
+    <p>Escolha uma opção abaixo.</p>
+
+    <div class="loginTabs">
+      <button id="gateTabLogin" class="active" onclick="setGateTab('login')">Login</button>
+      <button id="gateTabCreate" onclick="setGateTab('create')">Criar conta</button>
+    </div>
+
+    <div id="gateLoginForm">
+      <h3>Login</h3>
+      <input id="gateLoginEmail" placeholder="E-mail">
+      <input id="gateLoginPassword" type="password" placeholder="Senha">
+      <button onclick="loginGateUser()">Entrar</button>
+    </div>
+
+    <div id="gateCreateForm" style="display:none">
+      <h3>Criar conta</h3>
+      <input id="gateCreateUsername" placeholder="Nome de usuário Discord">
+      <input id="gateCreateEmail" placeholder="E-mail">
+      <input id="gateCreatePassword" type="password" placeholder="Senha">
+      <button onclick="createGateUser()">Criar conta</button>
+    </div>
   </div>
 </div>
 
-<div class="mobileOverlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
 <div class="app">
 <aside class="sidebar" id="sidebar">
 <button class="sidebarClose" onclick="toggleMobileMenu()">×</button>
@@ -711,92 +754,15 @@ function openCart(){renderOrders();document.getElementById("orders").scrollIntoV
 
 
 
-function getUsers(){try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}catch{return[]}}
-function setUsers(u){localStorage.setItem("tauros_users",JSON.stringify(u));}
 
-function setGateTab(tab){
-  document.getElementById("gateLoginForm").style.display = tab==="login" ? "block" : "none";
-  document.getElementById("gateCreateForm").style.display = tab==="create" ? "block" : "none";
-  document.getElementById("gateTabLogin").classList.toggle("active", tab==="login");
-  document.getElementById("gateTabCreate").classList.toggle("active", tab==="create");
-}
 
-async function saveClientToSupabase(user){
-  if(!supabaseClient) return false;
-  try{
-    const {error}=await supabaseClient.from("tauros_clients").upsert({
-      id:user.id,
-      discord:user.username,
-      email:user.email,
-      password:user.password,
-      created_at:user.createdAt
-    },{onConflict:"email"});
-    if(error) throw error;
-    return true;
-  }catch(e){
-    console.log("Erro ao salvar cliente no Supabase:",e);
-    return false;
-  }
-}
 
-async function loadUsersFromSupabase(){
-  if(!supabaseClient) return getUsers();
-  try{
-    const {data,error}=await supabaseClient.from("tauros_clients").select("*").order("id",{ascending:false});
-    if(error) throw error;
-    const mapped=(data||[]).map(u=>({
-      id:u.id,
-      username:u.discord || u.email,
-      email:u.email,
-      password:u.password || "",
-      createdAt:u.created_at || ""
-    }));
-    setUsers(mapped);
-    return mapped;
-  }catch(e){
-    console.log("Erro ao puxar clientes:",e);
-    return getUsers();
-  }
-}
 
-async function createGateUser(){
-  const username=document.getElementById("gateCreateUsername").value.trim();
-  const email=document.getElementById("gateCreateEmail").value.trim().toLowerCase();
-  const password=document.getElementById("gateCreatePassword").value.trim();
 
-  if(!username || !email || !password){toast("Preencha nome Discord, e-mail e senha.");return;}
 
-  let users=await loadUsersFromSupabase();
 
-  if(users.find(u=>u.email===email)){toast("Este e-mail já possui conta.");setGateTab("login");return;}
 
-  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
-  users=[user,...users];
-  setUsers(users);
-  await saveClientToSupabase(user);
 
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
-  document.getElementById("loginGate").style.display="none";
-  toast("Conta criada com sucesso!");
-  updateFounderStats();
-  renderAdmin();
-}
-
-async function loginGateUser(){
-  const email=document.getElementById("gateLoginEmail").value.trim().toLowerCase();
-  const password=document.getElementById("gateLoginPassword").value.trim();
-
-  if(!email || !password){toast("Preencha e-mail e senha.");return;}
-
-  const users=await loadUsersFromSupabase();
-  const user=users.find(u=>u.email===email && u.password===password);
-
-  if(!user){toast("Conta não encontrada ou senha incorreta.");return;}
-
-  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
-  document.getElementById("loginGate").style.display="none";
-  toast("Bem-vindo, "+user.username+"!");
-}
 
 async function login(){
   const email=document.getElementById("loginEmail").value.trim().toLowerCase();
@@ -861,6 +827,107 @@ function closeMobileMenu(){
   const overlay=document.getElementById("mobileOverlay");
   if(sidebar) sidebar.classList.remove("open");
   if(overlay) overlay.classList.remove("show");
+}
+
+
+function getUsers(){try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}catch{return[]}}
+function setUsers(u){localStorage.setItem("tauros_users",JSON.stringify(u));}
+
+function setGateTab(tab){
+  document.getElementById("gateLoginForm").style.display = tab==="login" ? "block" : "none";
+  document.getElementById("gateCreateForm").style.display = tab==="create" ? "block" : "none";
+  document.getElementById("gateTabLogin").classList.toggle("active", tab==="login");
+  document.getElementById("gateTabCreate").classList.toggle("active", tab==="create");
+}
+
+async function saveClientToSupabase(user){
+  if(!supabaseClient) return false;
+  try{
+    const {error}=await supabaseClient.from("tauros_clients").upsert({
+      id:user.id,
+      discord:user.username,
+      email:user.email,
+      password:user.password,
+      created_at:user.createdAt
+    },{onConflict:"email"});
+    if(error) throw error;
+    return true;
+  }catch(e){
+    console.log("Erro ao salvar cliente no Supabase:",e);
+    return false;
+  }
+}
+
+async function loadUsersFromSupabase(){
+  if(!supabaseClient) return getUsers();
+  try{
+    const {data,error}=await supabaseClient.from("tauros_clients").select("*").order("id",{ascending:false});
+    if(error) throw error;
+    const mapped=(data||[]).map(u=>({
+      id:u.id,
+      username:u.discord || u.email,
+      email:u.email,
+      password:u.password || "",
+      createdAt:u.created_at || ""
+    }));
+    setUsers(mapped);
+    return mapped;
+  }catch(e){
+    console.log("Erro ao puxar clientes:",e);
+    return getUsers();
+  }
+}
+
+async function createGateUser(){
+  const username=document.getElementById("gateCreateUsername").value.trim();
+  const email=document.getElementById("gateCreateEmail").value.trim().toLowerCase();
+  const password=document.getElementById("gateCreatePassword").value.trim();
+
+  if(!username || !email || !password){
+    toast("Preencha nome Discord, e-mail e senha.");
+    return;
+  }
+
+  let users=await loadUsersFromSupabase();
+
+  if(users.find(u=>u.email===email)){
+    toast("Este e-mail já possui conta. Faça login.");
+    setGateTab("login");
+    return;
+  }
+
+  const user={id:Date.now(),username,email,password,createdAt:new Date().toLocaleString("pt-BR")};
+  users=[user,...users];
+  setUsers(users);
+  await saveClientToSupabase(user);
+
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
+  document.getElementById("loginGate").style.display="none";
+  toast("Conta criada com sucesso!");
+  updateFounderStats();
+  renderAdmin();
+}
+
+async function loginGateUser(){
+  const email=document.getElementById("gateLoginEmail").value.trim().toLowerCase();
+  const password=document.getElementById("gateLoginPassword").value.trim();
+
+  if(!email || !password){
+    toast("Preencha e-mail e senha.");
+    return;
+  }
+
+  const users=await loadUsersFromSupabase();
+  const user=users.find(u=>u.email===email && u.password===password);
+
+  if(!user){
+    toast("Conta não encontrada ou senha incorreta.");
+    return;
+  }
+
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
+  document.getElementById("loginGate").style.display="none";
+  toast("Bem-vindo, "+user.username+"!");
 }
 
 renderFolders();

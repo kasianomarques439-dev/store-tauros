@@ -1,0 +1,1 @@
+Login corrigido: canal Login separado de canal Criar conta. Login pede email/senha; Criar conta pede Discord/email/senha.
