@@ -47,3 +47,7 @@ ATUALIZAÇÃO PAINÉIS:
 - Mensagem 'Supabase não configurado...' removida; agora mostra compras locais sem erro.
 - Senha Admin: admtauros
 - Senha Fundador: donotauros
+
+ATUALIZAÇÃO RESPONSIVA:
+- PC mantém sidebar lateral e layout largo.
+- Mobile usa botão ☰, menu lateral recolhível, cards em uma coluna, QR em popup e visual adaptado.

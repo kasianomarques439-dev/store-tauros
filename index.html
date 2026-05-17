@@ -75,9 +75,327 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 .founderStat{padding:18px;border-radius:16px;border:1px solid rgba(124,44,255,.55);background:rgba(255,255,255,.05)}
 .founderStat b{display:block;color:#ff54de;font-size:26px;margin-top:6px}
 
+
+/* ===== RESPONSIVO MOBILE/PC STORE TAUROS ===== */
+.mobileMenuBtn,.sidebarClose,.mobileOverlay{display:none}
+
+@media (min-width:901px){
+  .sidebar{display:block!important}
+  .folderGrid{grid-template-columns:repeat(2,minmax(280px,1fr))}
+  .productGrid{grid-template-columns:repeat(2,minmax(320px,1fr))}
+  .hero img{height:300px}
+}
+
+@media (max-width:900px){
+  body{background:#05000d}
+  body:before{
+    opacity:.13;
+    background-position:center top;
+    filter:none;
+  }
+  body:after{
+    background:linear-gradient(180deg,rgba(5,0,12,.96),rgba(15,0,28,.90));
+  }
+
+  .mobileMenuBtn{
+    display:block;
+    position:fixed;
+    left:14px;
+    top:14px;
+    z-index:120;
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    border:1px solid rgba(124,44,255,.8);
+    background:linear-gradient(135deg,#6e25ff,#b52dff);
+    color:white;
+    font-size:28px;
+    font-weight:900;
+    box-shadow:0 0 22px rgba(124,44,255,.55);
+  }
+
+  .mobileOverlay.show{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:98;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(3px);
+  }
+
+  .app{
+    display:block!important;
+    min-height:100vh;
+  }
+
+  .sidebar{
+    position:fixed!important;
+    top:0;
+    left:-290px;
+    width:280px!important;
+    height:100vh!important;
+    z-index:110;
+    transition:.28s ease;
+    overflow:auto;
+    padding:20px;
+    background:rgba(9,1,22,.98)!important;
+    border-right:1px solid rgba(124,44,255,.9);
+    box-shadow:0 0 40px rgba(124,44,255,.35);
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .sidebarClose{
+    display:block;
+    position:absolute;
+    right:14px;
+    top:14px;
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    border:1px solid rgba(124,44,255,.7);
+    background:#1d0734;
+    color:white;
+    font-size:24px;
+    font-weight:900;
+  }
+
+  .logo{
+    margin-top:44px;
+  }
+
+  .main{
+    padding:82px 14px 24px!important;
+    width:100%;
+  }
+
+  .top{
+    display:block!important;
+    margin-bottom:14px;
+  }
+
+  .topActions{
+    margin-top:12px;
+    display:grid!important;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .topActions button,.primary{
+    padding:14px 12px!important;
+    border-radius:15px!important;
+    font-size:14px!important;
+  }
+
+  .hero{
+    display:block!important;
+    padding:22px!important;
+    border-radius:24px!important;
+    text-align:left;
+    margin-bottom:16px;
+    background:linear-gradient(180deg,rgba(35,6,70,.88),rgba(5,0,13,.86))!important;
+  }
+
+  .hero h2{
+    font-size:38px!important;
+    line-height:1.02!important;
+    margin:14px 0!important;
+  }
+
+  .hero p{
+    font-size:15px!important;
+    line-height:1.55!important;
+  }
+
+  .hero img{
+    margin-top:16px;
+    height:190px!important;
+    width:100%;
+    object-fit:cover;
+    object-position:center;
+    border-radius:18px!important;
+  }
+
+  .features{
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+    margin:14px 0!important;
+  }
+
+  .feature{
+    padding:14px!important;
+    border-radius:16px!important;
+    font-size:14px;
+    text-align:center;
+  }
+
+  .section{
+    margin-top:16px!important;
+    padding:18px!important;
+    border-radius:22px!important;
+  }
+
+  .section h2{
+    font-size:30px!important;
+    line-height:1.1;
+  }
+
+  .lead{
+    font-size:16px!important;
+    line-height:1.45;
+    margin-bottom:16px!important;
+  }
+
+  .folderGrid{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:16px!important;
+  }
+
+  .folder{
+    min-height:220px!important;
+    border-radius:20px!important;
+  }
+
+  .folder img{
+    object-fit:cover!important;
+    object-position:center!important;
+  }
+
+  .folderInfo{
+    left:18px!important;
+    right:18px!important;
+    bottom:18px!important;
+  }
+
+  .folderInfo h3{
+    font-size:28px!important;
+    line-height:1.05;
+  }
+
+  .folderInfo p{
+    font-size:16px!important;
+    margin-top:6px;
+  }
+
+  .folderInfo b{
+    font-size:17px;
+    color:#e6b7ff!important;
+  }
+
+  .productGrid{
+    grid-template-columns:1fr!important;
+    gap:16px!important;
+  }
+
+  .product{
+    display:block!important;
+    padding:14px!important;
+    border-radius:20px!important;
+  }
+
+  .product img{
+    width:100%!important;
+    height:185px!important;
+    object-fit:cover!important;
+    border-radius:16px!important;
+    margin-bottom:13px;
+  }
+
+  .product h3{
+    font-size:23px!important;
+  }
+
+  .product p{
+    font-size:15px!important;
+  }
+
+  .price{
+    font-size:28px!important;
+  }
+
+  .product button{
+    padding:15px!important;
+    border-radius:14px!important;
+    font-size:16px;
+  }
+
+  .payment{
+    grid-template-columns:1fr!important;
+    text-align:center;
+  }
+
+  .payment img{
+    width:min(230px,80vw)!important;
+    margin:auto;
+  }
+
+  .modal{
+    width:94vw!important;
+    max-height:88vh;
+    overflow:auto;
+    border-radius:22px!important;
+  }
+
+  .modal .row{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+  }
+
+  .modal .pixQr{
+    width:min(250px,75vw)!important;
+    height:min(250px,75vw)!important;
+  }
+
+  .loginGateBox{
+    width:min(94vw,430px)!important;
+    padding:24px!important;
+    border-radius:24px!important;
+  }
+
+  .loginGateBox img{
+    width:120px!important;
+    height:120px!important;
+  }
+
+  .loginGateBox h2{
+    font-size:28px!important;
+  }
+
+  .loginGateBox input,
+  .loginGateBox button{
+    padding:15px!important;
+    font-size:16px;
+  }
+
+  .foundersGrid{
+    grid-template-columns:1fr!important;
+  }
+
+  .order{
+    font-size:14px;
+    overflow-wrap:anywhere;
+  }
+
+  .footer{
+    padding-bottom:30px;
+  }
+}
+
+@media (max-width:420px){
+  .main{padding-left:10px!important;padding-right:10px!important}
+  .hero h2{font-size:34px!important}
+  .folder{min-height:205px!important}
+  .folderInfo h3{font-size:25px!important}
+  .features{grid-template-columns:1fr!important}
+}
+
 </style>
 </head>
 <body>
+<button class="mobileMenuBtn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
 
 <div class="loginGate" id="loginGate">
   <div class="loginGateBox">
@@ -92,17 +410,19 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   </div>
 </div>
 
+<div class="mobileOverlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
 <div class="app">
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
+<button class="sidebarClose" onclick="toggleMobileMenu()">×</button>
   <div class="logo"><img class="logoImg" src="assets/logo-tauros-store.png" alt="Tauros Store"><h1>TAUROS<br><span>STORE</span></h1></div>
   <div class="navTitle">Menu</div>
   <div class="nav">
-    <button onclick="goHome()">🏠 Início</button>
-    <button onclick="scrollToProducts()">🛒 Produtos</button>
-    <button onclick="openLogin()">👤 Login / Criar conta</button>
-    <button onclick="openSupport()">🎧 Suporte</button>
-    <button onclick="openFounders()">👑 Fundadores</button>
-    <button onclick="openAdmin()">🔐 Painel Admin</button>
+    <button onclick="goHome();closeMobileMenu()">🏠 Início</button>
+    <button onclick="scrollToProducts();closeMobileMenu()">🛒 Produtos</button>
+    <button onclick="openLogin();closeMobileMenu()">👤 Login / Criar conta</button>
+    <button onclick="openSupport();closeMobileMenu()">🎧 Suporte</button>
+    <button onclick="openFounders();closeMobileMenu()">👑 Fundadores</button>
+    <button onclick="openAdmin();closeMobileMenu()">🔐 Painel Admin</button>
   </div>
   <div class="sideBox"><b>Entrega rápida</b><br>Após o pagamento, abra suporte para receber seu produto.</div>
   <div class="sideBox"><b>Supabase</b><br>Pedidos tentam salvar no banco. Se não configurar as keys, salva localmente.</div>
@@ -111,7 +431,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 <main class="main">
   <div class="top">
     <div><span class="online">59 online no site</span></div>
-    <div class="topActions"><button onclick="openLogin()">Área do cliente</button><button onclick="openCart()">Carrinho <span id="cartCount">0</span></button></div>
+    <div class="topActions"><button onclick="openLogin();closeMobileMenu()">Área do cliente</button><button onclick="openCart()">Carrinho <span id="cartCount">0</span></button></div>
   </div>
 
   <section class="hero">
@@ -119,7 +439,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
       <span class="online">100% seguro</span>
       <h2>Bem-vindo,<br>dono <span>Store Tauros</span></h2>
       <p>Sua loja premium de produtos digitais para Discord. Compre, pague via Pix e resgate seu pedido diretamente no suporte.</p>
-      <br><button class="primary" onclick="scrollToProducts()">Ver produtos</button>
+      <br><button class="primary" onclick="scrollToProducts();closeMobileMenu()">Ver produtos</button>
     </div>
     <img src="assets/topo-store-tauros.jpeg" alt="Store Tauros">
   </section>
@@ -475,6 +795,20 @@ function updateFounderStats(){
       <div class="order"><b>${u.username || u.email}</b><span>E-mail: ${u.email}</span><small>Criado: ${u.createdAt || "sem data"}</small></div>
     `).join("") : "<p>Nenhum login cadastrado.</p>";
   }
+}
+
+
+function toggleMobileMenu(){
+  const sidebar=document.getElementById("sidebar");
+  const overlay=document.getElementById("mobileOverlay");
+  if(sidebar) sidebar.classList.toggle("open");
+  if(overlay) overlay.classList.toggle("show");
+}
+function closeMobileMenu(){
+  const sidebar=document.getElementById("sidebar");
+  const overlay=document.getElementById("mobileOverlay");
+  if(sidebar) sidebar.classList.remove("open");
+  if(overlay) overlay.classList.remove("show");
 }
 
 renderFolders();
