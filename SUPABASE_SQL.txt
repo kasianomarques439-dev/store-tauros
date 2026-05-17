@@ -1,0 +1,26 @@
+-- STORE TAUROS - TABELAS SUPABASE
+create table if not exists public.tauros_orders (
+  id bigint primary key,
+  product text,
+  quantity int,
+  total text,
+  client text,
+  contact text,
+  date text,
+  status text
+);
+
+alter table public.tauros_orders enable row level security;
+
+grant usage on schema public to anon;
+grant select, insert, update, delete on public.tauros_orders to anon;
+
+drop policy if exists "pedidos insert public" on public.tauros_orders;
+drop policy if exists "pedidos select public" on public.tauros_orders;
+drop policy if exists "pedidos update public" on public.tauros_orders;
+drop policy if exists "pedidos delete public" on public.tauros_orders;
+
+create policy "pedidos insert public" on public.tauros_orders for insert to anon with check (true);
+create policy "pedidos select public" on public.tauros_orders for select to anon using (true);
+create policy "pedidos update public" on public.tauros_orders for update to anon using (true) with check (true);
+create policy "pedidos delete public" on public.tauros_orders for delete to anon using (true);
