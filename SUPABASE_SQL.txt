@@ -1,11 +1,4 @@
-create table if not exists public.tauros_clients (
-  id bigint primary key,
-  discord text,
-  email text unique,
-  password text,
-  created_at text
-);
-
+-- STORE TAUROS - TABELAS SUPABASE
 create table if not exists public.tauros_orders (
   id bigint primary key,
   product text,
@@ -17,22 +10,17 @@ create table if not exists public.tauros_orders (
   status text
 );
 
-alter table public.tauros_clients enable row level security;
 alter table public.tauros_orders enable row level security;
 
 grant usage on schema public to anon;
-grant select, insert, update, delete on public.tauros_clients to anon;
 grant select, insert, update, delete on public.tauros_orders to anon;
 
-drop policy if exists "clientes insert public" on public.tauros_clients;
-drop policy if exists "clientes select public" on public.tauros_clients;
 drop policy if exists "pedidos insert public" on public.tauros_orders;
 drop policy if exists "pedidos select public" on public.tauros_orders;
 drop policy if exists "pedidos update public" on public.tauros_orders;
-
-create policy "clientes insert public" on public.tauros_clients for insert to anon with check (true);
-create policy "clientes select public" on public.tauros_clients for select to anon using (true);
+drop policy if exists "pedidos delete public" on public.tauros_orders;
 
 create policy "pedidos insert public" on public.tauros_orders for insert to anon with check (true);
 create policy "pedidos select public" on public.tauros_orders for select to anon using (true);
 create policy "pedidos update public" on public.tauros_orders for update to anon using (true) with check (true);
+create policy "pedidos delete public" on public.tauros_orders for delete to anon using (true);

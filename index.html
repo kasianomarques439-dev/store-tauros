@@ -1,188 +1,357 @@
-
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Store Tauros</title>
-
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#050008;
-color:white;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+:root{--bg:#07020f;--card:#13051f;--purple:#7c2cff;--pink:#ff3ad7;--text:#fff;--muted:#d8c7ef}
+body{background:radial-gradient(circle at top,#24103e 0,#07020f 45%,#030009 100%);color:var(--text);min-height:100vh}
+body:before{content:"";position:fixed;inset:0;background:url("assets/topo-store-tauros.jpeg") center/cover no-repeat;opacity:.18;filter:blur(1px);z-index:-2}
+body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rgba(3,0,9,.95),rgba(10,2,20,.82));z-index:-1}
+.app{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
+.sidebar{background:rgba(10,3,22,.92);border-right:1px solid rgba(124,44,255,.55);padding:22px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.logoBadge{width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,var(--purple),#31005d);display:grid;place-items:center;font-size:28px;box-shadow:0 0 20px rgba(124,44,255,.6)}
+.logo h1{font-size:22px;line-height:1}.logo span{color:#b780ff}
+.navTitle{font-size:12px;color:#bba4dc;margin:22px 0 10px;text-transform:uppercase}
+.nav{display:grid;gap:10px}
+.nav button,.sideBtn{border:1px solid rgba(124,44,255,.45);background:linear-gradient(90deg,rgba(124,44,255,.35),rgba(39,8,70,.45));color:#fff;border-radius:12px;padding:13px 14px;font-weight:800;text-align:left;cursor:pointer}
+.nav button.active,.nav button:hover,.sideBtn:hover{background:linear-gradient(90deg,#7027ff,#9d25ff);box-shadow:0 0 16px rgba(124,44,255,.45)}
+.sideBox{margin-top:22px;padding:16px;border:1px solid rgba(124,44,255,.45);border-radius:14px;background:rgba(255,255,255,.04);color:#e8d9ff;font-size:14px;line-height:1.45}
+.main{padding:24px;overflow:hidden}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px}
+.online{padding:9px 14px;border-radius:999px;background:rgba(124,44,255,.25);border:1px solid rgba(124,44,255,.6);color:#e7d7ff;font-weight:800}
+.topActions{display:flex;gap:10px;flex-wrap:wrap}
+.topActions button,.primary{border:1px solid rgba(255,58,215,.7);background:linear-gradient(90deg,#6e25ff,#ff34d4);color:#fff;border-radius:12px;padding:12px 18px;font-weight:900;cursor:pointer}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;padding:34px;border:1px solid rgba(124,44,255,.7);border-radius:22px;background:linear-gradient(135deg,rgba(34,5,70,.85),rgba(3,0,10,.72));box-shadow:0 0 30px rgba(124,44,255,.25)}
+.hero h2{font-size:54px;line-height:.95;margin:15px 0}.hero h2 span{color:#a455ff;text-shadow:0 0 18px #7c2cff}
+.hero p{font-size:17px;color:#e5d9f5;max-width:560px;line-height:1.45}
+.hero img{width:100%;height:260px;object-fit:cover;border-radius:18px;border:1px solid rgba(124,44,255,.7);box-shadow:0 0 30px rgba(124,44,255,.35)}
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}
+.feature{padding:15px;border:1px solid rgba(124,44,255,.5);border-radius:14px;background:rgba(255,255,255,.04);font-weight:800}
+.section{margin-top:24px;padding:24px;border-radius:22px;background:rgba(9,2,20,.84);border:1px solid rgba(124,44,255,.65)}
+.section h2{font-size:28px;margin-bottom:8px}.lead{color:#cdbde8;margin-bottom:22px}
+.folderGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.folder{position:relative;min-height:205px;border:1px solid rgba(124,44,255,.7);border-radius:18px;overflow:hidden;cursor:pointer;background:#090212;box-shadow:0 0 18px rgba(124,44,255,.18)}
+.folder img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;transition:.3s}
+.folder:hover img{transform:scale(1.04)}
+.folder:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,0,12,.92),rgba(5,0,12,.1))}
+.folderInfo{position:absolute;left:18px;right:18px;bottom:16px;z-index:2}
+.folderInfo h3{font-size:22px;margin-bottom:5px}.folderInfo p{color:#e9dfff;font-size:14px}.folderInfo b{display:inline-block;margin-top:10px;color:#d7a8ff}
+.productGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.product{display:grid;grid-template-columns:145px 1fr;gap:16px;align-items:center;border:1px solid rgba(255,58,215,.55);border-radius:18px;padding:15px;background:linear-gradient(135deg,rgba(30,5,55,.9),rgba(8,1,17,.86))}
+.product img{width:145px;height:125px;object-fit:cover;border-radius:14px}
+.product h3{font-size:20px;margin-bottom:8px}.product p{color:#dccdf1;font-size:14px;line-height:1.35}
+.price{display:block;color:#ff54de;font-size:25px;font-weight:900;margin:12px 0}
+.product button{width:100%;border:none;border-radius:11px;background:linear-gradient(90deg,#ff37d4,#8b35ff);color:#fff;padding:12px;font-weight:900;cursor:pointer}
+.payment{display:grid;grid-template-columns:190px 1fr;gap:24px;align-items:center}
+.payment img{width:190px;border-radius:14px;background:#fff;padding:8px}
+.orders{display:grid;gap:12px}
+.order{padding:15px;border:1px solid rgba(124,44,255,.45);background:rgba(255,255,255,.04);border-radius:13px;display:grid;gap:4px}
+.modalWrap{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);place-items:center;padding:20px}
+.modal{width:min(520px,95vw);background:#10051d;border:1px solid #a238ff;border-radius:20px;padding:24px;box-shadow:0 0 30px rgba(124,44,255,.5)}
+.close{float:right;background:transparent!important;border:none!important;color:#fff!important;font-size:24px!important;cursor:pointer}
+.modal h2{color:#e2b4ff;margin-bottom:15px}
+.modal input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(124,44,255,.55);background:#05010b;color:#fff;margin:8px 0 14px}
+.modal .pixQr{width:170px;height:170px;object-fit:contain;background:#fff;border-radius:14px;padding:8px;display:block;margin:12px auto}.modal .row{display:flex;gap:10px}.modal .row button{flex:1;border:none;border-radius:12px;padding:13px;background:linear-gradient(90deg,#7a2dff,#ff36d2);color:#fff;font-weight:900;cursor:pointer}
+.adminPanel{display:none}.adminActions{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}.adminActions button{border:none;border-radius:12px;padding:12px;background:#7a2dff;color:white;font-weight:900;cursor:pointer}
+.search{width:100%;padding:13px;border-radius:12px;border:1px solid rgba(124,44,255,.5);background:#05010b;color:white;margin:10px 0}
+.toast{display:none;position:fixed;bottom:20px;right:20px;background:linear-gradient(90deg,#7a2dff,#ff36d2);padding:15px 20px;border-radius:14px;font-weight:900;z-index:80}
+.footer{margin-top:25px;color:#b7a7cf;text-align:center;font-size:13px}
+@media(max-width:900px){.app{display:block}.sidebar{position:relative;width:100%;height:auto}.main{padding:14px}.hero{grid-template-columns:1fr;padding:24px}.hero h2{font-size:38px}.features{grid-template-columns:1fr 1fr}.product{grid-template-columns:1fr}.product img{width:100%;height:160px}.payment{grid-template-columns:1fr}.top{display:block}.topActions{margin-top:12px}}
 
-.bg{
-position:fixed;
-inset:0;
-background:url('assets/fundo-login.png') center/cover no-repeat;
-opacity:0.25;
-z-index:-1;
-}
+.logoImg{width:72px;height:72px;border-radius:16px;object-fit:cover;box-shadow:0 0 22px rgba(0,68,255,.65);border:1px solid rgba(80,130,255,.65)}
+.loginGate{position:fixed;inset:0;z-index:999;background:radial-gradient(circle at top,#1b0b39,#05010b 55%,#000);display:grid;place-items:center;padding:20px}
+.loginGateBox{width:min(95vw,470px);border:1px solid rgba(124,44,255,.8);border-radius:26px;background:linear-gradient(180deg,rgba(20,5,40,.96),rgba(5,1,12,.96));box-shadow:0 0 45px rgba(124,44,255,.45);padding:30px;text-align:center}
+.loginGateBox img{width:150px;height:150px;object-fit:cover;border-radius:24px;margin-bottom:18px}
+.loginGateBox h2{font-size:32px;margin-bottom:8px;color:#fff}
+.loginGateBox p{color:#d8c7ef;margin-bottom:18px}
+.loginGateBox input{width:100%;padding:15px;border-radius:14px;border:1px solid rgba(124,44,255,.55);background:#06010d;color:white;margin:8px 0}
+.loginGateBox button{width:100%;border:none;border-radius:14px;padding:15px;margin-top:12px;background:linear-gradient(90deg,#6e25ff,#ff34d4);color:#fff;font-weight:900;cursor:pointer}
+.foundersGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:16px 0}
+.founderStat{padding:18px;border-radius:16px;border:1px solid rgba(124,44,255,.55);background:rgba(255,255,255,.05)}
+.founderStat b{display:block;color:#ff54de;font-size:26px;margin-top:6px}
 
-.login-screen{
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.login-box{
-width:430px;
-background:rgba(0,0,0,0.75);
-border:2px solid #8a2cff;
-border-radius:25px;
-padding:30px;
-text-align:center;
-box-shadow:0 0 25px #8a2cff;
-backdrop-filter:blur(10px);
-}
-
-.logo{
-width:180px;
-border-radius:20px;
-margin-bottom:20px;
-}
-
-input{
-width:100%;
-padding:15px;
-margin-top:14px;
-border-radius:12px;
-border:2px solid #8a2cff;
-background:#12001f;
-color:white;
-box-sizing:border-box;
-}
-
-button{
-width:100%;
-padding:15px;
-margin-top:15px;
-border:none;
-border-radius:12px;
-background:linear-gradient(90deg,#6f00ff,#d000ff);
-color:white;
-font-weight:bold;
-cursor:pointer;
-transition:0.2s;
-}
-
-button:hover{
-transform:scale(1.03);
-box-shadow:0 0 20px #b100ff;
-}
-
-button:active{
-transform:scale(0.95);
-}
-
-#discordField{
-display:none;
-}
-
-#site{
-display:none;
-padding:30px;
-}
 </style>
 </head>
-
 <body>
 
-<div class="bg"></div>
-
-<div id="loginScreen" class="login-screen">
-
-<div class="login-box">
-
-<img src="assets/logo-tauros-store.png" class="logo">
-
-<h1>STORE TAUROS</h1>
-
-<input type="text" id="discord" placeholder="Nome Discord">
-
-<input type="email" id="email" placeholder="Email">
-
-<input type="password" id="senha" placeholder="Senha">
-
-<button id="btnLogin">LOGIN</button>
-
-<button id="btnCreate">CRIAR CONTA</button>
-
-</div>
+<div class="loginGate" id="loginGate">
+  <div class="loginGateBox">
+    <img src="assets/logo-tauros-store.png" alt="Tauros Store">
+    <h2>Acessar Store Tauros</h2>
+    <p>Entre com nome de usuário, e-mail e senha para acessar o site.</p>
+    <input id="gateUsername" placeholder="Nome de usuário">
+    <input id="gateEmail" placeholder="E-mail">
+    <input id="gatePassword" type="password" placeholder="Senha">
+    <button onclick="enterSite()">Entrar no site</button>
+    <button onclick="enterSite(true)" style="background:transparent;border:1px solid rgba(124,44,255,.7)">Criar conta</button>
+  </div>
 </div>
 
-<div id="site">
-<h1>Bem-vindo à Store Tauros</h1>
-<p>Login realizado com sucesso.</p>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo"><img class="logoImg" src="assets/logo-tauros-store.png" alt="Tauros Store"><h1>TAUROS<br><span>STORE</span></h1></div>
+  <div class="navTitle">Menu</div>
+  <div class="nav">
+    <button onclick="goHome()">🏠 Início</button>
+    <button onclick="scrollToProducts()">🛒 Produtos</button>
+    <button onclick="openLogin()">👤 Login / Criar conta</button>
+    <button onclick="openSupport()" onclick="window.open('https://discordapp.com/channels/1500900705077166342/1501667181556138116','_blank')">🎧 Suporte</button>
+    <button onclick="openFounders()">👑 Fundadores</button>
+    <button onclick="openAdmin()">🔐 Painel Admin</button>
+  </div>
+  <div class="sideBox"><b>Entrega rápida</b><br>Após o pagamento, abra suporte para receber seu produto.</div>
+  <div class="sideBox"><b>Supabase</b><br>Pedidos tentam salvar no banco. Se não configurar as keys, salva localmente.</div>
+</aside>
+
+<main class="main">
+  <div class="top">
+    <div><span class="online">59 online no site</span></div>
+    <div class="topActions"><button onclick="openLogin()">Área do cliente</button><button onclick="openCart()">Carrinho <span id="cartCount">0</span></button></div>
+  </div>
+
+  <section class="hero">
+    <div>
+      <span class="online">100% seguro</span>
+      <h2>Bem-vindo,<br>dono <span>Store Tauros</span></h2>
+      <p>Sua loja premium de produtos digitais para Discord. Compre, pague via Pix e resgate seu pedido diretamente no suporte.</p>
+      <br><button class="primary" onclick="scrollToProducts()">Ver produtos</button>
+    </div>
+    <img src="assets/topo-store-tauros.jpeg" alt="Store Tauros">
+  </section>
+
+  <div class="features">
+    <div class="feature">⚡ Entrega rápida</div>
+    <div class="feature">🛡️ 100% seguro</div>
+    <div class="feature">🎧 Suporte 24/7</div>
+    <div class="feature">💜 Loja confiável</div>
+  </div>
+
+  <section class="section" id="productsSection">
+    <h2>Nossos Produtos</h2>
+    <p class="lead">Clique em uma pasta para abrir as opções de compra.</p>
+    <div class="folderGrid" id="folderGrid"></div>
+  </section>
+
+  <section class="section" id="productListSection">
+    <h2 id="listTitle">Produtos</h2>
+    <p class="lead" id="listDesc">Selecione uma categoria acima.</p>
+    <div class="productGrid" id="productGrid"></div>
+  </section>
+
+  <section class="section">
+    <h2>Pagamento Pix</h2>
+    <div class="payment">
+      <img src="assets/qr-pix.jpeg" alt="QR Pix">
+      <div><p>Chave Pix permanente:</p><h3>taurosorg@gmail.com</h3><br><button class="primary" onclick="copyPix()">Copiar Pix</button></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Meus pedidos</h2>
+    <div class="orders" id="orders"></div>
+  </section>
+
+  <section class="section adminPanel" id="adminPanel">
+    <h2>Painel Admin</h2>
+    <input class="search" id="search" placeholder="Buscar venda" oninput="renderAdmin()">
+    <div class="adminActions"><button onclick="loadOrdersFromSupabase()">Puxar compras</button><button onclick="clearOrders()">Limpar vendas locais</button></div>
+    <div class="orders" id="adminOrders"></div>
+  </section>
+
+  <div class="footer">© 2026 Store Tauros • Suporte e Fundadores</div>
+</main>
 </div>
 
+<div class="modalWrap" id="loginModal"><div class="modal"><button class="close" onclick="closeModal('loginModal')">×</button><h2>Acessar conta</h2><input id="loginEmail" placeholder="E-mail"><input id="loginPassword" type="password" placeholder="Senha"><div class="row"><button onclick="login()">Entrar</button><button onclick="createAccount()">Criar conta</button></div></div></div>
+<div class="modalWrap" id="buyModal"><div class="modal"><button class="close" onclick="closeModal('buyModal')">×</button><h2>Confirmar compra</h2><p id="buyInfo"></p><input id="customerName" placeholder="Seu nome ou Discord"><input id="customerContact" placeholder="E-mail ou contato"><div class="row"><button onclick="confirmBuy()">Confirmar compra</button></div></div></div>
+<div class="modalWrap" id="supportModal"><div class="modal"><button class="close" onclick="closeModal('supportModal')">×</button><h2>Suporte</h2><p>Abra um ticket no Discord para receber seu produto após o pagamento.</p><br><button class="primary" onclick="window.open('https://discord.com','_blank')">Abrir Discord</button></div></div>
+<div class="modalWrap" id="foundersModal"><div class="modal"><button class="close" onclick="closeModal('foundersModal')">×</button>
+<h2>Área dos Fundadores</h2>
+<p>Acompanhe rendimento da semana, cadastros e vendas registradas no site.</p>
+<div class="foundersGrid">
+  <div class="founderStat">Rendimento da semana<b id="weekRevenue">R$ 0,00</b></div>
+  <div class="founderStat">Pessoas cadastradas<b id="registeredUsers">0</b></div>
+  <div class="founderStat">Vendas da semana<b id="weekOrders">0</b></div>
+</div>
+<p><b>Dono:</b> Store Tauros</p><p><b>Equipe:</b> Suporte Tauros</p>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = ""; // COLE A URL DO SEU SUPABASE AQUI
+const SUPABASE_ANON_KEY = ""; // COLE A ANON KEY DO SEU SUPABASE AQUI
+const supabaseClient = (SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-function getUsers(){
-return JSON.parse(localStorage.getItem("tauros_users") || "[]")
+const categories = [
+  {id:"membros", title:"Membros Discord", desc:"Online, reais e premium", img:"assets/membros-discord.png"},
+  {id:"contas", title:"Contas Nitradas", desc:"Conta 1 mês e conta trimestral", img:"assets/conta-nitrada.png"},
+  {id:"nitro", title:"Nitro Link", desc:"Nitro Link e ativação", img:"assets/nitro-link-produto.png"},
+  {id:"spotify", title:"Spotify", desc:"Conta individual entregue", img:"assets/spotify-produto.png"},
+  {id:"impulsos", title:"Impulsos", desc:"Boosts para servidor", img:"assets/nitro-gaming-banner.png"},
+  {id:"design", title:"Design Servidor", desc:"Canais, cargos e visual", img:"assets/topo-store-tauros.jpeg"}
+];
+
+const products = [
+  {cat:"membros", name:"Membros Online", desc:"100 membros online para servidor Discord", price:10.00, img:"assets/membros-discord.png", qr:"assets/membros-online-10.png"},
+  {cat:"membros", name:"Membros Reais", desc:"100 membros reais para servidor Discord", price:3.80, img:"assets/membros-discord.png", qr:"assets/membros-reais-3.80.png"},
+  {cat:"membros", name:"Membros Premium", desc:"100 membros premium para servidor Discord", price:6.50, img:"assets/membros-discord.png", qr:"assets/membros-premium-6.50.png"},
+  {cat:"membros", name:"Membros Mistos", desc:"100 membros mistos para servidor Discord", price:4.00, img:"assets/membros-discord.png", qr:"assets/membros-mistos-4.png"},
+  {cat:"contas", name:"Conta Nitrada 1 Mês", desc:"Conta Discord com Nitro ativo", price:6.00, img:"assets/conta-nitrada.png", qr:"assets/conta-nitrada-1mes-6.png"},
+  {cat:"contas", name:"Conta Nitrada 3 Meses", desc:"Conta Discord nitrada trimestral", price:16.99, img:"assets/conta-nitrada.png", qr:"assets/conta-nitrada-3meses-16.99.png"},
+  {cat:"nitro", name:"Nitro Link 1 Mês", desc:"Link Nitro para ativação", price:1.99, img:"assets/nitro-link-produto.png", qr:"assets/nitro-link-1mes-1.99.png"},
+  {cat:"nitro", name:"Nitro Link 3 Meses", desc:"Link Nitro trimestral", price:8.99, img:"assets/nitro-link-produto.png", qr:"assets/nitro-link-3meses-8.99.png"},
+  {cat:"nitro", name:"Ativação Link", desc:"Ativação segura do Nitro Link", price:2.00, img:"assets/nitro-link-produto.png", qr:"assets/ativacao-link-2.png"},
+  {cat:"spotify", name:"Spotify Individual 1 Mês", desc:"Conta Spotify individual entregue", price:20.00, img:"assets/spotify-produto.png", qr:"assets/spotify-1mes-20.png"},
+  {cat:"spotify", name:"Spotify Individual 1 Ano", desc:"Conta Spotify individual anual", price:65.00, img:"assets/spotify-produto.png", qr:"assets/spotify-1ano-65.png"},
+  {cat:"impulsos", name:"2 Boost 1 Mês", desc:"2 impulsos para servidor", price:10.50, img:"assets/nitro-gaming-banner.png", qr:"assets/impulso-2x-10.50.png"},
+  {cat:"impulsos", name:"8 Boost 1 Mês", desc:"8 impulsos para servidor", price:29.50, img:"assets/nitro-gaming-banner.png", qr:"assets/impulso-8x-29.50.png"},
+  {cat:"impulsos", name:"14 Boost 1 Mês", desc:"14 impulsos para servidor", price:44.50, img:"assets/nitro-gaming-banner.png", qr:"assets/impulso-14x-44.50.png"},
+  {cat:"design", name:"Design de Servidor", desc:"Organização, canais, cargos e visual", price:50.00, img:"assets/topo-store-tauros.jpeg", qr:"assets/design-servidor-50.png"}
+];
+
+let currentProduct = null;
+let cart = 0;
+
+function money(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000);}
+function closeModal(id){document.getElementById(id).style.display="none";}
+function openLogin(){document.getElementById("loginModal").style.display="grid";}
+function openSupport(){document.getElementById("supportModal").style.display="grid";}
+function openFounders(){updateFounderStats();document.getElementById("foundersModal").style.display="grid";}
+function copyPix(){navigator.clipboard.writeText("taurosorg@gmail.com");toast("Chave Pix copiada!");}
+function scrollToProducts(){document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});}
+function goHome(){window.scrollTo({top:0,behavior:"smooth"});}
+
+function renderFolders(){
+  document.getElementById("folderGrid").innerHTML = categories.map(c=>`
+    <div class="folder" onclick="openCategory('${c.id}')">
+      <img src="${c.img}" alt="${c.title}">
+      <div class="folderInfo"><h3>${c.title}</h3><p>${c.desc}</p><b>Acessar produtos →</b></div>
+    </div>
+  `).join("");
 }
 
-function saveUsers(users){
-localStorage.setItem("tauros_users", JSON.stringify(users))
+function openCategory(cat){
+  const c = categories.find(x=>x.id===cat);
+  document.getElementById("listTitle").textContent = c.title;
+  document.getElementById("listDesc").textContent = c.desc;
+  document.getElementById("productGrid").innerHTML = products.filter(p=>p.cat===cat).map(p=>`
+    <div class="product">
+      <img src="${p.img}" alt="${p.name}">
+      <div>
+        <h3>${p.name}</h3>
+        <p>${p.desc}</p>
+        <span class="price">${money(p.price)}</span>
+        <button onclick='buy(${JSON.stringify(p)})'>Comprar agora</button>
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("productListSection").scrollIntoView({behavior:"smooth"});
 }
 
-document.getElementById("btnCreate").addEventListener("click",()=>{
-
-const discord=document.getElementById("discord").value.trim()
-const email=document.getElementById("email").value.trim()
-const senha=document.getElementById("senha").value.trim()
-
-if(!discord || !email || !senha){
-alert("Preencha todos os campos")
-return
+function buy(product){
+  currentProduct = product;
+  document.getElementById("buyInfo").innerHTML = `Produto: <b>${product.name}</b><br>Valor: <b>${money(product.price)}</b><br><img class="pixQr" src="${product.qr || 'assets/qr-pix.jpeg'}" alt="QR Pix do produto"><small>Escaneie o QR deste produto ou confirme a compra abaixo.</small>`;
+  document.getElementById("buyModal").style.display="grid";
 }
 
-const users=getUsers()
+function localOrders(){try{return JSON.parse(localStorage.getItem("tauros_orders")||"[]")}catch{return[]}}
+function setLocalOrders(x){localStorage.setItem("tauros_orders",JSON.stringify(x));}
 
-if(users.find(u=>u.email===email)){
-alert("Conta já existe")
-return
+async function confirmBuy(){
+  const client = document.getElementById("customerName").value.trim();
+  const contact = document.getElementById("customerContact").value.trim();
+  if(!client || !contact){toast("Preencha nome e contato.");return;}
+  const order = {id:Date.now(),product:currentProduct.name,quantity:1,total:String(currentProduct.price),client,contact,date:new Date().toLocaleString("pt-BR"),status:"Pendente"};
+  setLocalOrders([order,...localOrders()]);
+  if(supabaseClient){
+    try{await supabaseClient.from("tauros_orders").insert(order);}catch(e){console.log(e);}
+  }
+  cart++;document.getElementById("cartCount").textContent=cart;
+  closeModal("buyModal");renderOrders();toast("Compra confirmada!");
 }
 
-users.push({
-discord,
-email,
-senha
-})
-
-saveUsers(users)
-
-alert("Conta criada com sucesso")
-
-})
-
-document.getElementById("btnLogin").addEventListener("click",()=>{
-
-const email=document.getElementById("email").value.trim()
-const senha=document.getElementById("senha").value.trim()
-
-const users=getUsers()
-
-const user=users.find(
-u=>u.email===email && u.senha===senha
-)
-
-if(user){
-
-document.getElementById("loginScreen").style.display="none"
-document.getElementById("site").style.display="block"
-
-}else{
-alert("Conta inválida")
+function renderOrders(){
+  const orders = localOrders();
+  document.getElementById("orders").innerHTML = orders.length ? orders.slice(0,6).map(o=>`
+    <div class="order"><b>${o.product}</b><span>${o.client} • ${money(Number(o.total))} • ${o.status}</span><small>${o.date}</small></div>
+  `).join("") : "<p>Nenhum pedido ainda.</p>";
 }
 
-})
+async function loadOrdersFromSupabase(){
+  if(!supabaseClient){renderAdmin();toast("Supabase não configurado. Mostrando vendas locais.");return;}
+  try{
+    const {data,error}=await supabaseClient.from("tauros_orders").select("*").order("id",{ascending:false});
+    if(error) throw error;
+    setLocalOrders(data||[]);
+    renderOrders();renderAdmin();toast("Compras puxadas do Supabase!");
+  }catch(e){toast("Erro ao puxar compras.");renderAdmin();}
+}
 
+function openAdmin(){
+  const pass = prompt("Senha admin:");
+  if(pass!=="admtauros" && pass!=="stadm"){toast("Senha incorreta.");return;}
+  document.getElementById("adminPanel").style.display="block";
+  renderAdmin();
+  document.getElementById("adminPanel").scrollIntoView({behavior:"smooth"});
+}
+
+function renderAdmin(){
+  const q = (document.getElementById("search")?.value || "").toLowerCase();
+  const list = localOrders().filter(o=>(o.product+o.client+o.contact+o.status).toLowerCase().includes(q));
+  document.getElementById("adminOrders").innerHTML = list.length ? list.map(o=>`
+    <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
+  `).join("") : "<p>Nenhuma venda encontrada.</p>";
+}
+
+function clearOrders(){if(confirm("Limpar vendas locais?")){setLocalOrders([]);renderOrders();renderAdmin();toast("Vendas locais limpas.");}}
+function login(){closeModal("loginModal");toast("Login salvo localmente.");}
+function createAccount(){closeModal("loginModal");toast("Conta criada localmente.");}
+function openCart(){renderOrders();document.getElementById("orders").scrollIntoView({behavior:"smooth"});}
+
+
+function getUsers(){try{return JSON.parse(localStorage.getItem("tauros_users")||"[]")}catch{return[]}}
+function setUsers(u){localStorage.setItem("tauros_users",JSON.stringify(u));}
+function enterSite(create=false){
+  const username=document.getElementById("gateUsername").value.trim();
+  const email=document.getElementById("gateEmail").value.trim();
+  const password=document.getElementById("gatePassword").value.trim();
+  if(!username || !email || !password){toast("Preencha usuário, e-mail e senha.");return;}
+  let users=getUsers();
+  if(create || !users.find(u=>u.email===email)){
+    users=[{id:Date.now(),username,email,createdAt:new Date().toLocaleString("pt-BR")},...users];
+    setUsers(users);
+  }
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username,email}));
+  document.getElementById("loginGate").style.display="none";
+  toast("Bem-vindo, "+username+"!");
+}
+function updateFounderStats(){
+  const orders=localOrders();
+  const total=orders.reduce((sum,o)=>sum+(Number(o.total)||0),0);
+  document.getElementById("weekRevenue").textContent=money(total);
+  document.getElementById("registeredUsers").textContent=getUsers().length;
+  document.getElementById("weekOrders").textContent=orders.length;
+}
+
+renderFolders();
+openCategory("membros");
+renderOrders();
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const supportBtns=[...document.querySelectorAll('*')].filter(e=>e.textContent && e.textContent.includes('Suporte'));
+  supportBtns.forEach(btn=>{
+    btn.style.cursor='pointer';
+  });
+});
+</script>
 </body>
 </html>
