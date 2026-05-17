@@ -1,1 +1,0 @@
-Correções aplicadas: login real local, criação de conta, senha fundador, senha suporte, suporte com logins e pedidos.

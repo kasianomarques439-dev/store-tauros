@@ -1,5 +1,0 @@
-Arquivo corrigido.
-Botão Suporte corrigido para abrir o ticket direto.
-HTML revisado para remover onclick duplicado.
-Arquivos faltando: []
-Assets faltando: False

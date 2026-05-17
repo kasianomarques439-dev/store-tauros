@@ -1,2 +1,0 @@
-A aba de login agora fica roxa quando selecionada.
-A aba criar conta também fica roxa quando clicada.
