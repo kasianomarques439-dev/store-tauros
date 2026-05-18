@@ -51,7 +51,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 .payment img{width:190px;border-radius:14px;background:#fff;padding:8px}
 .orders{display:grid;gap:12px}
 .order{padding:15px;border:1px solid rgba(124,44,255,.45);background:rgba(255,255,255,.04);border-radius:13px;display:grid;gap:4px}
-.modalWrap{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);place-items:center;padding:20px}
+.modalWrap{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);place-items:center;padding:20px;overflow-y:auto}
 .modal{width:min(520px,95vw);background:#10051d;border:1px solid #a238ff;border-radius:20px;padding:24px;box-shadow:0 0 30px rgba(124,44,255,.5)}
 .close{float:right;background:transparent!important;border:none!important;color:#fff!important;font-size:24px!important;cursor:pointer}
 .modal h2{color:#e2b4ff;margin-bottom:15px}
@@ -668,6 +668,48 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   }
 }
 
+
+/* ===== AJUSTE PAINÉIS ADMIN/FUNDADOR ===== */
+#foundersModal{
+  align-items:flex-start!important;
+  overflow-y:auto!important;
+  padding:22px!important;
+}
+#foundersModal .modal{
+  max-height:88vh!important;
+  overflow-y:auto!important;
+  margin:20px auto!important;
+  scrollbar-width:thin;
+}
+#foundersModal .modal::-webkit-scrollbar{
+  width:8px;
+}
+#foundersModal .modal::-webkit-scrollbar-thumb{
+  background:#7c2cff;
+  border-radius:20px;
+}
+#adminPanel .foundersGrid{
+  display:none!important;
+}
+.adminMiniInfo{
+  padding:13px;
+  border:1px solid rgba(124,44,255,.45);
+  background:rgba(255,255,255,.04);
+  border-radius:14px;
+  margin:12px 0;
+  color:#d8c7ef;
+}
+@media(max-width:900px){
+  #foundersModal{
+    padding:10px!important;
+  }
+  #foundersModal .modal{
+    width:96vw!important;
+    max-height:86vh!important;
+    margin:12px auto!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -769,7 +811,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   </section>
 
   <section class="section adminPanel" id="adminPanel">
-    <h2>Painel Admin</h2>
+    <h2>Painel Admin</h2><div class="adminMiniInfo">Área admin: visualize apenas pedidos e logins cadastrados.</div>
     <div class="adminActions">
       <button onclick="loadOrdersFromSupabase()">Puxar compras</button>
       <button onclick="renderAdmin()">Atualizar painel</button>
@@ -796,7 +838,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 
 <div class="modalWrap" id="foundersModal"><div class="modal"><button class="close" onclick="closeModal('foundersModal')">×</button>
 <h2>Painel Fundadores</h2>
-<p>Rendimento, lucro, pedidos e logins cadastrados.</p>
+<p>Rendimento, lucro, pedidos e logins cadastrados. Role para baixo para ver tudo.</p>
 <div class="adminActions">
   <button onclick="loadOrdersFromSupabase();updateFounderStats()">Puxar compras</button>
   <button onclick="updateFounderStats()">Atualizar painel</button>

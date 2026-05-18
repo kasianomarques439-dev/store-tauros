@@ -1,0 +1,4 @@
+Alterações:
+- Painel Fundadores agora permite rolar para baixo.
+- Rendimento e lucro ficam visíveis somente no Fundadores.
+- Painel Admin fica focado em pedidos e logins.
