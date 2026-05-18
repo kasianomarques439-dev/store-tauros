@@ -560,6 +560,114 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   }
 }
 
+
+/* ===== PROFISSIONAL MOBILE + STATUS + POPUP QR ===== */
+.statusPill{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  margin-top:6px;
+}
+.status-pendente{background:rgba(255,193,7,.16);color:#ffd45a;border:1px solid rgba(255,193,7,.45)}
+.status-aprovado{background:rgba(0,200,255,.14);color:#5fdcff;border:1px solid rgba(0,200,255,.45)}
+.status-entregue{background:rgba(72,255,134,.14);color:#6cff9a;border:1px solid rgba(72,255,134,.45)}
+.modalWrap{
+  backdrop-filter:blur(8px);
+  animation:fadeInModal .22s ease;
+}
+.modal{
+  animation:popModal .24s ease;
+}
+@keyframes fadeInModal{from{opacity:0}to{opacity:1}}
+@keyframes popModal{from{transform:scale(.92);opacity:.4}to{transform:scale(1);opacity:1}}
+.fixedBuyBar{
+  display:none;
+}
+.orderActions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.orderActions button{
+  border:none;
+  border-radius:10px;
+  padding:8px 10px;
+  background:#7a2dff;
+  color:white;
+  font-weight:800;
+  cursor:pointer;
+}
+@media(max-width:900px){
+  .folderGrid,.productGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .folder{
+    min-height:150px!important;
+  }
+  .folderInfo h3{
+    font-size:17px!important;
+  }
+  .folderInfo p{
+    font-size:12px!important;
+  }
+  .product{
+    padding:9px!important;
+    border-radius:16px!important;
+  }
+  .product img{
+    height:92px!important;
+  }
+  .product h3{
+    font-size:14px!important;
+  }
+  .product p{
+    display:none!important;
+  }
+  .price{
+    font-size:17px!important;
+  }
+  .product button{
+    font-size:12px!important;
+    padding:11px 6px!important;
+  }
+  .fixedBuyBar{
+    display:flex;
+    position:fixed;
+    left:10px;
+    right:10px;
+    bottom:12px;
+    z-index:90;
+    gap:8px;
+    padding:10px;
+    border:1px solid rgba(124,44,255,.65);
+    background:rgba(10,0,22,.92);
+    border-radius:18px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 25px rgba(124,44,255,.45);
+  }
+  .fixedBuyBar button{
+    flex:1;
+    border:none;
+    border-radius:13px;
+    padding:13px 8px;
+    color:white;
+    font-weight:900;
+    background:linear-gradient(90deg,#6e25ff,#ff34d4);
+  }
+  .footer{
+    padding-bottom:85px!important;
+  }
+}
+@media(max-width:370px){
+  .folderGrid,.productGrid{
+    grid-template-columns:1fr!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -704,6 +812,12 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 <h3 style="margin-top:18px">Tabela de logins</h3>
 <div class="orders" id="founderUsers"></div>
 </div></div>
+
+<div class="fixedBuyBar" id="fixedBuyBar">
+  <button onclick="scrollToProducts()">🛒 Produtos</button>
+  <button onclick="openCart()">📋 Pedidos</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -730,7 +844,7 @@ const products = [
   {cat:"contas", name:"Conta Nitrada 3 Meses", desc:"Conta Discord nitrada trimestral", price:16.99, img:"assets/conta-nitrada.png", qr:"assets/conta-nitrada-3meses-16.99.png"},
   {cat:"nitro", name:"Nitro Link 1 Mês", desc:"Link Nitro para ativação", price:3.99, img:"assets/nitro-link-produto.png", qr:"assets/nitro-link-1mes-1.99.png"},
   {cat:"nitro", name:"Nitro Link 3 Meses", desc:"Link Nitro trimestral", price:8.99, img:"assets/nitro-link-produto.png", qr:"assets/nitro-link-3meses-8.99.png"},
-  {cat:"nitro", name:"Ativação Link", desc:"Ativação segura do Nitro Link", price:2.00, img:"assets/nitro-link-produto.png", qr:"assets/ativacao-link-2.png"},
+  {cat:"nitro", name:"Ativação Link", desc:"Ativação segura do Nitro Link", price:5.00, img:"assets/nitro-link-produto.png", qr:"assets/ativacao-link-2.png"},
   {cat:"spotify", name:"Spotify Individual 1 Mês", desc:"Conta Spotify individual entregue", price:20.00, img:"assets/spotify-produto.png", qr:"assets/spotify-1mes-20.png"},
   {cat:"spotify", name:"Spotify Individual 1 Ano", desc:"Conta Spotify individual anual", price:65.00, img:"assets/spotify-produto.png", qr:"assets/spotify-1ano-65.png"},
   {cat:"impulsos", name:"2 Boost 1 Mês", desc:"2 impulsos para servidor", price:10.50, img:"assets/impulsos-novo.png", qr:"assets/impulso-2x-10.50.png"},
@@ -841,9 +955,16 @@ async function confirmBuy(){
 }
 
 function renderOrders(){
-  const orders = localOrders();
-  document.getElementById("orders").innerHTML = orders.length ? orders.slice(0,6).map(o=>`
-    <div class="order"><b>${o.product}</b><span>${o.client} • Qtd: ${o.quantity || 1} • ${money(Number(o.total))} • ${o.status}</span><small>${o.date}</small></div>
+  const logged = JSON.parse(localStorage.getItem("tauros_logged_user") || "null");
+  const allOrders = localOrders();
+  const orders = logged ? allOrders.filter(o => (o.contact || "").toLowerCase() === (logged.email || "").toLowerCase() || (o.client || "").toLowerCase() === (logged.username || "").toLowerCase()) : allOrders;
+  document.getElementById("orders").innerHTML = orders.length ? orders.slice(0,8).map(o=>`
+    <div class="order">
+      <b>${o.product}</b>
+      <span>${o.client} • Qtd: ${o.quantity || 1} • ${money(Number(o.total))}</span>
+      <span class="statusPill status-${(o.status || "Pendente").toLowerCase()}">${o.status || "Pendente"}</span>
+      <small>${o.date}</small>
+    </div>
   `).join("") : "<p>Nenhum pedido ainda.</p>";
 }
 
@@ -894,7 +1015,20 @@ function renderAdmin(){
   const list = orders.filter(o=>(o.product+o.client+o.contact+o.status).toLowerCase().includes(q));
   if(document.getElementById("adminOrders")){
     document.getElementById("adminOrders").innerHTML = list.length ? list.map(o=>`
-      <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Qtd: ${o.quantity || 1}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
+      <div class="order">
+        <b>${o.product}</b>
+        <span>Cliente: ${o.client}</span>
+        <span>Contato: ${o.contact}</span>
+        <span>Qtd: ${o.quantity || 1}</span>
+        <span>Total: ${money(Number(o.total))}</span>
+        <span class="statusPill status-${(o.status || "Pendente").toLowerCase()}">${o.status || "Pendente"}</span>
+        <small>${o.date}</small>
+        <div class="orderActions">
+          <button onclick="setOrderStatus(${o.id}, 'Pendente')">Pendente</button>
+          <button onclick="setOrderStatus(${o.id}, 'Aprovado')">Aprovado</button>
+          <button onclick="setOrderStatus(${o.id}, 'Entregue')">Entregue</button>
+        </div>
+      </div>
     `).join("") : "<p>Nenhum pedido encontrado.</p>";
   }
 
@@ -903,6 +1037,20 @@ function renderAdmin(){
       <div class="order"><b>${u.username || u.email}</b><span>E-mail: ${u.email}</span><small>Criado: ${u.createdAt || "sem data"}</small></div>
     `).join("") : "<p>Nenhum login cadastrado.</p>";
   }
+}
+
+
+async function setOrderStatus(id,status){
+  let orders = localOrders();
+  orders = orders.map(o => String(o.id) === String(id) ? {...o,status} : o);
+  setLocalOrders(orders);
+  if(supabaseClient){
+    try{await supabaseClient.from("tauros_orders").update({status}).eq("id", id);}catch(e){console.log(e);}
+  }
+  renderOrders();
+  renderAdmin();
+  updateFounderStats();
+  toast("Status atualizado para " + status);
 }
 
 function clearOrders(){if(confirm("Limpar vendas locais?")){setLocalOrders([]);renderOrders();renderAdmin();toast("Vendas locais limpas.");}}
@@ -974,7 +1122,15 @@ async function updateFounderStats(){
 
   if(document.getElementById("founderOrders")){
     document.getElementById("founderOrders").innerHTML = orders.length ? orders.map(o=>`
-      <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Qtd: ${o.quantity || 1}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
+      <div class="order">
+        <b>${o.product}</b>
+        <span>Cliente: ${o.client}</span>
+        <span>Contato: ${o.contact}</span>
+        <span>Qtd: ${o.quantity || 1}</span>
+        <span>Total: ${money(Number(o.total))}</span>
+        <span class="statusPill status-${(o.status || "Pendente").toLowerCase()}">${o.status || "Pendente"}</span>
+        <small>${o.date}</small>
+      </div>
     `).join("") : "<p>Nenhum pedido registrado.</p>";
   }
 
