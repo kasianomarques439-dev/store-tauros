@@ -425,14 +425,150 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   font-size:22px!important;
 }
 
+
+/* ===== QR UNICO + QUANTIDADE + MOBILE PROFISSIONAL ===== */
+.qtyBox{
+  margin:14px 0;
+  padding:14px;
+  border:1px solid rgba(124,44,255,.55);
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+}
+.qtyBox label{
+  display:block;
+  margin-bottom:8px;
+  color:#e9dfff;
+  font-weight:900;
+}
+.qtyBox input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid rgba(124,44,255,.65);
+  background:#05010b;
+  color:white;
+  font-size:18px;
+  font-weight:900;
+}
+.totalPreview{
+  margin:12px 0;
+  padding:12px;
+  border-radius:12px;
+  background:linear-gradient(90deg,rgba(124,44,255,.35),rgba(255,58,215,.22));
+  font-size:18px;
+  font-weight:900;
+}
+.pixKeyBox{
+  padding:12px;
+  border-radius:12px;
+  border:1px dashed rgba(255,255,255,.25);
+  margin-top:10px;
+  color:#e9dfff;
+  word-break:break-all;
+}
+@media(max-width:900px){
+  .folderGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  .folder{
+    min-height:175px!important;
+    border-radius:18px!important;
+  }
+  .folderInfo{
+    left:12px!important;
+    right:12px!important;
+    bottom:12px!important;
+  }
+  .folderInfo h3{
+    font-size:20px!important;
+  }
+  .folderInfo p{
+    font-size:13px!important;
+    line-height:1.25!important;
+  }
+  .folderInfo b{
+    font-size:13px!important;
+  }
+  .productGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  .product{
+    padding:10px!important;
+    border-radius:18px!important;
+  }
+  .product img{
+    height:110px!important;
+    border-radius:14px!important;
+    margin-bottom:10px!important;
+  }
+  .product h3{
+    font-size:16px!important;
+    line-height:1.15!important;
+  }
+  .product p{
+    font-size:12px!important;
+    line-height:1.25!important;
+  }
+  .price{
+    font-size:19px!important;
+    margin:8px 0!important;
+  }
+  .product button{
+    padding:12px 8px!important;
+    font-size:13px!important;
+  }
+  .section{
+    padding:15px!important;
+  }
+  .section h2{
+    font-size:25px!important;
+  }
+}
+@media(max-width:380px){
+  .folderGrid,.productGrid{
+    grid-template-columns:1fr!important;
+  }
+  .folder{min-height:190px!important}
+  .product img{height:150px!important}
+}
+
+
+/* Login no canto */
+.floatingLoginBtn{
+  position:fixed;
+  right:16px;
+  top:16px;
+  z-index:130;
+  width:auto!important;
+  padding:12px 16px!important;
+  border-radius:16px!important;
+  border:1px solid rgba(124,44,255,.8)!important;
+  background:linear-gradient(90deg,#6e25ff,#ff34d4)!important;
+  color:#fff!important;
+  font-weight:900!important;
+  cursor:pointer!important;
+  box-shadow:0 0 20px rgba(124,44,255,.55);
+}
+@media(max-width:900px){
+  .floatingLoginBtn{
+    top:14px;
+    right:14px;
+    padding:11px 13px!important;
+    font-size:13px!important;
+  }
+}
+
 </style>
 </head>
 <body>
+<button class="floatingLoginBtn" onclick="openGateLogin()">👤 Login</button>
 <button class="mobileMenuBtn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
 
 
-<div class="loginGate" id="loginGate">
-  <div class="loginGateBox">
+<div class="loginGate" id="loginGate" style="display:none">
+  <div class="loginGateBox"><button class="close" onclick="closeGateLogin()">×</button>
     <img src="assets/logo-tauros-store.png" alt="Tauros Store">
     <h2>Acessar Store Tauros</h2>
     <p>Escolha uma opção abaixo.</p>
@@ -501,7 +637,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
 
   <section class="section" id="productsSection">
     <h2>Nossos Produtos</h2>
-    <p class="lead">Clique em uma pasta para abrir as opções de compra.</p>
+    <p class="lead">Clique em uma pasta para abrir as opções de compra. Ao comprar, escolha a quantidade e o total será calculado.</p>
     <div class="folderGrid" id="folderGrid"></div>
   </section>
 
@@ -514,8 +650,8 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   <section class="section">
     <h2>Pagamento Pix</h2>
     <div class="payment">
-      <img src="assets/qr-pix.jpeg" alt="QR Pix">
-      <div><p>Chave Pix permanente:</p><h3>taurosorg@gmail.com</h3><br><button class="primary" onclick="copyPix()">Copiar Pix</button></div>
+      <img src="assets/qr-pix-unico.jpeg" alt="QR Pix">
+      <div><p>Chave Pix permanente:</p><h3>7357abb4-6aa0-4823-a605-486952861494</h3><br><button class="primary" onclick="copyPix()">Copiar Pix</button></div>
     </div>
   </section>
 
@@ -581,7 +717,7 @@ const categories = [
   {id:"contas", title:"Contas Nitradas", desc:"Conta 1 mês e conta trimestral", img:"assets/conta-nitrada.png"},
   {id:"nitro", title:"Nitro Link", desc:"Nitro Link e ativação", img:"assets/nitro-link-produto.png"},
   {id:"spotify", title:"Spotify", desc:"Conta individual entregue", img:"assets/spotify-produto.png"},
-  {id:"impulsos", title:"Impulsos", desc:"Boosts para servidor", img:"assets/nitro-gaming-banner.png"},
+  {id:"impulsos", title:"Impulsos", desc:"Boosts para servidor", img:"assets/impulsos-novo.png"},
   {id:"design", title:"Design Servidor", desc:"Canais, cargos e visual", img:"assets/topo-store-tauros.jpeg"}
 ];
 
@@ -592,14 +728,14 @@ const products = [
   {cat:"membros", name:"Membros Mistos", desc:"100 membros mistos para servidor Discord", price:4.00, img:"assets/membros-discord.png", qr:"assets/membros-mistos-4.png"},
   {cat:"contas", name:"Conta Nitrada 1 Mês", desc:"Conta Discord com Nitro ativo", price:6.00, img:"assets/conta-nitrada.png", qr:"assets/conta-nitrada-1mes-6.png"},
   {cat:"contas", name:"Conta Nitrada 3 Meses", desc:"Conta Discord nitrada trimestral", price:16.99, img:"assets/conta-nitrada.png", qr:"assets/conta-nitrada-3meses-16.99.png"},
-  {cat:"nitro", name:"Nitro Link 1 Mês", desc:"Link Nitro para ativação", price:1.99, img:"assets/nitro-link-produto.png", qr:"assets/nitro-link-1mes-1.99.png"},
+  {cat:"nitro", name:"Nitro Link 1 Mês", desc:"Link Nitro para ativação", price:3.99, img:"assets/nitro-link-produto.png", qr:"assets/nitro-link-1mes-1.99.png"},
   {cat:"nitro", name:"Nitro Link 3 Meses", desc:"Link Nitro trimestral", price:8.99, img:"assets/nitro-link-produto.png", qr:"assets/nitro-link-3meses-8.99.png"},
   {cat:"nitro", name:"Ativação Link", desc:"Ativação segura do Nitro Link", price:2.00, img:"assets/nitro-link-produto.png", qr:"assets/ativacao-link-2.png"},
   {cat:"spotify", name:"Spotify Individual 1 Mês", desc:"Conta Spotify individual entregue", price:20.00, img:"assets/spotify-produto.png", qr:"assets/spotify-1mes-20.png"},
   {cat:"spotify", name:"Spotify Individual 1 Ano", desc:"Conta Spotify individual anual", price:65.00, img:"assets/spotify-produto.png", qr:"assets/spotify-1ano-65.png"},
-  {cat:"impulsos", name:"2 Boost 1 Mês", desc:"2 impulsos para servidor", price:10.50, img:"assets/nitro-gaming-banner.png", qr:"assets/impulso-2x-10.50.png"},
-  {cat:"impulsos", name:"8 Boost 1 Mês", desc:"8 impulsos para servidor", price:29.50, img:"assets/nitro-gaming-banner.png", qr:"assets/impulso-8x-29.50.png"},
-  {cat:"impulsos", name:"14 Boost 1 Mês", desc:"14 impulsos para servidor", price:44.50, img:"assets/nitro-gaming-banner.png", qr:"assets/impulso-14x-44.50.png"},
+  {cat:"impulsos", name:"2 Boost 1 Mês", desc:"2 impulsos para servidor", price:10.50, img:"assets/impulsos-novo.png", qr:"assets/impulso-2x-10.50.png"},
+  {cat:"impulsos", name:"8 Boost 1 Mês", desc:"8 impulsos para servidor", price:29.50, img:"assets/impulsos-novo.png", qr:"assets/impulso-8x-29.50.png"},
+  {cat:"impulsos", name:"14 Boost 1 Mês", desc:"14 impulsos para servidor", price:44.50, img:"assets/impulsos-novo.png", qr:"assets/impulso-14x-44.50.png"},
   {cat:"design", name:"Design de Servidor", desc:"Organização, canais, cargos e visual", price:50.00, img:"assets/topo-store-tauros.jpeg", qr:"assets/design-servidor-50.png"}
 ];
 
@@ -608,6 +744,8 @@ let cart = 0;
 
 function money(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000);}
+function openGateLogin(){document.getElementById('loginGate').style.display='grid';}
+function closeGateLogin(){document.getElementById('loginGate').style.display='none';}
 function closeModal(id){document.getElementById(id).style.display="none";}
 function openLogin(){document.getElementById("loginModal").style.display="grid";}
 function openSupport(){window.open("https://discord.gg/WPH5Xc58cm","_blank");}
@@ -617,7 +755,7 @@ async function openFounders(){
   await updateFounderStats();
   document.getElementById("foundersModal").style.display="grid";
 }
-function copyPix(){navigator.clipboard.writeText("taurosorg@gmail.com");toast("Chave Pix copiada!");}
+function copyPix(){navigator.clipboard.writeText("7357abb4-6aa0-4823-a605-486952861494");toast("Chave Pix copiada!");}
 function scrollToProducts(){document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});}
 function goHome(){window.scrollTo({top:0,behavior:"smooth"});}
 
@@ -650,30 +788,62 @@ function openCategory(cat){
 
 function buy(product){
   currentProduct = product;
-  document.getElementById("buyInfo").innerHTML = `Produto: <b>${product.name}</b><br>Valor: <b>${money(product.price)}</b><br><img class="pixQr" src="${product.qr || 'assets/qr-pix.jpeg'}" alt="QR Pix do produto"><small>Escaneie o QR deste produto ou confirme a compra abaixo.</small>`;
+  document.getElementById("buyInfo").innerHTML = `
+    Produto: <b>${product.name}</b><br>
+    Valor unitário: <b>${money(product.price)}</b>
+    <div class="qtyBox">
+      <label>Quantidade desejada</label>
+      <input id="buyQuantity" type="number" min="1" value="1" oninput="updateBuyTotal()">
+      <small>Exemplo: 2x = o dobro do produto e o dobro do valor.</small>
+    </div>
+    <div class="totalPreview" id="buyTotalPreview">Total: ${money(product.price)}</div>
+    <img class="pixQr" src="assets/qr-pix-unico.jpeg" alt="QR Pix único">
+    <div class="pixKeyBox">Chave Pix: <b>7357abb4-6aa0-4823-a605-486952861494</b></div>
+    <small>Escaneie o QR e coloque o valor total mostrado acima.</small>
+  `;
   document.getElementById("buyModal").style.display="grid";
 }
 
 function localOrders(){try{return JSON.parse(localStorage.getItem("tauros_orders")||"[]")}catch{return[]}}
 function setLocalOrders(x){localStorage.setItem("tauros_orders",JSON.stringify(x));}
 
+
+function updateBuyTotal(){
+  if(!currentProduct) return;
+  const q = Math.max(1, Number(document.getElementById("buyQuantity")?.value || 1));
+  const total = currentProduct.price * q;
+  const el = document.getElementById("buyTotalPreview");
+  if(el) el.textContent = "Total: " + money(total);
+}
+
 async function confirmBuy(){
+  const logged = localStorage.getItem("tauros_logged_user");
+  if(!logged){
+    toast("Faça login ou crie conta para confirmar o pedido.");
+    openGateLogin();
+    return;
+  }
   const client = document.getElementById("customerName").value.trim();
   const contact = document.getElementById("customerContact").value.trim();
+  const quantity = Math.max(1, Number(document.getElementById("buyQuantity")?.value || 1));
   if(!client || !contact){toast("Preencha nome e contato.");return;}
-  const order = {id:Date.now(),product:currentProduct.name,quantity:1,total:String(currentProduct.price),client,contact,date:new Date().toLocaleString("pt-BR"),status:"Pendente"};
+  const totalValue = currentProduct.price * quantity;
+  const order = {id:Date.now(),product:currentProduct.name,quantity,total:String(totalValue),client,contact,date:new Date().toLocaleString("pt-BR"),status:"Pendente"};
   setLocalOrders([order,...localOrders()]);
   if(supabaseClient){
     try{await supabaseClient.from("tauros_orders").insert(order);}catch(e){console.log(e);}
   }
-  cart++;document.getElementById("cartCount").textContent=cart;
-  closeModal("buyModal");renderOrders();toast("Compra confirmada!");
+  cart += quantity;
+  document.getElementById("cartCount").textContent=cart;
+  closeModal("buyModal");
+  renderOrders();
+  toast("Compra confirmada!");
 }
 
 function renderOrders(){
   const orders = localOrders();
   document.getElementById("orders").innerHTML = orders.length ? orders.slice(0,6).map(o=>`
-    <div class="order"><b>${o.product}</b><span>${o.client} • ${money(Number(o.total))} • ${o.status}</span><small>${o.date}</small></div>
+    <div class="order"><b>${o.product}</b><span>${o.client} • Qtd: ${o.quantity || 1} • ${money(Number(o.total))} • ${o.status}</span><small>${o.date}</small></div>
   `).join("") : "<p>Nenhum pedido ainda.</p>";
 }
 
@@ -724,7 +894,7 @@ function renderAdmin(){
   const list = orders.filter(o=>(o.product+o.client+o.contact+o.status).toLowerCase().includes(q));
   if(document.getElementById("adminOrders")){
     document.getElementById("adminOrders").innerHTML = list.length ? list.map(o=>`
-      <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
+      <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Qtd: ${o.quantity || 1}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
     `).join("") : "<p>Nenhum pedido encontrado.</p>";
   }
 
@@ -804,7 +974,7 @@ async function updateFounderStats(){
 
   if(document.getElementById("founderOrders")){
     document.getElementById("founderOrders").innerHTML = orders.length ? orders.map(o=>`
-      <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
+      <div class="order"><b>${o.product}</b><span>Cliente: ${o.client}</span><span>Contato: ${o.contact}</span><span>Qtd: ${o.quantity || 1}</span><span>Total: ${money(Number(o.total))}</span><small>${o.date} • ${o.status}</small></div>
     `).join("") : "<p>Nenhum pedido registrado.</p>";
   }
 
