@@ -758,7 +758,7 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
     <button onclick="openFounders();closeMobileMenu()">👑 Fundadores</button>
     <button onclick="openAdmin();closeMobileMenu()">🔐 Painel Admin</button>
   </div>
-  <div class="sideBox"><b>Entrega rápida</b><br>Após o pagamento, abra suporte para receber seu produto.</div>
+  <div class="sideBox"><b>Entrega rápida</b><br>Após o pagamento, clique em Suporte para entrar no Discord e receber seu produto.</div>
   <div class="sideBox"><b>Supabase</b><br>Pedidos tentam salvar no banco. Se não configurar as keys, salva localmente.</div>
 </aside>
 
@@ -904,7 +904,7 @@ function openGateLogin(){document.getElementById('loginGate').style.display='gri
 function closeGateLogin(){document.getElementById('loginGate').style.display='none';}
 function closeModal(id){document.getElementById(id).style.display="none";}
 function openLogin(){document.getElementById("loginModal").style.display="grid";}
-function openSupport(){window.open("https://discord.gg/WPH5Xc58cm","_blank");}
+function openSupport(){window.open("https://discord.gg/FbKgxZ9Pjm","_blank");}
 async function openFounders(){
   const pass = prompt("Senha fundador:");
   if(pass !== "donotauros"){toast("Senha incorreta.");return;}
