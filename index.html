@@ -710,9 +710,192 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   }
 }
 
+
+/* ===== UPGRADE PREMIUM MOBILE + CARROSSEL + PAINÉIS ===== */
+:root{
+  --neonBlue:#00d9ff;
+  --neonDark:#020612;
+  --premiumLine:rgba(0,217,255,.55);
+}
+body{
+  scroll-behavior:smooth;
+}
+body:before{
+  will-change:transform;
+}
+.premiumParticles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  background:
+    radial-gradient(circle at 15% 25%,rgba(0,217,255,.12) 0 2px,transparent 3px),
+    radial-gradient(circle at 70% 35%,rgba(124,44,255,.14) 0 2px,transparent 3px),
+    radial-gradient(circle at 40% 80%,rgba(255,58,215,.10) 0 2px,transparent 3px);
+  background-size:140px 140px,180px 180px,220px 220px;
+  animation:taurosParticles 18s linear infinite;
+}
+@keyframes taurosParticles{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-80px,-120px,0)}
+}
+.product,.folder,.section,.hero,.feature,.order,.modal{
+  box-shadow:0 0 0 1px rgba(0,217,255,.06),0 0 22px rgba(0,217,255,.08);
+}
+.product,.folder{
+  transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.product:hover,.folder:hover{
+  transform:translateY(-4px);
+  border-color:var(--premiumLine)!important;
+  box-shadow:0 0 18px rgba(0,217,255,.28),0 0 35px rgba(124,44,255,.22);
+}
+.product button,.primary,.topActions button,.floatingLoginBtn,.modal .row button{
+  position:relative;
+  overflow:hidden;
+  transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  box-shadow:0 0 18px rgba(0,217,255,.18);
+}
+.product button:hover,.primary:hover,.topActions button:hover,.floatingLoginBtn:hover,.modal .row button:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.08);
+  box-shadow:0 0 22px rgba(0,217,255,.35),0 0 24px rgba(255,58,215,.22);
+}
+.product button:after,.primary:after,.topActions button:after,.floatingLoginBtn:after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-80%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.26),transparent);
+  transform:skewX(-18deg);
+  animation:buttonShine 4s ease-in-out infinite;
+}
+@keyframes buttonShine{
+  0%,55%{left:-80%}
+  75%,100%{left:130%}
+}
+.badgeRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:8px 0 10px;
+}
+.productBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:900;
+  color:#eaffff;
+  border:1px solid rgba(0,217,255,.45);
+  background:linear-gradient(90deg,rgba(0,217,255,.16),rgba(124,44,255,.18));
+}
+.carouselHint{
+  display:none;
+  color:#cfefff;
+  font-size:13px;
+  margin:-8px 0 12px;
+  opacity:.9;
+}
+.dashboardGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:12px;
+  margin:15px 0;
+}
+.dashCard{
+  padding:16px;
+  border:1px solid rgba(0,217,255,.45);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(0,217,255,.08),rgba(124,44,255,.08));
+}
+.dashCard span{color:#d7efff;font-size:13px;font-weight:800}
+.dashCard b{display:block;margin-top:6px;font-size:24px;color:#72eaff}
+.adminTools{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:10px;
+  margin:12px 0;
+}
+.adminTools input,.adminTools select{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(0,217,255,.45);
+  background:#05010b;
+  color:#fff;
+}
+@media(max-width:900px){
+  html,body{overflow-x:hidden}
+  .premiumParticles{opacity:.7}
+  .carouselHint{display:block}
+  .folderGrid,.productGrid{
+    display:flex!important;
+    grid-template-columns:none!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    gap:12px!important;
+    padding:2px 4px 16px!important;
+    margin-left:-2px;
+    margin-right:-2px;
+  }
+  .folderGrid::-webkit-scrollbar,.productGrid::-webkit-scrollbar{height:7px}
+  .folderGrid::-webkit-scrollbar-thumb,.productGrid::-webkit-scrollbar-thumb{
+    background:linear-gradient(90deg,#00d9ff,#7c2cff);
+    border-radius:999px;
+  }
+  .folder,.product{
+    flex:0 0 78%!important;
+    min-width:78%!important;
+    scroll-snap-align:start;
+  }
+  .folder{min-height:165px!important}
+  .product{
+    display:block!important;
+    background:linear-gradient(180deg,rgba(0,16,35,.96),rgba(16,3,35,.96))!important;
+    border:1px solid rgba(0,217,255,.55)!important;
+  }
+  .product img{
+    height:128px!important;
+    object-fit:cover!important;
+  }
+  .product p{
+    display:block!important;
+    font-size:12px!important;
+    min-height:32px;
+  }
+  .badgeRow{
+    gap:5px;
+    margin:6px 0;
+  }
+  .productBadge{
+    font-size:10px;
+    padding:4px 6px;
+  }
+  .dashboardGrid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media(max-width:420px){
+  .folder,.product{
+    flex-basis:84%!important;
+    min-width:84%!important;
+  }
+  .product img{height:118px!important}
+  .dashboardGrid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
+<div class="premiumParticles"></div>
+<div class="mobileOverlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
 <button class="floatingLoginBtn" onclick="openGateLogin()">👤 Login</button>
 <button class="mobileMenuBtn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
 
@@ -788,12 +971,14 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   <section class="section" id="productsSection">
     <h2>Nossos Produtos</h2>
     <p class="lead">Clique em uma pasta para abrir as opções de compra. Ao comprar, escolha a quantidade e o total será calculado.</p>
+    <p class="carouselHint">↔️ No celular, arraste para o lado para ver mais categorias.</p>
     <div class="folderGrid" id="folderGrid"></div>
   </section>
 
   <section class="section" id="productListSection">
     <h2 id="listTitle">Produtos</h2>
     <p class="lead" id="listDesc">Selecione uma categoria acima.</p>
+    <p class="carouselHint">↔️ Arraste para direita ou esquerda para continuar vendo os produtos.</p>
     <div class="productGrid" id="productGrid"></div>
   </section>
 
@@ -811,7 +996,22 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   </section>
 
   <section class="section adminPanel" id="adminPanel">
-    <h2>Painel Admin</h2><div class="adminMiniInfo">Área admin: visualize apenas pedidos e logins cadastrados.</div>
+    <h2>Painel Admin</h2><div class="adminMiniInfo">Área admin: visualize pedidos, clientes, status e resumo de vendas.</div>
+    <div class="dashboardGrid">
+      <div class="dashCard"><span>Lucro diário</span><b id="adminProfitDay">R$ 0,00</b></div>
+      <div class="dashCard"><span>Lucro semanal</span><b id="adminProfitWeek">R$ 0,00</b></div>
+      <div class="dashCard"><span>Lucro mensal</span><b id="adminProfitMonth">R$ 0,00</b></div>
+      <div class="dashCard"><span>Produto mais vendido</span><b id="adminBestProduct">--</b></div>
+    </div>
+    <div class="adminTools">
+      <input id="clientSearch" placeholder="Pesquisar cliente rápido" oninput="renderAdmin()">
+      <select id="statusFilter" onchange="renderAdmin()">
+        <option value="">Todos os status</option>
+        <option value="Pendente">Pendente</option>
+        <option value="Aprovado">Aprovado</option>
+        <option value="Entregue">Entregue</option>
+      </select>
+    </div>
     <div class="adminActions">
       <button onclick="loadOrdersFromSupabase()">Puxar compras</button>
       <button onclick="renderAdmin()">Atualizar painel</button>
@@ -849,6 +1049,12 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   <div class="founderStat">Pessoas cadastradas<b id="registeredUsers">0</b></div>
   <div class="founderStat">Vendas registradas<b id="weekOrders">0</b></div>
 </div>
+<div class="dashboardGrid">
+  <div class="dashCard"><span>Hoje</span><b id="founderToday">R$ 0,00</b></div>
+  <div class="dashCard"><span>Semana</span><b id="founderWeek">R$ 0,00</b></div>
+  <div class="dashCard"><span>Mês</span><b id="founderMonth">R$ 0,00</b></div>
+  <div class="dashCard"><span>Mais vendido</span><b id="founderBestProduct">--</b></div>
+</div>
 <h3 style="margin-top:18px">Tabela de pedidos</h3>
 <div class="orders" id="founderOrders"></div>
 <h3 style="margin-top:18px">Tabela de logins</h3>
@@ -878,10 +1084,10 @@ const categories = [
 ];
 
 const products = [
-  {cat:"membros", name:"Membros Online", desc:"100 membros online para servidor Discord", price:8.00, img:"assets/membros-discord.png", qr:"assets/membros-online-10.png"},
+  {cat:"membros", name:"Membros Online", desc:"100 membros online para servidor Discord", price:7.99, img:"assets/membros-discord.png", qr:"assets/membros-online-10.png"},
   {cat:"membros", name:"Membros Reais", desc:"100 membros reais para servidor Discord", price:3.00, img:"assets/membros-discord.png", qr:"assets/membros-reais-3.80.png"},
   {cat:"membros", name:"Membros Premium", desc:"100 membros premium para servidor Discord", price:6.00, img:"assets/membros-discord.png", qr:"assets/membros-premium-6.50.png"},
-  {cat:"membros", name:"Membros Mistos", desc:"100 membros mistos para servidor Discord", price:3.49, img:"assets/membros-discord.png", qr:"assets/membros-mistos-4.png"},
+  {cat:"membros", name:"Membros Mistos", desc:"100 membros mistos para servidor Discord", price:3.50, img:"assets/membros-discord.png", qr:"assets/membros-mistos-4.png"},
   {cat:"contas", name:"Conta Nitrada 1 Mês", desc:"Conta Discord com Nitro ativo", price:6.00, img:"assets/conta-nitrada.png", qr:"assets/conta-nitrada-1mes-6.png"},
   {cat:"contas", name:"Conta Nitrada 3 Meses", desc:"Conta Discord nitrada trimestral", price:16.99, img:"assets/conta-nitrada.png", qr:"assets/conta-nitrada-3meses-16.99.png"},
   {cat:"nitro", name:"Nitro Link 1 Mês", desc:"Link Nitro para ativação", price:3.99, img:"assets/nitro-link-produto.png", qr:"assets/nitro-link-1mes-1.99.png"},
@@ -933,6 +1139,7 @@ function openCategory(cat){
       <img src="${p.img}" alt="${p.name}">
       <div>
         <h3>${p.name}</h3>
+        ${productBadges(p.name)}
         <p>${p.desc}</p>
         <span class="price">${money(p.price)}</span>
         <button onclick='buy(${JSON.stringify(p)})'>Comprar agora</button>
@@ -1044,8 +1251,70 @@ async function openAdmin(){
   document.getElementById("adminPanel").scrollIntoView({behavior:"smooth"});
 }
 
+
+function parseBRDate(dateText){
+  if(!dateText) return null;
+  const parts = String(dateText).match(/(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{2})?:?(\d{2})?/);
+  if(!parts) return null;
+  return new Date(Number(parts[3]), Number(parts[2])-1, Number(parts[1]), Number(parts[4]||0), Number(parts[5]||0));
+}
+function isSamePeriod(dateText,period){
+  const d=parseBRDate(dateText);
+  if(!d) return false;
+  const now=new Date();
+  if(period==="day") return d.toDateString()===now.toDateString();
+  if(period==="week"){
+    const start=new Date(now); start.setDate(now.getDate()-6); start.setHours(0,0,0,0);
+    return d>=start && d<=now;
+  }
+  if(period==="month") return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  return true;
+}
+function sumOrders(period){
+  return localOrders().filter(o=>isSamePeriod(o.date,period)).reduce((s,o)=>s+(Number(o.total)||0),0);
+}
+function bestProductName(){
+  const count={};
+  localOrders().forEach(o=>{
+    count[o.product]=(count[o.product]||0)+Number(o.quantity||1);
+  });
+  const best=Object.entries(count).sort((a,b)=>b[1]-a[1])[0];
+  return best ? best[0] : "--";
+}
+function profit(v){return v*0.35;}
+function updateDashboards(){
+  const day=sumOrders("day"), week=sumOrders("week"), month=sumOrders("month");
+  const best=bestProductName();
+  const ids = {
+    adminProfitDay:money(profit(day)),
+    adminProfitWeek:money(profit(week)),
+    adminProfitMonth:money(profit(month)),
+    adminBestProduct:best,
+    founderToday:money(day),
+    founderWeek:money(week),
+    founderMonth:money(month),
+    founderBestProduct:best
+  };
+  Object.entries(ids).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=val;
+  });
+}
+function productBadges(name){
+  const hot = ["Membros Online","Membros Reais","Nitro Link 1 Mês","Conta Nitrada 1 Mês"].includes(name);
+  return `
+    <div class="badgeRow">
+      ${hot ? '<span class="productBadge">🔥 Mais vendido</span>' : ''}
+      <span class="productBadge">⚡ Entrega rápida</span>
+      <span class="productBadge">🟢 Online agora</span>
+    </div>
+  `;
+}
+
 function renderAdmin(){
-  const q = (document.getElementById("search")?.value || "").toLowerCase();
+  const q = ((document.getElementById("search")?.value || "") + " " + (document.getElementById("clientSearch")?.value || "")).toLowerCase();
+  const statusFilter = document.getElementById("statusFilter")?.value || "";
+  updateDashboards();
   const orders = localOrders();
   const users = getUsers();
   const total = orders.reduce((s,o)=>s+(Number(o.total)||0),0);
@@ -1054,7 +1323,7 @@ function renderAdmin(){
   if(document.getElementById("adminTotalUsers")) document.getElementById("adminTotalUsers").textContent = users.length;
   if(document.getElementById("adminTotalMoney")) document.getElementById("adminTotalMoney").textContent = money(total);
 
-  const list = orders.filter(o=>(o.product+o.client+o.contact+o.status).toLowerCase().includes(q));
+  const list = orders.filter(o=>(o.product+o.client+o.contact+o.status).toLowerCase().includes(q)).filter(o=>!statusFilter || (o.status||"Pendente")===statusFilter);
   if(document.getElementById("adminOrders")){
     document.getElementById("adminOrders").innerHTML = list.length ? list.map(o=>`
       <div class="order">
@@ -1130,7 +1399,9 @@ async function login(){
   const users=await loadUsersFromSupabase();
   const user=users.find(u=>u.email===email && u.password===password);
   if(!user){toast("Conta não encontrada ou senha incorreta.");return;}
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
   closeModal("loginModal");
+  renderOrders();
   toast("Login realizado.");
 }
 
@@ -1144,7 +1415,9 @@ async function createAccount(){
   users=[user,...users];
   setUsers(users);
   await saveClientToSupabase(user);
+  localStorage.setItem("tauros_logged_user",JSON.stringify({username:user.username,email:user.email}));
   closeModal("loginModal");
+  renderOrders();
   toast("Conta criada e salva.");
   updateFounderStats();
   renderAdmin();
@@ -1152,6 +1425,7 @@ async function createAccount(){
 
 async function updateFounderStats(){
   await loadUsersFromSupabase();
+  updateDashboards();
   const orders=localOrders();
   const users=getUsers();
   const total=orders.reduce((sum,o)=>sum+(Number(o.total)||0),0);
@@ -1301,6 +1575,7 @@ async function loginGateUser(){
 renderFolders();
 openCategory("membros");
 renderOrders();
+updateDashboards();
 </script>
 
 <script>
