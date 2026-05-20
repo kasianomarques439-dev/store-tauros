@@ -1,1 +1,0 @@
-CSS e JS responsivo aplicado para mobile e computador.

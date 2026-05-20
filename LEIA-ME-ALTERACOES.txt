@@ -1,4 +1,0 @@
-Pasta atualizada sem remover configurações antigas do index.
-Adicionado: selos, animações, partículas, glow, cards premium, ID do pedido, comprovante, status, editar/excluir pedido, banir login, dashboard fundador, gráfico simples, menu inferior mobile e suporte interno.
-Pix automático removido: ficou Pix manual Nubank usando o QR antigo do site.
-IMPORTANTE: mantenha/copiem a pasta assets antiga junto com este index.html. As imagens precisam estar dentro de assets/ com os nomes listados em LISTA_ASSETS_NECESSARIOS.txt.

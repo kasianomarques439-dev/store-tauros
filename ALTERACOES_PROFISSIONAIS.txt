@@ -1,8 +1,0 @@
-Adicionado:
-- Ativação Link R$5,00
-- Mobile com cards menores
-- Botão fixo no celular para Produtos/Pedidos
-- Histórico de pedidos do usuário logado
-- Status dos pedidos: Pendente, Aprovado, Entregue
-- Admin pode alterar status
-- QR popup com blur e animação

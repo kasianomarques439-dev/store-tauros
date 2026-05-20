@@ -1,1 +1,0 @@
-Arquivo editado conforme pedido: senhas, suporte e salvamento de contas no SQL/Supabase.

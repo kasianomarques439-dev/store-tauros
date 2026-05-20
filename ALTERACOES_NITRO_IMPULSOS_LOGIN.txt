@@ -1,6 +1,0 @@
-Alterações:
-- Nitro Link 1 mês: R$ 3,99.
-- Imagem de Impulsos trocada para assets/impulsos-novo.png.
-- Login não é mais obrigatório ao abrir site.
-- Botão Login fica no canto.
-- Login/criar conta obrigatório apenas ao confirmar pedido.

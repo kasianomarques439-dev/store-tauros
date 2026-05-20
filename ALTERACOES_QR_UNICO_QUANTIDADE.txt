@@ -1,7 +1,0 @@
-Alterações feitas:
-- QR individual removido na hora da compra: todos usam assets/qr-pix-unico.jpeg.
-- Chave Pix: 7357abb4-6aa0-4823-a605-486952861494.
-- Campo de quantidade no modal de compra.
-- Total multiplica valor do produto pela quantidade.
-- Mobile melhorado com categorias e produtos em 2 colunas quando couber.
-- Supabase mantido configurado.
