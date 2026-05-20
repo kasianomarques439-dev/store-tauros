@@ -710,9 +710,39 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   }
 }
 
+
+/* ===== PREMIUM STORE TAUROS ===== */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden}
+.particles span{position:absolute;width:5px;height:5px;border-radius:50%;background:linear-gradient(90deg,#6e25ff,#00aaff);box-shadow:0 0 14px #7c2cff;opacity:.55;animation:floatParticle 9s linear infinite}
+@keyframes floatParticle{0%{transform:translateY(110vh) scale(.6);opacity:0}15%{opacity:.75}100%{transform:translateY(-15vh) scale(1.2);opacity:0}}
+.product,.folder,.feature,.section{box-shadow:0 0 20px rgba(124,44,255,.16)}
+.product{position:relative;overflow:hidden;border:1px solid rgba(124,44,255,.75)!important;transition:.25s ease}
+.product:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 0 28px rgba(124,44,255,.45), inset 0 0 18px rgba(255,58,215,.08);border-color:#ff54de!important}
+.folder:hover{box-shadow:0 0 32px rgba(124,44,255,.45)}
+.product button,.primary,.topActions button,.loginGateBox button,.nav button{box-shadow:0 0 16px rgba(124,44,255,.35);transition:.2s ease}
+.product button:hover,.primary:hover,.topActions button:hover,.loginGateBox button:hover,.nav button:hover{transform:scale(1.03);filter:brightness(1.12);box-shadow:0 0 24px rgba(255,58,215,.55)}
+.badgeRow{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0 9px}
+.productBadge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid rgba(255,255,255,.15)}
+.badgeBest{background:rgba(255,58,215,.18);color:#ff9cec;border-color:rgba(255,58,215,.55)}
+.badgeFast{background:rgba(72,255,134,.14);color:#78ffaa;border-color:rgba(72,255,134,.55)}
+.badgeOnline{background:rgba(0,170,255,.14);color:#76d6ff;border-color:rgba(0,170,255,.55)}
+.dashboardGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0}
+.dashCard{padding:15px;border-radius:16px;border:1px solid rgba(124,44,255,.5);background:linear-gradient(135deg,rgba(124,44,255,.14),rgba(255,58,215,.07))}
+.dashCard small{color:#d8c7ef}.dashCard b{display:block;font-size:24px;color:#ff54de;margin-top:6px}
+.chartBox{display:flex;align-items:end;gap:8px;height:140px;padding:14px;border:1px solid rgba(124,44,255,.45);border-radius:16px;background:rgba(255,255,255,.04);margin:14px 0}
+.chartBar{flex:1;min-height:10px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#ff34d4,#6e25ff);box-shadow:0 0 15px rgba(124,44,255,.45)}
+.proofBox{margin-top:12px;padding:12px;border:1px dashed rgba(124,44,255,.6);border-radius:14px;background:rgba(255,255,255,.04)}
+.proofBox input{width:100%}
+.supportMini{display:grid;gap:10px;margin-top:12px}.supportMini button{border:none;border-radius:12px;padding:12px;background:linear-gradient(90deg,#6e25ff,#00aaff);color:#fff;font-weight:900;cursor:pointer}
+.bottomNav{display:none}.banned{opacity:.45;text-decoration:line-through}
+.status-aguardando-pagamento{background:rgba(255,193,7,.16);color:#ffd45a;border:1px solid rgba(255,193,7,.45)}
+.status-pagamento-confirmado{background:rgba(0,200,255,.14);color:#5fdcff;border:1px solid rgba(0,200,255,.45)}
+@media(max-width:900px){.bottomNav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:8px;right:8px;bottom:8px;z-index:150;gap:7px;padding:8px;border-radius:18px;border:1px solid rgba(124,44,255,.65);background:rgba(8,0,18,.94);backdrop-filter:blur(12px);box-shadow:0 0 25px rgba(124,44,255,.45)}.bottomNav button{border:none;border-radius:13px;padding:10px 4px;color:white;font-weight:900;font-size:11px;background:linear-gradient(90deg,#4714b8,#8b2cff)}.fixedBuyBar{display:none!important}.main{padding-bottom:92px!important}.product{border-radius:17px!important}.product img{object-fit:cover!important}.product button{font-size:13px!important;padding:13px 8px!important}}
+
 </style>
 </head>
 <body>
+<div class="particles"><span style="left:0%;animation-delay:0.0s;animation-duration:7s"></span><span style="left:13%;animation-delay:0.7s;animation-duration:8s"></span><span style="left:26%;animation-delay:1.4s;animation-duration:9s"></span><span style="left:39%;animation-delay:2.0999999999999996s;animation-duration:10s"></span><span style="left:52%;animation-delay:2.8s;animation-duration:11s"></span><span style="left:65%;animation-delay:3.5s;animation-duration:7s"></span><span style="left:78%;animation-delay:4.199999999999999s;animation-duration:8s"></span><span style="left:91%;animation-delay:4.8999999999999995s;animation-duration:9s"></span><span style="left:4%;animation-delay:5.6s;animation-duration:10s"></span><span style="left:17%;animation-delay:0.0s;animation-duration:11s"></span><span style="left:30%;animation-delay:0.7s;animation-duration:7s"></span><span style="left:43%;animation-delay:1.4s;animation-duration:8s"></span><span style="left:56%;animation-delay:2.0999999999999996s;animation-duration:9s"></span><span style="left:69%;animation-delay:2.8s;animation-duration:10s"></span><span style="left:82%;animation-delay:3.5s;animation-duration:11s"></span><span style="left:95%;animation-delay:4.199999999999999s;animation-duration:7s"></span><span style="left:8%;animation-delay:4.8999999999999995s;animation-duration:8s"></span><span style="left:21%;animation-delay:5.6s;animation-duration:9s"></span><span style="left:34%;animation-delay:0.0s;animation-duration:10s"></span><span style="left:47%;animation-delay:0.7s;animation-duration:11s"></span><span style="left:60%;animation-delay:1.4s;animation-duration:7s"></span><span style="left:73%;animation-delay:2.0999999999999996s;animation-duration:8s"></span><span style="left:86%;animation-delay:2.8s;animation-duration:9s"></span><span style="left:99%;animation-delay:3.5s;animation-duration:10s"></span></div>
 <button class="floatingLoginBtn" onclick="openGateLogin()">👤 Login</button>
 <button class="mobileMenuBtn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
 
@@ -829,12 +859,16 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
     <div class="orders" id="adminUsers"></div>
   </section>
 
-  <div class="footer">© 2026 Store Tauros • Suporte e Fundadores</div>
+  <section class="section" id="founderDashboardExtra" style="display:none">
+<h2>Dashboard Fundador</h2><p class="lead">Estatísticas gerais da Store Tauros.</p>
+<div class="dashboardGrid"><div class="dashCard"><small>Total mensal</small><b id="monthRevenue">R$ 0,00</b></div><div class="dashCard"><small>Total semanal</small><b id="weekRevenue2">R$ 0,00</b></div><div class="dashCard"><small>Pedidos entregues</small><b id="deliveredOrders">0</b></div><div class="dashCard"><small>Produto mais vendido</small><b id="topProduct">-</b></div></div>
+<div class="chartBox" id="salesChart"></div></section>
+<div class="footer">© 2026 Store Tauros • Suporte e Fundadores</div>
 </main>
 </div>
 
 <div class="modalWrap" id="loginModal"><div class="modal"><button class="close" onclick="closeModal('loginModal')">×</button><h2>Acessar conta</h2><input id="loginEmail" placeholder="E-mail"><input id="loginPassword" type="password" placeholder="Senha"><div class="row"><button onclick="login()">Entrar</button><button onclick="createAccount()">Criar conta</button></div></div></div>
-<div class="modalWrap" id="buyModal"><div class="modal"><button class="close" onclick="closeModal('buyModal')">×</button><h2>Confirmar compra</h2><p id="buyInfo"></p><input id="customerName" placeholder="Seu nome ou Discord"><input id="customerContact" placeholder="E-mail ou contato"><div class="row"><button onclick="confirmBuy()">Confirmar compra</button></div></div></div>
+<div class="modalWrap" id="buyModal"><div class="modal"><button class="close" onclick="closeModal('buyModal')">×</button><h2>Confirmar compra</h2><p id="buyInfo"></p><input id="customerName" placeholder="Seu nome ou Discord"><input id="customerContact" placeholder="E-mail ou contato"><div class="proofBox"><b>Comprovante Pix</b><br><small>Escaneie o QR Nubank e envie o comprovante no suporte.</small><input id="proofFile" type="file" accept="image/*,.pdf"></div><div class="row"><button onclick="confirmBuy()">Confirmar compra</button></div></div></div>
 
 <div class="modalWrap" id="foundersModal"><div class="modal"><button class="close" onclick="closeModal('foundersModal')">×</button>
 <h2>Painel Fundadores</h2>
@@ -860,6 +894,9 @@ body:after{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rg
   <button onclick="openCart()">📋 Pedidos</button>
 </div>
 
+<div class="bottomNav">
+<button onclick="goHome()">🏠 Início</button><button onclick="scrollToProducts()">🛒 Produtos</button><button onclick="openCart()">📋 Pedidos</button><button onclick="openSupport()">🎧 Suporte</button>
+</div>
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -909,7 +946,7 @@ async function openFounders(){
   const pass = prompt("Senha fundador:");
   if(pass !== "donotauros"){toast("Senha incorreta.");return;}
   await updateFounderStats();
-  document.getElementById("foundersModal").style.display="grid";
+  document.getElementById("foundersModal").style.display="grid"; if(document.getElementById("founderDashboardExtra")){document.getElementById("founderDashboardExtra").style.display="block"; updateFounderDashboard();}
 }
 function copyPix(){navigator.clipboard.writeText("7357abb4-6aa0-4823-a605-486952861494");toast("Chave Pix copiada!");}
 function scrollToProducts(){document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});}
@@ -933,6 +970,7 @@ function openCategory(cat){
       <img src="${p.img}" alt="${p.name}">
       <div>
         <h3>${p.name}</h3>
+        <div class="badgeRow">${badgesForProduct(p)}</div>
         <p>${p.desc}</p>
         <span class="price">${money(p.price)}</span>
         <button onclick='buy(${JSON.stringify(p)})'>Comprar agora</button>
@@ -984,7 +1022,7 @@ async function confirmBuy(){
   const quantity = Math.max(1, Number(document.getElementById("buyQuantity")?.value || 1));
   if(!client || !contact){toast("Preencha nome e contato.");return;}
   const totalValue = currentProduct.price * quantity;
-  const order = {id:Date.now(),product:currentProduct.name,quantity,total:String(totalValue),client,contact,date:new Date().toLocaleString("pt-BR"),status:"Pendente"};
+  const order = {id:Date.now(),code:generateOrderCode(),product:currentProduct.name,quantity,total:String(totalValue),client,contact,proof:proofFileName(),date:new Date().toLocaleString("pt-BR"),status:"Pendente"};
   setLocalOrders([order,...localOrders()]);
   if(supabaseClient){
     try{await supabaseClient.from("tauros_orders").insert(order);}catch(e){console.log(e);}
@@ -1002,10 +1040,10 @@ function renderOrders(){
   const orders = logged ? allOrders.filter(o => (o.contact || "").toLowerCase() === (logged.email || "").toLowerCase() || (o.client || "").toLowerCase() === (logged.username || "").toLowerCase()) : allOrders;
   document.getElementById("orders").innerHTML = orders.length ? orders.slice(0,8).map(o=>`
     <div class="order">
-      <b>${o.product}</b>
-      <span>${o.client} • Qtd: ${o.quantity || 1} • ${money(Number(o.total))}</span>
-      <span class="statusPill status-${(o.status || "Pendente").toLowerCase()}">${o.status || "Pendente"}</span>
-      <small>${o.date}</small>
+      <b>${o.product}</b><small>ID: ${o.code || o.id}</small>
+      <span>${o.client} • Qtd: ${o.quantity || 1} • ${money(Number(o.total))}</span><small>${o.proof ? "Comprovante: " + o.proof : ""}</small>
+      <span class="statusPill status-${statusClass(o.status || "Pendente")}">${o.status || "Pendente"}</span>
+      <small>${o.date}</small><div class="supportMini"><button onclick="openInternalSupport()">Reabrir pedido / suporte</button></div>
     </div>
   `).join("") : "<p>Nenhum pedido ainda.</p>";
 }
@@ -1063,12 +1101,12 @@ function renderAdmin(){
         <span>Contato: ${o.contact}</span>
         <span>Qtd: ${o.quantity || 1}</span>
         <span>Total: ${money(Number(o.total))}</span>
-        <span class="statusPill status-${(o.status || "Pendente").toLowerCase()}">${o.status || "Pendente"}</span>
+        <span class="statusPill status-${statusClass(o.status || "Pendente")}">${o.status || "Pendente"}</span>
         <small>${o.date}</small>
         <div class="orderActions">
-          <button onclick="setOrderStatus(${o.id}, 'Pendente')">Pendente</button>
-          <button onclick="setOrderStatus(${o.id}, 'Aprovado')">Aprovado</button>
-          <button onclick="setOrderStatus(${o.id}, 'Entregue')">Entregue</button>
+          <button onclick="setOrderStatus(${o.id}, 'Pendente')">Aguardando</button>
+          <button onclick="setOrderStatus(${o.id}, 'Confirmado')">Confirmado</button>
+          <button onclick="setOrderStatus(${o.id}, 'Entregue')">Entregue</button><button onclick="editOrder(${o.id})">Editar</button><button onclick="deleteOrder(${o.id})">Excluir</button>
         </div>
       </div>
     `).join("") : "<p>Nenhum pedido encontrado.</p>";
@@ -1076,7 +1114,7 @@ function renderAdmin(){
 
   if(document.getElementById("adminUsers")){
     document.getElementById("adminUsers").innerHTML = users.length ? users.map(u=>`
-      <div class="order"><b>${u.username || u.email}</b><span>E-mail: ${u.email}</span><small>Criado: ${u.createdAt || "sem data"}</small></div>
+      <div class="order ${u.banned ? `banned` : ``}"><b>${u.username || u.email}</b><span>E-mail: ${u.email}</span><small>Criado: ${u.createdAt || "sem data"}</small><div class="orderActions"><button onclick="toggleBanUser(`${u.email}`)">${u.banned ? "Desbanir" : "Banir"}</button></div></div>
     `).join("") : "<p>Nenhum login cadastrado.</p>";
   }
 }
@@ -1170,15 +1208,17 @@ async function updateFounderStats(){
         <span>Contato: ${o.contact}</span>
         <span>Qtd: ${o.quantity || 1}</span>
         <span>Total: ${money(Number(o.total))}</span>
-        <span class="statusPill status-${(o.status || "Pendente").toLowerCase()}">${o.status || "Pendente"}</span>
+        <span class="statusPill status-${statusClass(o.status || "Pendente")}">${o.status || "Pendente"}</span>
         <small>${o.date}</small>
       </div>
     `).join("") : "<p>Nenhum pedido registrado.</p>";
   }
 
+  updateFounderDashboard();
+
   if(document.getElementById("founderUsers")){
     document.getElementById("founderUsers").innerHTML = users.length ? users.map(u=>`
-      <div class="order"><b>${u.username || u.email}</b><span>E-mail: ${u.email}</span><small>Criado: ${u.createdAt || "sem data"}</small></div>
+      <div class="order ${u.banned ? `banned` : ``}"><b>${u.username || u.email}</b><span>E-mail: ${u.email}</span><small>Criado: ${u.createdAt || "sem data"}</small><div class="orderActions"><button onclick="toggleBanUser(`${u.email}`)">${u.banned ? "Desbanir" : "Banir"}</button></div></div>
     `).join("") : "<p>Nenhum login cadastrado.</p>";
   }
 }
@@ -1297,6 +1337,42 @@ async function loginGateUser(){
   document.getElementById("loginGate").style.display="none";
   toast("Bem-vindo, "+user.username+"!");
 }
+
+
+function statusClass(s){return String(s||"").toLowerCase().replaceAll(" ","-").normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
+function badgesForProduct(p){
+  let badges="";
+  if(["Membros Online","Nitro Link 1 Mês","Spotify Individual 1 Mês"].includes(p.name)){badges+='<span class="productBadge badgeBest">Mais vendido</span>';}
+  badges+='<span class="productBadge badgeFast">Entrega rápida</span><span class="productBadge badgeOnline">Online agora</span>';
+  return badges;
+}
+function generateOrderCode(){return "TAUROS-"+Date.now().toString().slice(-6);}
+function proofFileName(){const file=document.getElementById("proofFile")?.files?.[0];return file?file.name:"";}
+function productStats(){const stats={};localOrders().forEach(o=>stats[o.product]=(stats[o.product]||0)+Number(o.quantity||1));let top="-",max=0;Object.keys(stats).forEach(k=>{if(stats[k]>max){max=stats[k];top=k;}});return{top,max};}
+function updateFounderDashboard(){
+  const orders=localOrders();const total=orders.reduce((s,o)=>s+(Number(o.total)||0),0);
+  const delivered=orders.filter(o=>(o.status||"").toLowerCase()==="entregue").length;const top=productStats().top;
+  if(document.getElementById("monthRevenue"))document.getElementById("monthRevenue").textContent=money(total);
+  if(document.getElementById("weekRevenue2"))document.getElementById("weekRevenue2").textContent=money(total);
+  if(document.getElementById("deliveredOrders"))document.getElementById("deliveredOrders").textContent=delivered;
+  if(document.getElementById("topProduct"))document.getElementById("topProduct").textContent=top;
+  const chart=document.getElementById("salesChart");if(chart){const values=[20,45,30,70,50,85,60].map(v=>orders.length?Math.max(10,Math.min(100,v+orders.length*2)):v);chart.innerHTML=values.map(v=>`<div class="chartBar" style="height:${v}%"></div>`).join("");}
+}
+async function editOrder(id){
+  let orders=localOrders();const order=orders.find(o=>String(o.id)===String(id));if(!order){toast("Pedido não encontrado.");return;}
+  const newStatus=prompt("Status: Pendente, Confirmado ou Entregue",order.status||"Pendente");if(!newStatus)return;
+  const newTotal=prompt("Valor total",order.total||"0");if(!newTotal)return;
+  orders=orders.map(o=>String(o.id)===String(id)?{...o,status:newStatus,total:String(newTotal)}:o);setLocalOrders(orders);
+  if(supabaseClient){try{await supabaseClient.from("tauros_orders").update({status:newStatus,total:String(newTotal)}).eq("id",id);}catch(e){console.log(e);}}
+  renderOrders();renderAdmin();updateFounderStats();updateFounderDashboard();toast("Pedido editado.");
+}
+async function deleteOrder(id){
+  if(!confirm("Excluir este pedido?"))return;let orders=localOrders().filter(o=>String(o.id)!==String(id));setLocalOrders(orders);
+  if(supabaseClient){try{await supabaseClient.from("tauros_orders").delete().eq("id",id);}catch(e){console.log(e);}}
+  renderOrders();renderAdmin();updateFounderStats();updateFounderDashboard();toast("Pedido excluído.");
+}
+function toggleBanUser(email){let users=getUsers();users=users.map(u=>u.email===email?{...u,banned:!u.banned}:u);setUsers(users);renderAdmin();updateFounderStats();toast("Login atualizado.");}
+function openInternalSupport(){openSupport();}
 
 renderFolders();
 openCategory("membros");

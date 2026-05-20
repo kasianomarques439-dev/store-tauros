@@ -1,0 +1,3 @@
+Pix automático removido.
+Sistema mantido apenas com QR manual Nubank.
+Cliente escaneia o QR e envia comprovante no suporte.
